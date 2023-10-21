@@ -75,9 +75,7 @@ class SpacesMapperTest {
 	@Test
 	void updateTally(){
 		SpaceVO spaceVO = new SpaceVO();
-		spaceVO.setSpaceUserTally(spacesMapper.getTally(4L) + 1);
-		spaceVO.setSpaceId(4L);
-		spacesMapper.updateTally(spaceVO);
+		spacesMapper.updateTally(4L, spacesMapper.getTally(4L) + 1);
 
 	}
 }

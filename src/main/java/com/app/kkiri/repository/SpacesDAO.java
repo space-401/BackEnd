@@ -37,7 +37,7 @@ public class SpacesDAO {
 	public int getTally(Long spaceId){ return spacesMapper.getTally(spaceId); };
 
 	// 스페이스 인원 업데이트
-	public void setTally(SpaceVO spaceVO){ spacesMapper.updateTally(spaceVO); };
+	public void setTally(Long spaceId, int spaceUserTally){ spacesMapper.updateTally(spaceId, spaceUserTally); };
 
 	// Post
 	// 게시글 필터 조회

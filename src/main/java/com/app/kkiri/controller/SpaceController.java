@@ -60,9 +60,11 @@ public class SpaceController {
 
 	// 스페이스 생성
 	@PostMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public void register(@RequestPart SpaceVO spaceVO, @RequestPart MultipartFile imgUrl, @RequestPart Long defaultImg) throws IOException {
+	public ResponseEntity<?> register(@RequestPart SpaceVO spaceVO, @RequestPart MultipartFile imgUrl, @RequestPart(required = false) Long defaultImg) throws IOException {
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		Long userId = 1L;
+
+		log.info("------------------ 여기 ------------------");
 
 		if(imgUrl != null){
 			// 이미지를 업로드했을 경우
@@ -102,7 +104,8 @@ public class SpaceController {
 			}
 		}
 		spaceUserVO.setUserId(userId);
-		spaceService.register(spaceVO, spaceUserVO);
+		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
+		return ResponseEntity.ok().body(spaceId);
 	};
 
 	// 스페이스 삭제
@@ -128,7 +131,7 @@ public class SpaceController {
 
 	// 스페이스 태그 조회
 	@GetMapping("/tag")
-	public ResponseEntity<?> tagList(@RequestBody Long spaceId){
+	public ResponseEntity<?> tagList(@RequestParam Long spaceId){
 		List<TagVO> tags = spaceService.tagList(spaceId);
 		return ResponseEntity.ok().body(tags);
 	};

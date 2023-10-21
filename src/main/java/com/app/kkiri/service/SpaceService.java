@@ -136,6 +136,7 @@ public class SpaceService {
 				spaceUserVO.createNormal(userId);
 				spaceUserVO.setSpaceId(spaceId);
 				spaceUsersDAO.save(spaceUserVO);
+				spacesDAO.setTally(spaceId,spacesDAO.getTally(spaceId) + 1);
 			}
 		} else {
 			log.info("비밀번호가 틀린 경우");
