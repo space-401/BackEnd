@@ -30,5 +30,5 @@ public interface SpacesMapper {
 	 public int getTally(Long spaceId);
 
 	// 스페이스 인원 업데이트
-	public void updateTally(SpaceVO spaceVO);
+	public void updateTally(Long spaceId, int spaceUserTally);
 }
