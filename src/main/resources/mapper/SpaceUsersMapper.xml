@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.SpaceUsersMapper">
+    <select id="selectAll" resultType="spaceUserVO">
+        SELECT user_id, user_nickname, profile_img_path
+        FROM SPACE_USERS
+        WHERE SPACE_ID=#{spaceId}
+        ORDER BY (CASE WHEN USER_ID = #{userId} THEN 1
+                        WHEN USER_ADMIN_YN='1' THEN 2 ELSE 3 END)
+    </select>
+
+    <select id="selectById" resultType="spaceUserVO">
+        SELECT user_admin_yn, user_nickname, profile_img_name, profile_img_path, profile_img_uuid, profile_img_size, space_signup_date, space_id, user_id
+        FROM SPACE_USERS
+        WHERE SPACE_ID=#{spaceId} AND USER_ID=#{userId}
+    </select>
+
+<!-- int 로 가져와지는지 체크 -->
+    <select id="selectByUserAdminYn" resultType="int">
+        SELECT USER_ADMIN_YN FROM SPACE_USERS
+        WHERE SPACE_ID=#{spaceId} AND USER_ID=#{userId}
+    </select>
+
+    <select id="selectByFirst" resultType="int">
+        SELECT COUNT(USER_ID) FROM SPACE_USERS
+        WHERE SPACE_ID=#{spaceId} AND USER_ID=#{userId} AND USER_NICKNAME= 'default'
+    </select>
+
+<!--    <select id="getTotal" resultType="int">-->
+<!--        SELECT COUNT(USER_ID) FROM SPACE_USERS-->
+<!--        WHERE SPACE_ID=#{spaceId}-->
+<!--    </select>-->
+
+    <insert id="insert">
+        INSERT INTO SPACE_USERS(SPACE_ID, USER_ID, USER_NICKNAME, USER_ADMIN_YN, PROFILE_IMG_NAME, PROFILE_IMG_PATH, PROFILE_IMG_SIZE, PROFILE_IMG_UUID)
+        VALUES(#{spaceId}, #{userId}, #{userNickname}, #{userAdminYn}, #{profileImgName}, #{profileImgPath}, #{profileImgSize}, #{profileImgUuid})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM SPACE_USERS
+        WHERE USER_ID=#{userId} AND SPACE_ID=#{spaceId}
+    </delete>
+
+    <update id="update">
+        UPDATE SPACE_USERS
+        SET USER_NICKNAME=#{userNickname}, PROFILE_IMG_NAME=#{profileImgName},
+            PROFILE_IMG_PATH=#{profileImgPath}, PROFILE_IMG_UUID=#{profileImgUuid},
+            PROFILE_IMG_SIZE=#{profileImgSize}
+        WHERE USER_ID=#{userId} AND SPACE_ID=#{spaceId}
+    </update>
+
+    <update id="updateByAdminYn">
+        UPDATE SPACE_USERS
+        SET USER_ADMIN_YN = '0'
+        WHERE USER_ADMIN_YN = '1' AND SPACE_ID=#{spaceId}
+    </update>
+
+    <update id="updateByUserId">
+        UPDATE SPACE_USERS
+        SET USER_ADMIN_YN = '1'
+        WHERE USER_ID=#{userId} AND SPACE_ID=#{spaceId}
+    </update>
+
+    <select id="selectByNickname" resultType="int">
+        SELECT COUNT(USER_ID) FROM SPACE_USERS
+        WHERE SPACE_ID=#{spaceId} AND USER_NICKNAME=#{userNickname}
+    </select>
+
+</mapper>

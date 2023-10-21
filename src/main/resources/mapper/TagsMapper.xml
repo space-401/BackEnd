@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.TagsMapper">
+    <select id="selectAll" resultType="TagVO">
+        SELECT TAG_ID, TAG_NAME FROM TAGS
+        WHERE SPACE_ID=#{spaceId}
+    </select>
+
+    <insert id="insert">
+        <selectKey keyProperty="tagId" order="BEFORE" resultType="long">
+            SELECT SEQ_TAGS.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TAGS(TAG_ID, TAG_NAME, SPACE_ID)
+        VALUES (#{tagId}, #{tagName}, #{spaceId})
+    </insert>
+
+    <select id="getTagCnt" resultType="int">
+        SELECT COUNT(TAG_ID) FROM TAGS
+        WHERE SPACE_ID=#{spaceId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM TAGS
+        WHERE TAG_ID=#{tagId}
+    </delete>
+
+</mapper>
