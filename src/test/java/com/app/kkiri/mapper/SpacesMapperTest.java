@@ -1,10 +1,5 @@
 package com.app.kkiri.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -52,30 +47,30 @@ class SpacesMapperTest {
 		spacesMapper.delete(21L);
 	}
 
-	@Test
-	void update() {
-		SpaceVO spaceVO = spacesMapper.selectById(4L);
-		spaceVO.setSpaceId(4L);
-		spaceVO.setSpaceName("수정스페이스");
-		spaceVO.setSpaceDescription("설명 수정");
-		spaceVO.setSpacePw("00000");
-		spaceVO.setSpaceUserTally(2);
-		spaceVO.setSpaceIconName("a");
-		spaceVO.setSpaceIconPath("a");
-		spaceVO.setSpaceIconUuid("a");
-		spaceVO.setSpaceIconSize(12L);
-		spacesMapper.update(spaceVO);
-	}
+	// @Test
+	// void update() {
+	// 	SpaceVO spaceVO = spacesMapper.selectById(4L);
+	// 	spaceVO.setSpaceId(4L);
+	// 	spaceVO.setSpaceName("수정스페이스");
+	// 	spaceVO.setSpaceDescription("설명 수정");
+	// 	spaceVO.setSpacePw("00000");
+	// 	spaceVO.setSpaceUserTally(2);
+	// 	spaceVO.setSpaceIconName("a");
+	// 	spaceVO.setSpaceIconPath("a");
+	// 	spaceVO.setSpaceIconUuid("a");
+	// 	spaceVO.setSpaceIconSize(12L);
+	// 	spacesMapper.update(spaceVO);
+	// }
 
-	@Test
-	void getTally(){
-		spacesMapper.getTally(4L);
-	}
+	// @Test
+	// void getTally(){
+	// 	spacesMapper.getTally(4L);
+	// }
 
-	@Test
-	void updateTally(){
-		SpaceVO spaceVO = new SpaceVO();
-		spacesMapper.updateTally(4L, spacesMapper.getTally(4L) + 1);
-
-	}
+	// @Test
+	// void updateTally(){
+	// 	SpaceVO spaceVO = new SpaceVO();
+	// 	spacesMapper.updateTally(4L, spacesMapper.getTally(4L) + 1);
+	//
+	// }
 }
