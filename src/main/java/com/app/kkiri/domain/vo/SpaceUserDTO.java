@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class SpaceUserDTO {
     private Long spaceId;
     private Long userId;
-    private boolean isAdmin;
-    private MultipartFile image;
+    private Boolean isAdmin;
     private String userNickname;
 }

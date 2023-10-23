@@ -1,5 +1,6 @@
 package com.app.kkiri.repository;
 
+import com.app.kkiri.domain.vo.SpaceDTO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.mapper.SpacesMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class SpacesDAO {
 	public void delete(Long spaceId){ spacesMapper.delete(spaceId); };
 
 	// 스페이스 수정
-	public void set(SpaceVO spaceVO){ spacesMapper.update(spaceVO); };
+	public void set(SpaceDTO spaceDTO){ spacesMapper.update(spaceDTO); };
 
 	// 스페이스 회원 전체수
 	public int getTally(Long spaceId){ return spacesMapper.getTally(spaceId); };

@@ -28,7 +28,7 @@
             SELECT SEQ_SPACES.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO SPACES (SPACE_ID, SPACE_NAME, SPACE_DESCRIPTION, SPACE_PW, SPACE_CODE, SPACE_USER_TALLY, SPACE_ICON_NAME, SPACE_ICON_PATH, SPACE_ICON_UUID, SPACE_ICON_SIZE)
-        VALUES(#{spaceId}, #{spaceName}, #{spaceDescription}, #{spacePw}, #{spaceCode}, 1, #{spaceIconName}, #{spaceIconPath}, #{spaceIconUuid}, #{spaceIconSize})
+        VALUES(#{spaceId}, #{spaceName}, #{spaceDescription}, #{spacePw}, #{spaceCode}, #{spaceUserTally}, #{spaceIconName}, #{spaceIconPath}, #{spaceIconUuid}, #{spaceIconSize})
     </insert>
 
     <delete id="delete">

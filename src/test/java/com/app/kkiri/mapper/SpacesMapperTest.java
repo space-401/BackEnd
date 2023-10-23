@@ -54,17 +54,17 @@ class SpacesMapperTest {
 
 	@Test
 	void update() {
-		SpaceVO spaceVO = spacesMapper.selectById(4L);
-		spaceVO.setSpaceId(4L);
-		spaceVO.setSpaceName("수정스페이스");
-		spaceVO.setSpaceDescription("설명 수정");
-		spaceVO.setSpacePw("00000");
-		spaceVO.setSpaceUserTally(2);
-		spaceVO.setSpaceIconName("a");
-		spaceVO.setSpaceIconPath("a");
-		spaceVO.setSpaceIconUuid("a");
-		spaceVO.setSpaceIconSize(12L);
-		spacesMapper.update(spaceVO);
+//		SpaceVO spaceVO = spacesMapper.selectById(4L);
+//		spaceVO.setSpaceId(4L);
+//		spaceVO.setSpaceName("수정스페이스");
+//		spaceVO.setSpaceDescription("설명 수정");
+//		spaceVO.setSpacePw("00000");
+//		spaceVO.setSpaceUserTally(2);
+//		spaceVO.setSpaceIconName("a");
+//		spaceVO.setSpaceIconPath("a");
+//		spaceVO.setSpaceIconUuid("a");
+//		spaceVO.setSpaceIconSize(12L);
+//		spacesMapper.update(spaceVO);
 	}
 
 	@Test

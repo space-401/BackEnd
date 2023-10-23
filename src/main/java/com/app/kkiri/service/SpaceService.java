@@ -87,9 +87,9 @@ public class SpaceService {
 	};
 
 	// 스페이스 수정
-	public void modify(SpaceVO spaceVO){
+	public void modify(SpaceDTO spaceDTO){
 		try {
-			spacesDAO.set(spaceVO);
+			spacesDAO.set(spaceDTO);
 		}catch(Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}

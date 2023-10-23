@@ -40,14 +40,12 @@ public class SpaceController {
 //		userId 수정
 		Long userId = 1L;
 		List<SpaceListDTO> spaceList = spaceService.list(userId);
-		log.info("controller spaceList: " + spaceList);
 		return ResponseEntity.ok().body(spaceList);
 	};
 
 	// 스페이스 상세 조회
 	@GetMapping("/")
 	public ResponseEntity<?> spaceDetail(@RequestParam Long spaceId){
-//		userId 수정
 		Long userId = 1L;
 		SpaceDetailDTO spaceDetailDTO = spaceService.spaceDetail(spaceId, userId);
 		return ResponseEntity.ok().body(spaceDetailDTO);
@@ -60,12 +58,87 @@ public class SpaceController {
 
 	// 스페이스 생성
 	@PostMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<?> register(@RequestPart SpaceVO spaceVO, @RequestPart MultipartFile imgUrl, @RequestPart(required = false) Long defaultImg) throws IOException {
+	public ResponseEntity<?> register(@RequestPart SpaceDTO spaceDTO, @RequestPart(required = false) MultipartFile imgUrl) throws IOException {
+		SpaceVO spaceVO = new SpaceVO();
+		spaceVO.setSpaceName(spaceDTO.getSpaceName());
+		spaceVO.setSpacePw(spaceDTO.getSpacePw());
+		spaceVO.setSpaceDescription(spaceDTO.getSpaceDescription());
+
+		Long defaultImg = spaceDTO.getDefaultImg();
+
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		Long userId = 1L;
 
-		log.info("------------------ 여기 ------------------");
+		UUID uuid = UUID.randomUUID();
 
+		if(!imgUrl.isEmpty()){
+			// 이미지를 업로드했을 경우
+			String rootPath = "/Users/son/Documents/upload/space";
+			String uploadPath = getUploadPath();
+			String uploadFileName = "";
+			String spaceIconPath = "";
+
+			File uploadFullPath = new File(rootPath, uploadPath);
+			if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+
+			String fileName = imgUrl.getOriginalFilename();
+			uploadFileName = uuid.toString() + "_" + fileName;
+
+			File fullPath = new File(uploadFullPath, uploadFileName);
+			imgUrl.transferTo(fullPath);
+
+			spaceIconPath = uploadPath + "/" + uploadFileName;
+
+			spaceVO.setSpaceIconUuid(uploadFileName);
+			spaceVO.setSpaceIconPath(spaceIconPath);
+			spaceVO.setSpaceIconName(fileName);
+			spaceVO.setSpaceIconSize(imgUrl.getSize());
+
+
+		} else{
+			// 기본이미지를 사용한 경우
+			if(defaultImg != null){
+				spaceVO.setSpaceIconUuid("default");
+				spaceVO.setSpaceIconPath("/images/" + defaultImg +".jpg");
+				spaceVO.setSpaceIconName(defaultImg + ".jpg");
+				spaceVO.setSpaceIconSize(0L);
+			} else {
+				throw new CustomException(StatusCode.BAD_REQUEST);
+			}
+		}
+		spaceVO.setSpaceCode(uuid.toString());
+		spaceVO.setSpaceUserTally(1);
+
+		spaceUserVO.setUserId(userId);
+		spaceUserVO.setUserAdminYn("1");
+		spaceUserVO.setUserNickname("default");
+		spaceUserVO.setProfileImgName("default");
+		spaceUserVO.setProfileImgPath("default");
+		spaceUserVO.setProfileImgUuid("default");
+		spaceUserVO.setProfileImgSize(0L);
+
+		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
+		return ResponseEntity.ok().body(spaceId);
+	};
+
+	// 스페이스 삭제
+	@DeleteMapping("/")
+	public ResponseEntity<StatusCode> remove(@RequestParam Long spaceId){
+		spaceService.remove(spaceId);
+		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+
+	};
+
+	// 스페이스 수정
+	@PatchMapping("/")
+	public ResponseEntity<StatusCode> modify(@RequestPart SpaceDTO spaceDTO, @RequestPart(required = false) MultipartFile imgUrl) throws IOException{
+
+		log.info("------------------- 여기 ---------------");
+		log.info("spaceDTO: " + spaceDTO);
+		log.info("imgUrl: " + imgUrl);
+		log.info("dd");
+
+		// 이미지 저장
 		if(imgUrl != null){
 			// 이미지를 업로드했을 경우
 			String rootPath = "/Users/son/Documents/upload/space";
@@ -86,41 +159,25 @@ public class SpaceController {
 
 			spaceIconPath = uploadPath + "/" + uploadFileName;
 
-			spaceVO.setSpaceIconUuid(uploadFileName);
-			spaceVO.setSpaceIconPath(spaceIconPath);
-			spaceVO.setSpaceIconName(fileName);
-			spaceVO.setSpaceIconSize(imgUrl.getSize());
+			spaceDTO.setSpaceIconUuid(uploadFileName);
+			spaceDTO.setSpaceIconPath(spaceIconPath);
+			spaceDTO.setSpaceIconName(fileName);
+			spaceDTO.setSpaceIconSize(imgUrl.getSize());
 
-		} else if(imgUrl == null){
+			log.info("spaceDTO: " + spaceDTO);
+		} else {
 			// 기본이미지를 사용한 경우
-			if(defaultImg != null){
-				DefaultImgVO defaultImgVO = defaultImgService.defaultImgData(defaultImg);
-				spaceVO.setSpaceIconUuid(defaultImgVO.getDefaultImgUuid());
-				spaceVO.setSpaceIconPath(defaultImgVO.getDefaultImgPath());
-				spaceVO.setSpaceIconName(defaultImgVO.getDefaultImgName());
-				spaceVO.setSpaceIconSize(defaultImgVO.getDefaultImgSize());
+			if(spaceDTO.getDefaultImg() != null){
+				spaceDTO.setSpaceIconUuid("default");
+				spaceDTO.setSpaceIconPath("/images/" + spaceDTO.getDefaultImg() +".jpg");
+				spaceDTO.setSpaceIconName(spaceDTO.getDefaultImg() + ".jpg");
+				spaceDTO.setSpaceIconSize(0L);
 			} else {
 				throw new CustomException(StatusCode.BAD_REQUEST);
 			}
 		}
-		spaceUserVO.setUserId(userId);
-		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
-		return ResponseEntity.ok().body(spaceId);
-	};
 
-	// 스페이스 삭제
-	@DeleteMapping("/")
-	public ResponseEntity<StatusCode> remove(@RequestParam Long spaceId){
-		spaceService.remove(spaceId);
-		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
-
-	};
-
-	// 스페이스 수정
-	@PatchMapping("/")
-	public ResponseEntity<StatusCode> modify(@RequestPart SpaceVO spaceVO, @RequestPart MultipartFile imgUrl){
-		spaceService.modify(spaceVO);
-		// 이미지 저장
+		spaceService.modify(spaceDTO);
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
 	};
 
@@ -168,18 +225,26 @@ public class SpaceController {
 
 	// 스페이스 내 유저 정보 변경
 	@PatchMapping(value = "/user", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<StatusCode> modifyInfo(@RequestPart SpaceUserDTO spaceUserDTO) throws IOException{
+	public ResponseEntity<StatusCode> modifyInfo(@RequestPart SpaceUserDTO spaceUserDTO, @RequestPart(required = false) MultipartFile image) throws IOException{
+		Long userId = 1L;
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
-		if(spaceUserDTO.isAdmin()){
+		spaceUserVO.setUserId(userId);
+
+		log.info(" ----------- 여기  -----------");
+		log.info("spaceUserDTO: " + spaceUserDTO);
+
+		if(spaceUserDTO.getIsAdmin()){
+			log.info("방장 변경 들어옴");
 			// 방장 변경
-			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), spaceUserDTO.getUserId());
+			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), userId);
 		} else {
+			log.info("이미지 저장 들어옴");
 //			이미지 저장
 			String rootPath = "/Users/son/Documents/upload/profile";
 			String uploadPath = getUploadPath();
 			String uploadFileName = "";
 			String profilePath = "";
-			MultipartFile file = spaceUserDTO.getImage();
+			MultipartFile file = image;
 
 			File uploadFullPath = new File(rootPath, uploadPath);
 			if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
@@ -202,8 +267,11 @@ public class SpaceController {
 			spaceUserVO.setProfileImgUuid(fileName);
 			spaceUserVO.setProfileImgSize(file.getSize());
 
+			log.info("spaceUserVO: " + spaceUserVO);
+
 			spaceService.modifyInfo(spaceUserVO);
 		}
+
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
 	};
 }

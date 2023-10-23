@@ -2,6 +2,7 @@ package com.app.kkiri.mapper;
 
 import java.util.List;
 
+import com.app.kkiri.domain.vo.SpaceDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.app.kkiri.domain.vo.SpaceVO;
@@ -24,7 +25,7 @@ public interface SpacesMapper {
 	public void delete(Long spaceId);
 
 	// 스페이스 수정
-	public void update(SpaceVO spaceVO);
+	public void update(SpaceDTO spaceDTO);
 
 	// 스페이스 회원 전체수
 	 public int getTally(Long spaceId);

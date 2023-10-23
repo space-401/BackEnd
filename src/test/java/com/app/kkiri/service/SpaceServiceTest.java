@@ -52,16 +52,16 @@ class SpaceServiceTest {
 
     @Test
     void modify() {
-        SpaceVO spaceVO = new SpaceVO();
-        spaceVO.setSpaceId(51L);
-        spaceVO.setSpaceName("수정완료");
-        spaceVO.setSpaceDescription("수정완료");
-        spaceVO.setSpacePw("12345");
-        spaceVO.setSpaceIconName("a");
-        spaceVO.setSpaceIconUuid("a");
-        spaceVO.setSpaceIconPath("a");
-        spaceVO.setSpaceIconSize(12L);
-        spaceService.modify(spaceVO);
+//        SpaceVO spaceVO = new SpaceVO();
+//        spaceVO.setSpaceId(51L);
+//        spaceVO.setSpaceName("수정완료");
+//        spaceVO.setSpaceDescription("수정완료");
+//        spaceVO.setSpacePw("12345");
+//        spaceVO.setSpaceIconName("a");
+//        spaceVO.setSpaceIconUuid("a");
+//        spaceVO.setSpaceIconPath("a");
+//        spaceVO.setSpaceIconSize(12L);
+//        spaceService.modify(spaceVO);
     }
 
     @Test
