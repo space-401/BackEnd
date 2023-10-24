@@ -14,34 +14,28 @@ spring:
       client:
         registration:
           google:
-            client-id: 227302417113-j672tg79f1mtdj8rarrrk829ig15rq4a.apps.googleusercontent.com
-            client-secret: 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
+            client-id: 1056152786225-ssoboempquap25h5h6hghcsp21tk5n7j.apps.googleusercontent.com
+            client-secret: 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
             scope:
-              - openid
               - profile
               - email
 
           naver:
-            client-id: voa6ErTaNMtmcKMrC2VE
-            client-secret: 9wyMXiX4zn
+            client-id: TmC2zgdKuyI4RA4R8qta
+            client-secret: sKgaWD5MMq
             authorization-grant-type: authorization_code
-            client-name: naver-client-app
-            redirect-uri: http://localhost:8081/login/oauth2/code/naver
-            scope:
-              - profile
-              - email
+            client-name: client-naver
+            redirect-uri: http://52.79.57.246:8081/user/auth/naver
 
           kakao:
-            client-id: d17ae8b9f4f682aaba42421ce469dd76
-            client-secret: 8UKeCB2FmJmu7q9kVrwGEGKxqae9XmLH
+            client-id: 589c5b3cc0bf60c60e8185acda5bfed7
+            client-secret: 975908
             client-authentication-method: POST
             authorization-grant-type: authorization_code
-            client-name: client-app
-            redirect-uri: http://localhost:8081/login/oauth2/code/kakao
+            client-name: client-kakao
+            redirect-uri: http://52.79.57.246:8081/user/auth/kakao
             scope:
-              - openid
               - profile_nickname
-              - profile_image
               - account_email
 
         provider:
@@ -57,7 +51,7 @@ spring:
             token-uri: https://nid.naver.com/oauth2.0/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
-            user-name-attribute: sub
+            user-name-attribute: kakao_account
 
 # log4jdbc, Mybatis Console Log
 logging:
