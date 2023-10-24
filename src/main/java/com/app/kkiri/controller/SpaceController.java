@@ -32,7 +32,6 @@ import java.util.UUID;
 @Slf4j
 public class SpaceController {
 	private final SpaceService spaceService;
-	private final DefaultImgService defaultImgService;
 
 	// 목록 조회
 	@GetMapping("/list")
@@ -73,7 +72,7 @@ public class SpaceController {
 
 		if(!imgUrl.isEmpty()){
 			// 이미지를 업로드했을 경우
-			String rootPath = "/Users/son/Documents/upload/space";
+			String rootPath = "/home/ec2-user/upload/space";
 			String uploadPath = getUploadPath();
 			String uploadFileName = "";
 			String spaceIconPath = "";
@@ -99,7 +98,7 @@ public class SpaceController {
 			// 기본이미지를 사용한 경우
 			if(defaultImg != null){
 				spaceVO.setSpaceIconUuid("default");
-				spaceVO.setSpaceIconPath("/images/" + defaultImg +".jpg");
+				spaceVO.setSpaceIconPath("/home/ec2-user/upload/default/" + defaultImg +".jpg");
 				spaceVO.setSpaceIconName(defaultImg + ".jpg");
 				spaceVO.setSpaceIconSize(0L);
 			} else {
@@ -141,7 +140,7 @@ public class SpaceController {
 		// 이미지 저장
 		if(imgUrl != null){
 			// 이미지를 업로드했을 경우
-			String rootPath = "/Users/son/Documents/upload/space";
+			String rootPath = "/home/ec2-user/upload/space";
 			String uploadPath = getUploadPath();
 			String uploadFileName = "";
 			String spaceIconPath = "";
@@ -169,7 +168,7 @@ public class SpaceController {
 			// 기본이미지를 사용한 경우
 			if(spaceDTO.getDefaultImg() != null){
 				spaceDTO.setSpaceIconUuid("default");
-				spaceDTO.setSpaceIconPath("/images/" + spaceDTO.getDefaultImg() +".jpg");
+				spaceDTO.setSpaceIconPath("/home/ec2-user/upload/default/" + spaceDTO.getDefaultImg() +".jpg");
 				spaceDTO.setSpaceIconName(spaceDTO.getDefaultImg() + ".jpg");
 				spaceDTO.setSpaceIconSize(0L);
 			} else {
@@ -240,7 +239,7 @@ public class SpaceController {
 		} else {
 			log.info("이미지 저장 들어옴");
 //			이미지 저장
-			String rootPath = "/Users/son/Documents/upload/profile";
+			String rootPath = "/home/ec2-user/upload/profile";
 			String uploadPath = getUploadPath();
 			String uploadFileName = "";
 			String profilePath = "";
