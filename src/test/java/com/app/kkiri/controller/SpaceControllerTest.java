@@ -13,18 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 @SpringBootTest
 @Slf4j
@@ -43,14 +39,14 @@ class SpaceControllerTest {
     void list() throws Exception {
         log.info("list: " + mockMvc.perform(MockMvcRequestBuilders.get("/space/list").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-               .andDo(MockMvcResultHandlers.print()));
+                .andDo(MockMvcResultHandlers.print()));
     }
 
     @Test
     void spaceDetail() throws Exception{
         log.info("spaceDetail: " + mockMvc.perform(MockMvcRequestBuilders.get("/space/")
                         .param("spaceId", "44"))
-                        .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print()));
     }
 
@@ -85,16 +81,16 @@ class SpaceControllerTest {
                 null, //originalFilename
                 "application/json",
                 json.getBytes()
-                );
+        );
 
         log.info("json: " + json);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.multipart("/space/")
-                        .file(image)
-                        .file(spaceVO1)
-                        .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .characterEncoding("UTF-8"))
+                        MockMvcRequestBuilders.multipart("/space/")
+                                .file(image)
+                                .file(spaceVO1)
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .characterEncoding("UTF-8"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }
@@ -168,9 +164,9 @@ class SpaceControllerTest {
         });
 
         mockMvc.perform(
-                builder.file(data)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .characterEncoding("UTF-8"))
+                        builder.file(data)
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .characterEncoding("UTF-8"))
 //                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }

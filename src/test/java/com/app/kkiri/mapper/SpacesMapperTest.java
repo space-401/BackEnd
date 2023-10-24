@@ -1,10 +1,5 @@
 package com.app.kkiri.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
