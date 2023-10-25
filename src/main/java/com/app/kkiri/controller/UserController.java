@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-@Slf4j
 public class UserController {
 	private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
