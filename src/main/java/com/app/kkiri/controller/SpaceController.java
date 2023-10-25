@@ -64,13 +64,17 @@ public class SpaceController {
 		spaceVO.setSpacePw(spaceDTO.getSpacePw());
 		spaceVO.setSpaceDescription(spaceDTO.getSpaceDescription());
 
+		log.info("spaceName: " + spaceDTO.getSpaceName());
+		log.info("spaceName: " + spaceDTO.getSpaceDescription());
+		log.info("spaceName: " + spaceDTO.getSpacePw());
+
 		Long defaultImg = spaceDTO.getDefaultImg();
 
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		Long userId = 1L;
 
 		UUID uuid = UUID.randomUUID();
-
+		
 		if(!imgUrl.isEmpty()){
 			// 이미지를 업로드했을 경우
 			String rootPath = "/home/ec2-user/upload/space";

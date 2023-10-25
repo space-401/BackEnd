@@ -114,11 +114,19 @@ class SpaceControllerTest {
                 json.getBytes()
         );
 
+        MockMultipartFile imgUrl = new MockMultipartFile(
+                "imgUrl", //name
+                null, //originalFilename
+                "application/json",
+                "".getBytes()
+        );
+
         log.info("json: " + json);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart("/space/")
                                 .file(data)
+                                .file(imgUrl)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .characterEncoding("UTF-8"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
