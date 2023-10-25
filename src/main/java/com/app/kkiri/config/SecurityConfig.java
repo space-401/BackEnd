@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,9 +21,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+	// private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+	// private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
 	@Bean
 	SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
@@ -34,8 +36,8 @@ public class SecurityConfig {
 		http.csrf().disable();
 
 		http.oauth2Login(oauth2 -> oauth2
-			.successHandler(oAuth2AuthenticationSuccessHandler)
-			.failureHandler(oAuth2AuthenticationFailureHandler));
+			.failureHandler(new SimpleUrlAuthenticationFailureHandler())
+			.successHandler(new SimpleUrlAuthenticationSuccessHandler()));
 
 		return http.build();
 	}
