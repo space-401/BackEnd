@@ -28,6 +28,7 @@ public class OAuth2ClientConfig {
 			// .antMatchers("/").permitAll()
 			// .antMatchers("/auth/**").permitAll()
 			// .anyRequest().authenticated()
+			//
 
 			.antMatchers("/**").permitAll()
 		);
