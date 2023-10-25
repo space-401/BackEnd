@@ -25,17 +25,12 @@ public class OAuth2ClientConfig {
 	@Bean
 	SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests(requests -> requests
-			.antMatchers("/").permitAll()
-			.antMatchers("/auth/**").permitAll()
-			.anyRequest().authenticated()
-		);
+			// .antMatchers("/").permitAll()
+			// .antMatchers("/auth/**").permitAll()
+			// .anyRequest().authenticated()
 
-		// http.oauth2Login(oauth2 -> oauth2
-		// 	.userInfoEndpoint(userInfoEndpointConfig ->
-		// 		userInfoEndpointConfig
-		// 			.userService(customOAuth2UserService)
-		// 			.oidcUserService(customOidcUserService))
-		// );
+			.antMatchers("/**").permitAll()
+		);
 
 		http.oauth2Login(oauth2 -> oauth2
 			.successHandler(oAuth2AuthenticationSuccessHandler)
