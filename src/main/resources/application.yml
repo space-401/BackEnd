@@ -16,6 +16,7 @@ spring:
           google:
             client-id: 1056152786225-ssoboempquap25h5h6hghcsp21tk5n7j.apps.googleusercontent.com
             client-secret: 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
+            client-name: kkiri-google
             scope:
               - profile
               - email
@@ -24,14 +25,15 @@ spring:
             client-id: TmC2zgdKuyI4RA4R8qta
             client-secret: sKgaWD5MMq
             authorization-grant-type: authorization_code
-            client-name: naver-client
+            client-name: kkiri-naver
             redirect-uri: http://localhost:3000
 
           kakao:
             client-id: 589c5b3cc0bf60c60e8185acda5bfed7
+            client-secret: Wv3VHLNCX8HM3LbmqwaeTnRrMUUb1yJ5
             client-authentication-method: POST
             authorization-grant-type: authorization_code
-            client-name: kakao-client
+            client-name: kkiri-kakao
             redirect-uri: http://localhost:3000
             scope:
               - profile_nickname
