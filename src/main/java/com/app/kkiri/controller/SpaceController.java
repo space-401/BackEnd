@@ -30,6 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/space/*")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class SpaceController {
 	private final SpaceService spaceService;
 
