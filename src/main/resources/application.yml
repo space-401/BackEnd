@@ -22,7 +22,9 @@ spring:
 
           naver:
             client-id: TmC2zgdKuyI4RA4R8qta
+#            client-id: voa6ErTaNMtmcKMrC2VE
             client-secret: sKgaWD5MMq
+#            client-secret: 9wyMXiX4zn
             authorization-grant-type: authorization_code
             client-name: client-naver
             redirect-uri: http://localhost:3000
