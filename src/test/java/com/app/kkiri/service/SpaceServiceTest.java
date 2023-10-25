@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.app.kkiri.domain.vo.SpaceListDTO;
+import com.app.kkiri.domain.dto.SpaceListDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
-import com.app.kkiri.domain.vo.SpaceVO;
 
 import lombok.extern.slf4j.Slf4j;
 

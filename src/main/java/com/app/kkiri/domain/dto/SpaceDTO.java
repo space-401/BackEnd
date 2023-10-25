@@ -1,4 +1,4 @@
-package com.app.kkiri.domain.vo;
+package com.app.kkiri.domain.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

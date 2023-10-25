@@ -1,16 +1,17 @@
 package com.app.kkiri.controller;
 
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceDetailDTO;
+import com.app.kkiri.domain.dto.SpaceListDTO;
+import com.app.kkiri.domain.dto.SpaceUserDTO;
 import com.app.kkiri.domain.vo.*;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
-import com.app.kkiri.service.DefaultImgService;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.app.kkiri.service.SpaceService;
@@ -30,7 +31,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/space/*")
 @Slf4j
-@CrossOrigin(origins = "*")
 public class SpaceController {
 	private final SpaceService spaceService;
 
@@ -44,7 +44,7 @@ public class SpaceController {
 	};
 
 	// 스페이스 상세 조회
-	@GetMapping("/")
+	@GetMapping("")
 	public ResponseEntity<?> spaceDetail(@RequestParam Long spaceId){
 		Long userId = 1L;
 		SpaceDetailDTO spaceDetailDTO = spaceService.spaceDetail(spaceId, userId);
@@ -57,12 +57,16 @@ public class SpaceController {
 	};
 
 	// 스페이스 생성
-	@PostMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+	@PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<?> register(@RequestPart SpaceDTO spaceDTO, @RequestPart(required = false) MultipartFile imgUrl) throws IOException {
 		SpaceVO spaceVO = new SpaceVO();
 		spaceVO.setSpaceName(spaceDTO.getSpaceName());
 		spaceVO.setSpacePw(spaceDTO.getSpacePw());
 		spaceVO.setSpaceDescription(spaceDTO.getSpaceDescription());
+
+		log.info("spaceName: " + spaceDTO.getSpaceName());
+		log.info("spaceName: " + spaceDTO.getSpaceDescription());
+		log.info("spaceName: " + spaceDTO.getSpacePw());
 
 		Long defaultImg = spaceDTO.getDefaultImg();
 
@@ -70,7 +74,7 @@ public class SpaceController {
 		Long userId = 1L;
 
 		UUID uuid = UUID.randomUUID();
-
+		
 		if(!imgUrl.isEmpty()){
 			// 이미지를 업로드했을 경우
 			String rootPath = "/home/ec2-user/upload/space";
@@ -122,7 +126,7 @@ public class SpaceController {
 	};
 
 	// 스페이스 삭제
-	@DeleteMapping("/")
+	@DeleteMapping("")
 	public ResponseEntity<StatusCode> remove(@RequestParam Long spaceId){
 		spaceService.remove(spaceId);
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
@@ -130,7 +134,7 @@ public class SpaceController {
 	};
 
 	// 스페이스 수정
-	@PatchMapping("/")
+	@PatchMapping("")
 	public ResponseEntity<StatusCode> modify(@RequestPart SpaceDTO spaceDTO, @RequestPart(required = false) MultipartFile imgUrl) throws IOException{
 
 		log.info("------------------- 여기 ---------------");

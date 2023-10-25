@@ -1,7 +1,7 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.vo.SpaceDTO;
-import com.app.kkiri.domain.vo.SpaceUserDTO;
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceUserDTO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.google.gson.Gson;
@@ -114,11 +114,19 @@ class SpaceControllerTest {
                 json.getBytes()
         );
 
+        MockMultipartFile imgUrl = new MockMultipartFile(
+                "imgUrl", //name
+                null, //originalFilename
+                "application/json",
+                "".getBytes()
+        );
+
         log.info("json: " + json);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart("/space/")
                                 .file(data)
+                                .file(imgUrl)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .characterEncoding("UTF-8"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
