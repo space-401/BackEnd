@@ -1,5 +1,8 @@
 package com.app.kkiri.service;
 
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceDetailDTO;
+import com.app.kkiri.domain.dto.SpaceListDTO;
 import com.app.kkiri.domain.vo.*;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;

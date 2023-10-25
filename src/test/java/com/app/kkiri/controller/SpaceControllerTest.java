@@ -1,7 +1,7 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.vo.SpaceDTO;
-import com.app.kkiri.domain.vo.SpaceUserDTO;
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceUserDTO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.google.gson.Gson;

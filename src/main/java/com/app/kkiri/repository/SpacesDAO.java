@@ -1,9 +1,8 @@
 package com.app.kkiri.repository;
 
-import com.app.kkiri.domain.vo.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.mapper.SpacesMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,7 @@
-package com.app.kkiri.domain.vo;
+package com.app.kkiri.domain.dto;
 
+import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.domain.vo.TagVO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;

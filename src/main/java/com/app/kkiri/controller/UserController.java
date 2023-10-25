@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-@Slf4j
 public class UserController {
 	private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
@@ -44,26 +43,18 @@ public class UserController {
 	@GetMapping("/auth/{socialType}")
 	public void oAuth2Login(
 		@PathVariable String socialType,
-		@RequestParam(required = false) String code,
-		@RequestParam(required = false) String state,
-		@RequestParam(required = false) String error,
-		@RequestParam(value = "error_description", required = false) String errorDescription,
+		@RequestParam String code,
+		@RequestParam String state,
 		HttpServletRequest request,
 		HttpServletResponse response,
 		RedirectAttributes redirectAttributes) throws IOException {
-		LOGGER.info("[oAuth2Login()] socialType : {}, code : {}, state : {}, error : {}, errorDescription : {}",
-			socialType, code, state, error, errorDescription);
+		LOGGER.info("[oAuth2Login()] socialType : {}, code : {}, state : {}", socialType, code, state);
 
 		OAuth2AuthorizationRequest authorizationRequest = this.resolver.resolve(socialType, state);
 		LOGGER.info("[resolve()] authorizationRequest : {}", authorizationRequest);
 
-		if (authorizationRequest != null) { // 인가서버로부터 인가 코드 받기 응답 성공한 경우
-			redirectAttributes.addAttribute("code", code);
-			redirectAttributes.addAttribute("state", state);
-		} else { // 인가서버로부터 인가 코드 받기 응답이 실패할 경우
-			redirectAttributes.addAttribute("error", error);
-			redirectAttributes.addAttribute("error_description ", errorDescription);
-		}
+		redirectAttributes.addAttribute("code", code);
+		redirectAttributes.addAttribute("state", state);
 
 		this.saveRedirectForAuthorization(request, response, authorizationRequest);
 
