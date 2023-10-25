@@ -1,4 +1,4 @@
-package com.example.test.controller;
+package com.app.kkiri.controller;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.test.common.CustomOAuth2AuthorizationRequestResolver;
+import com.app.kkiri.common.CustomOAuth2AuthorizationRequestResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,16 +51,11 @@ public class UserController {
 		HttpServletRequest request,
 		HttpServletResponse response,
 		RedirectAttributes redirectAttributes) throws IOException {
-
-		log.info("-----------------------------------들어옴1-------------------------------------");
-
 		LOGGER.info("[oAuth2Login()] socialType : {}, code : {}, state : {}, error : {}, errorDescription : {}",
 			socialType, code, state, error, errorDescription);
 
 		OAuth2AuthorizationRequest authorizationRequest = this.resolver.resolve(socialType, state);
 		LOGGER.info("[resolve()] authorizationRequest : {}", authorizationRequest);
-
-		log.info("-----------------------------------들어옴2-------------------------------------");
 
 		if (authorizationRequest != null) { // 인가서버로부터 인가 코드 받기 응답 성공한 경우
 			redirectAttributes.addAttribute("code", code);
@@ -69,8 +64,6 @@ public class UserController {
 			redirectAttributes.addAttribute("error", error);
 			redirectAttributes.addAttribute("error_description ", errorDescription);
 		}
-
-		log.info("-----------------------------------들어옴3-------------------------------------");
 
 		this.saveRedirectForAuthorization(request, response, authorizationRequest);
 
