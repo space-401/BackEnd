@@ -9,6 +9,7 @@ spring:
       username: hr
       password: hr
 
+
   security:
     oauth2:
       client:

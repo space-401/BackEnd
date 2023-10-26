@@ -37,7 +37,6 @@ import lombok.ToString;
 
 @Component
 @RequiredArgsConstructor
-@ToString
 public class CustomOAuth2AuthorizationRequestResolver {
 
 	private static final StringKeyGenerator DEFAULT_STATE_GENERATOR = new Base64StringKeyGenerator(

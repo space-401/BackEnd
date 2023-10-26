@@ -84,6 +84,31 @@ tasks.named('test') {
 }
 
 // 테스트 코드를 제외한 빌드 수행
-//tasks.withType(Test) {
-//    enabled = false
+tasks.withType(Test) {
+    enabled = false
+}
+
+//sourceSets {
+//    main {
+//        resources {
+//            srcDir("src/main/resources")
+//        }
+//        resources {
+//            srcDir("src/main/java")
+//            include("**/*.xml")
+//        }
+//        resources {
+//            srcDir("src/main/resources")
+//            include("**/*.xml")
+//            include("**/*.yml")
+//            include("**/*.properties")
+//            include("**/*.setting")
+//        }
+//    }
+//}
+
+//tasks {
+//    processResources {
+//        duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+//    }
 //}

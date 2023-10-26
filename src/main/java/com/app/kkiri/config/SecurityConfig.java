@@ -21,10 +21,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	// private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-
-	// private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
 	@Bean
 	SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests(requests -> requests
