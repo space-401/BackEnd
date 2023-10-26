@@ -7,8 +7,10 @@
         <typeAlias type="com.app.kkiri.domain.vo.SpaceUserVO" alias="spaceUserVO"/>
         <typeAlias type="com.app.kkiri.domain.vo.TagVO" alias="tagVO"/>
         <typeAlias type="com.app.kkiri.domain.vo.DefaultImgVO" alias="defaultImgVO"/>
-        <typeAlias type="com.app.kkiri.domain.vo.PostVO" alias="postVO"/>
-        <typeAlias type="com.app.kkiri.domain.vo.PostImgVO" alias="postImgVO"/>
-        <typeAlias type="com.app.kkiri.domain.vo.PostBookmarkVO" alias="postBookmarkVO"/>
+
+        <!-- VO 클래스가 현재는 없는 관계로 주석 처리함 -->
+<!--        <typeAlias type="com.app.kkiri.domain.vo.PostVO" alias="postVO"/>-->
+<!--        <typeAlias type="com.app.kkiri.domain.vo.PostImgVO" alias="postImgVO"/>-->
+<!--        <typeAlias type="com.app.kkiri.domain.vo.PostBookmarkVO" alias="postBookmarkVO"/>-->
     </typeAliases>
 </configuration>
