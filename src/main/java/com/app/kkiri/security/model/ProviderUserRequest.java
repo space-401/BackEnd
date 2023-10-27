@@ -1,4 +1,4 @@
-package com.app.kkiri.domain.data;
+package com.app.kkiri.security.model;
 
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;

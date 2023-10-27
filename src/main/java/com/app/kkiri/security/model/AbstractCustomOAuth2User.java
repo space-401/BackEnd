@@ -1,17 +1,22 @@
-package com.app.kkiri.domain.model;
+package com.app.kkiri.security.model;
 
+import java.util.Collection;
 import java.util.Map;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-public abstract class OAuth2ProviderUser implements ProviderUser {
+import lombok.ToString;
+
+@ToString
+public abstract class AbstractCustomOAuth2User implements CustomOAuth2User {
 
 	private Map<String, Object> attributes;
 	private OAuth2User oAuth2User;
 	private ClientRegistration clientRegistration;
 
-	public OAuth2ProviderUser(Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration) {
+	public AbstractCustomOAuth2User(Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration) {
 		this.attributes = attributes;
 		this.oAuth2User = oAuth2User;
 		this.clientRegistration = clientRegistration;
@@ -25,5 +30,15 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
 	@Override
 	public Map<String, Object> getAttributes() {
 		return attributes;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
+
+	@Override
+	public String getRegistrationId() {
+		return clientRegistration.getRegistrationId();
 	}
 }
