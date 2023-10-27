@@ -1,18 +1,17 @@
-package com.app.kkiri.config;
+package com.app.kkiri.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.app.kkiri.common.OAuth2AuthenticationFailureHandler;
-import com.app.kkiri.common.OAuth2AuthenticationSuccessHandler;
+import com.app.kkiri.security.handlers.OAuth2AuthenticationFailureHandler;
+import com.app.kkiri.security.handlers.OAuth2AuthenticationSuccessHandler;
+import com.app.kkiri.security.service.CustomOAuth2UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,20 +19,28 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+	private final CustomOAuth2UserService customOAuth2UserService;
+
+	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
 	@Bean
-	SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests(requests -> requests
-			.anyRequest().permitAll()
-		);
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http.csrf().disable();
 
 		http.cors().configurationSource(corsConfigurationSource());
 
-		http.csrf().disable();
+		http.authorizeRequests(requests -> requests
+			.antMatchers("/").permitAll()
+			.anyRequest().authenticated()
+		);
 
 		http.oauth2Login(oauth2 -> oauth2
-			.failureHandler(new SimpleUrlAuthenticationFailureHandler())
-			.successHandler(new SimpleUrlAuthenticationSuccessHandler()));
+			.userInfoEndpoint(userInfo -> userInfo
+				.userService(customOAuth2UserService))
+			.successHandler(oAuth2AuthenticationSuccessHandler)
+			.failureHandler(oAuth2AuthenticationFailureHandler));
 
 		return http.build();
 	}

@@ -1,4 +1,4 @@
-package com.app.kkiri.common;
+package com.app.kkiri.security.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
