@@ -12,6 +12,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationFailureHandler;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationSuccessHandler;
 import com.app.kkiri.security.service.CustomOAuth2UserService;
+import com.app.kkiri.security.utils.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,22 +26,30 @@ public class SecurityConfig {
 
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
+	private final JwtTokenProvider jwtTokenProvider;
+
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable();
-
 		http.cors().configurationSource(corsConfigurationSource());
 
-		http.authorizeRequests(requests -> requests
-			.antMatchers("/").permitAll()
-			.anyRequest().authenticated()
-		);
+		http.csrf().disable();
 
-		http.oauth2Login(oauth2 -> oauth2
-			.userInfoEndpoint(userInfo -> userInfo
-				.userService(customOAuth2UserService))
-			.successHandler(oAuth2AuthenticationSuccessHandler)
-			.failureHandler(oAuth2AuthenticationFailureHandler));
+		http.authorizeHttpRequests().anyRequest().permitAll();
+
+		// http.authorizeRequests(requests -> requests
+		// 	.antMatchers("/").permitAll()
+		// 	.anyRequest().authenticated()
+		// 	.and()
+		// 	.exceptionHandling().authenticationEntryPoint()
+		// );
+
+		// http.addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider), LogoutFilter.class);
+
+		// http.oauth2Login(oauth2 -> oauth2
+		// 	.userInfoEndpoint(userInfo -> userInfo
+		// 		.userService(customOAuth2UserService))
+		// 	.successHandler(oAuth2AuthenticationSuccessHandler)
+		// 	.failureHandler(oAuth2AuthenticationFailureHandler));
 
 		return http.build();
 	}

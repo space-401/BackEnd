@@ -4,11 +4,11 @@ import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -90,24 +90,6 @@ public class JwtTokenProvider {
 		} catch (JwtException ex){
 			return false;
 		}
-	}
-
-	/**
-	 * HTTP Request Header 에 설정된 토큰 값을 가져옴
-	 *
-	 * @param request - 인증 요청
-	 * @return String 타입의 토큰
-	 */
-	public String resolveToken(HttpServletRequest request) {
-		String value = request.getHeader("Authorization");
-
-		if(value == null) {
-			return null;
-		}
-
-		int endIndex = value.indexOf("Bearer") + 6; // "Bearer 토큰값" 일 경우 6을 리턴한다.
-
-		return value.substring(endIndex + 1); //"Bearer 토큰값" 일 경우 "토큰값"만 리턴한다.
 	}
 }
 
