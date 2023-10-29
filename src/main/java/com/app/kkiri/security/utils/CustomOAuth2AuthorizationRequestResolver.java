@@ -1,4 +1,4 @@
-package com.app.kkiri.common;
+package com.app.kkiri.security.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -37,7 +37,6 @@ import lombok.ToString;
 
 @Component
 @RequiredArgsConstructor
-@ToString
 public class CustomOAuth2AuthorizationRequestResolver {
 
 	private static final StringKeyGenerator DEFAULT_STATE_GENERATOR = new Base64StringKeyGenerator(

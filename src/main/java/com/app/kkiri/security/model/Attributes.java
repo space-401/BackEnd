@@ -1,4 +1,4 @@
-package com.app.kkiri.domain.model;
+package com.app.kkiri.security.model;
 
 import java.util.Map;
 
