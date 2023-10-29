@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.MentionMapper">
+    <insert id="insert">
+        INSERT INTO MENTION(POST_ID, USER_ID)
+        VALUES (#{postId}, #{userId})
+    </insert>
+
+    <select id="selectById" resultType="spaceUserVO">
+        SELECT u.USER_ID, u.USER_NICKNAME, u.PROFILE_IMG_PATH
+        FROM MENTION m INNER JOIN SPACE_USERS u
+        ON m.USER_ID = u.USER_ID
+        WHERE POST_ID=#{postId} AND SPACE_ID=#{spaceId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM MENTION
+        WHERE POST_ID=#{postId}
+    </delete>
+</mapper>

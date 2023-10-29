@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.PostsMapper">
+    <insert id="insert">
+        <selectKey keyProperty="postId" order="BEFORE" resultType="long">
+            SELECT SEQ_POSTS.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO POSTS (POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, SPACE_ID, USER_ID)
+        VALUES (#{postId}, #{postTitle}, #{postLocationKeyword}, #{postLocationLat}, #{postLocationLng}, #{postBeginDate}, #{postEndDate}, #{postContent}, #{spaceId}, #{userId})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM POSTS
+        WHERE POST_ID=#{postId}
+    </delete>
+
+    <update id="update">
+        UPDATE POSTS
+        SET POST_TITLE=#{postTitle}, POST_LOCATION_KEYWORD=#{postLocationKeyword},
+            POST_LOCATION_LAT=#{postLocationLat}, POST_LOCATION_LNG=#{postLocationLng},
+            POST_BEGIN_DATE=#{postBeginDate}, POST_END_DATE=#{postEndDate},
+            POST_CONTENT=#{postContent}, POST_UPDATE_DATE=SYSDATE
+        WHERE POST_ID=#{postId}
+    </update>
+
+    <select id="selectById" resultType="postDetailDTO">
+        SELECT POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, POST_REGISTER_DATE, POST_UPDATE_DATE, SPACE_ID, USER_ID FROM POSTS
+        WHERE POST_ID=#{postId}
+    </select>
+
+</mapper>
