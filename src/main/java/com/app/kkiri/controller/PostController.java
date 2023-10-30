@@ -2,14 +2,26 @@ package com.app.kkiri.controller;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.PostDetailDTO;
+import com.app.kkiri.domain.vo.PostBookmarkVO;
+import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.exceptions.StatusCode;
 import com.app.kkiri.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,26 +31,108 @@ public class PostController {
     private final PostService postService;
 
     // 게시글 작성
-    @PostMapping("/")
-    public void register(@RequestBody PostDTO postDTO){}
+    @PostMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> register(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs) throws IOException{
+        Long userId = 1L;
+
+        postDTO.setUserId(userId);
+
+        String rootPath = "/home/ec2-user/upload/space";
+        String uploadPath = getUploadPath();
+        String uploadFileName = "";
+        String spaceIconPath = "";
+        String uuid = "";
+        List<PostImgVO> imgList = new ArrayList<>();
+
+        File uploadFullPath = new File(rootPath, uploadPath);
+        if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+
+        for (MultipartFile file :imgs) {
+            PostImgVO postImgVO = new PostImgVO();
+            uuid = UUID.randomUUID().toString();
+            String fileName = file.getOriginalFilename();
+            uploadFileName = uuid.toString() + "_" + fileName;
+
+            File fullPath = new File(uploadFullPath, uploadFileName);
+            file.transferTo(fullPath);
+
+            spaceIconPath = uploadPath + "/" + uploadFileName;
+
+            postImgVO.setPostImgUuid(uploadFileName);
+            postImgVO.setPostImgPath(spaceIconPath);
+            postImgVO.setPostImgName(fileName);
+            postImgVO.setPostImgSize(file.getSize());
+
+            imgList.add(postImgVO);
+        }
+
+        postService.register(postDTO, imgList);
+        return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+    }
 
     // 게시글 삭제
-    @DeleteMapping("/")
-    public void remove(@RequestParam Long postId){}
+    @DeleteMapping("")
+    public ResponseEntity<?> remove(@RequestParam Long postId){
+        postService.remove(postId);
+        return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+    }
+
+    // 사진 업로드 위치 (해당 이미지를 업로드한 년/월/일)
+    private String getUploadPath(){
+        return new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+    };
 
     // 게시글 수정
-    @PatchMapping("/")
-    public void modify(@RequestBody PostDTO postDTO){}
+    @PatchMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> modify(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs) throws IOException {
+        String rootPath = "/home/ec2-user/upload/space";
+        String uploadPath = getUploadPath();
+        String uploadFileName = "";
+        String spaceIconPath = "";
+        String uuid = "";
+        List<PostImgVO> imgList = new ArrayList<>();
+
+        File uploadFullPath = new File(rootPath, uploadPath);
+        if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+
+        for (MultipartFile file : imgs) {
+            PostImgVO postImgVO = new PostImgVO();
+            uuid = UUID.randomUUID().toString();
+            String fileName = file.getOriginalFilename();
+            uploadFileName = uuid.toString() + "_" + fileName;
+
+            File fullPath = new File(uploadFullPath, uploadFileName);
+            file.transferTo(fullPath);
+
+            spaceIconPath = uploadPath + "/" + uploadFileName;
+
+            postImgVO.setPostImgUuid(uploadFileName);
+            postImgVO.setPostImgPath(spaceIconPath);
+            postImgVO.setPostImgName(fileName);
+            postImgVO.setPostImgSize(file.getSize());
+
+            imgList.add(postImgVO);
+        }
+
+        postService.modify(postDTO, imgList);
+
+        return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+    }
 
     // 게시글 상세 조회
-    @GetMapping("/")
-    public void postDetail(@RequestParam Long postId){}
+    @GetMapping("")
+    public ResponseEntity<?> postDetail(@RequestParam Long postId){
+        Long userId = 1L;
+        PostDetailDTO postDetailDTO = postService.postDetail(postId, userId);
+        return ResponseEntity.ok().body(postDetailDTO);
+    }
 
     // 게시글 북마크
-    @PostMapping("/bookmark")
-    public ResponseEntity<?> bookmark(@RequestBody Long postId){
+    @PostMapping(path = "/bookmark")
+    public ResponseEntity<?> bookmark(@RequestBody PostBookmarkVO postId){
         Long userId = 1L;
-        postService.bookmark(postId, userId);
+        log.info("postId: " + postId.getPostId());
+        postService.bookmark(postId.getPostId(), userId);
         return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
     }
 }

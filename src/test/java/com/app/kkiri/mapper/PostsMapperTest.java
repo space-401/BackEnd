@@ -19,7 +19,7 @@ class PostsMapperTest {
     @Test
     void insert() {
         PostDTO postDTO = new PostDTO();
-        postDTO.create(46L,"test", "test", null, null,  "카페",231.2, 232.3, null, "2023/10/30", "2023/11/01");
+        postDTO.create(46L,"test", "test", null, null,  "카페",231.2, 232.3, "2023/10/30", "2023/11/01");
         postDTO.setUserId(1L);
         postsMapper.insert(postDTO);
     }
@@ -32,7 +32,7 @@ class PostsMapperTest {
     @Test
     void update() {
         PostDTO postDTO = new PostDTO();
-        postDTO.create(46L,"수정", "수정", null, null,  "카페",231.2, 232.3, null, "2023/10/30", "2023/11/05");
+        postDTO.create(46L,"수정", "수정", null, null,  "카페",231.2, 232.3,"2023/10/30", "2023/11/05");
         postDTO.setPostId(4L);
         postsMapper.update(postDTO);
     }

@@ -21,11 +21,10 @@ public class PostDTO {
     private String postLocationKeyword;
     private Double postLocationLng;
     private Double postLocationLat;
-    private List<MultipartFile> imgs;
     private String postBeginDate;
     private String postEndDate;
 
-    public void create(Long spaceId, String postTitle, String postContent, List<Long> people, List<Long> tags,String postLocationKeyword, Double postLocationLng, Double postLocationLat, List<MultipartFile> imgs, String postBeginDate, String postEndDate) {
+    public void create(Long spaceId, String postTitle, String postContent, List<Long> people, List<Long> tags,String postLocationKeyword, Double postLocationLng, Double postLocationLat, String postBeginDate, String postEndDate) {
         this.spaceId = spaceId;
         this.postTitle = postTitle;
         this.postContent = postContent;
@@ -34,7 +33,6 @@ public class PostDTO {
         this.postLocationKeyword = postLocationKeyword;
         this.postLocationLng = postLocationLng;
         this.postLocationLat = postLocationLat;
-        this.imgs = imgs;
         this.postBeginDate = postBeginDate;
         this.postEndDate = postEndDate;
     }

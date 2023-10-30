@@ -27,11 +27,15 @@ public class PostService {
     @Transactional(rollbackFor = Exception.class)
     // 게시글 작성
     public Long register(PostDTO postDTO, List<PostImgVO> imgs){
-        Long postId = postsDAO.save(postDTO);
+        postsDAO.save(postDTO);
+        Long postId = postDTO.getPostId();
         List<Long> tags = postDTO.getTags();
         List<Long> people = postDTO.getPeople();
 
+        log.info("postId: " + postId);
+
         for (PostImgVO img : imgs) {
+            img.setPostId(postId);
             postImgsDAO.save(img);
         }
 
@@ -68,6 +72,7 @@ public class PostService {
         mentionDAO.delete(postId);
 
         for (PostImgVO img : imgs) {
+            img.setPostId(postId);
             postImgsDAO.save(img);
         }
 
@@ -95,13 +100,19 @@ public class PostService {
         postDetailDTO.setIsBookmark(postBookmarksDAO.select(postId, userId) != 0);
 //        postDetailDTO.setCommentConut();
 
+        log.info("postDetail: " + postDetailDTO);
+
         return postDetailDTO;
     }
 
     // 게시글 북마크
     public void bookmark(Long postId, Long userId){
         try {
-            postBookmarksDAO.setBookmark(postId, userId);
+            if(postBookmarksDAO.select(postId, userId) == 0){
+                postBookmarksDAO.setBookmark(postId, userId);
+            } else{
+                postBookmarksDAO.delete(postId, userId);
+            }
         } catch (Exception e){
             throw new CustomException(StatusCode.BAD_REQUEST);
         }
