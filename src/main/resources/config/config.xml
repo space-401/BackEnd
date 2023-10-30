@@ -12,5 +12,7 @@
         <typeAlias type="com.app.kkiri.domain.vo.PostImgVO" alias="postImgVO"/>
         <typeAlias type="com.app.kkiri.domain.vo.PostBookmarkVO" alias="postBookmarkVO"/>
         <typeAlias type="com.app.kkiri.domain.vo.UserVO" alias="userVO"/>
+        <typeAlias type="com.app.kkiri.domain.vo.CommentVO" alias="commentVO"/>
+        <typeAlias type="com.app.kkiri.domain.dto.CommentDTO" alias="commentDTO"/>
     </typeAliases>
 </configuration>
