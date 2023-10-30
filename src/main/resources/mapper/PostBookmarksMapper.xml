@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.PostBookmarksMapper">
+    <update id="updateBookmark">
+        MERGE INTO POST_BOOKMARKS
+        USING DUAL
+        ON (POST_ID=#{postId} AND USER_ID=#{userId})
+        WHEN NOT MATCHED THEN
+        INSERT(POST_ID, USER_ID)
+        VALUES(#{postId},#{userId})
+    </update>
+
+    <delete id="delete">
+        DELETE POST_BOOKMARKS
+        WHERE USER_ID=#{userId} AND POST_ID=#{postId}
+    </delete>
+
+    <select id="select" resultType="int">
+        SELECT COUNT(POST_ID) FROM POST_BOOKMARKS
+        WHERE POST_ID=#{postId} AND USER_ID=#{userId}
+    </select>
+</mapper>
