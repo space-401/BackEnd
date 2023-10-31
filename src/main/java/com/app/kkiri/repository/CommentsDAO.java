@@ -16,6 +16,9 @@ public class CommentsDAO {
     // 댓글 추가
     public void save(CommentVO commentVO){ commentsMapper.insert(commentVO); }
 
+    // 대댓글 추가
+    public void saveReply(CommentVO commentVO){ commentsMapper.insertReply(commentVO);}
+
     // 댓글 삭제
     public void delete(Long commentId){ commentsMapper.delete(commentId); }
 

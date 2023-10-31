@@ -11,6 +11,9 @@ public interface CommentsMapper {
     // 댓글 추가
     public void insert(CommentVO commentVO);
 
+    // 대댓글 추가
+    public void insertReply(CommentVO commentVO);
+
     // 댓글 삭제
     public void delete(Long commentId);
 

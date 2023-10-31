@@ -10,18 +10,22 @@ import org.springframework.stereotype.Component;
 public class CommentVO {
     private Long commentId;
     private String commentContent;
-    private Long commentClass;
+    private Boolean commentRefYn;
     private Long commentGroup;
     private String commentRegisterDate;
     private Long postId;
     private Long userId;
 
-    public void create(Long commentId, String commentContent, Long commentClass, Long commentGroup, String commentRegisterDate, Long postId, Long userId) {
-        this.commentId = commentId;
+    public void create(String commentContent, Boolean commentRefYn, Long postId, Long userId) {
         this.commentContent = commentContent;
-        this.commentClass = commentClass;
+        this.commentRefYn = commentRefYn;
+        this.postId = postId;
+        this.userId = userId;
+    }
+    public void create(String commentContent, Boolean commentRefYn, Long commentGroup, Long postId, Long userId) {
+        this.commentContent = commentContent;
+        this.commentRefYn = commentRefYn;
         this.commentGroup = commentGroup;
-        this.commentRegisterDate = commentRegisterDate;
         this.postId = postId;
         this.userId = userId;
     }
