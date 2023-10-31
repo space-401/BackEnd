@@ -6,8 +6,16 @@
         <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
             SELECT SEQ_COMMENTS.nextval FROM DUAL
         </selectKey>
-        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_CLASS, COMMENT_GROUP, POST_ID, USER_ID)
-        VALUES (#{commentId}, #{commentContent}, #{commentClass}, #{commentGroup}, #{postId}, #{userId})
+        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
+        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentId}, #{postId}, #{userId})
+    </insert>
+
+    <insert id="insertReply">
+        <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
+            SELECT SEQ_COMMENTS.nextval FROM DUAL
+        </selectKey>
+        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
+        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentGroup}, #{postId}, #{userId})
     </insert>
 
     <delete id="delete">
@@ -16,7 +24,7 @@
     </delete>
 
     <select id="selectById" resultType="commentDTO">
-        SELECT COMMENT_ID, COMMENT_CONTENT, COMMENT_CLASS, COMMENT_GROUP, COMMENT_REGISTER_DATE, USER_ID FROM COMMENTS
+        SELECT COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, COMMENT_REGISTER_DATE, USER_ID FROM COMMENTS
         WHERE POST_ID=#{postId}
     </select>
 </mapper>
