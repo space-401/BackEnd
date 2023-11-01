@@ -1,6 +1,5 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.dto.CommentDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import com.app.kkiri.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -8,13 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/comment/*")
 @Slf4j
-public class commentController {
+public class CommentController {
     private CommentService commentService;
 
     @PostMapping("")
@@ -31,7 +28,7 @@ public class commentController {
 
     @GetMapping("")
     // 댓글 조회
-    public void selectById(@RequestParam Long postId){
+    public void selectById(@RequestParam Long postId, @RequestParam Long spaceId){
 
     }
 }
