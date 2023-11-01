@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.CommentsMapper">
+    <insert id="insert">
+        <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
+            SELECT SEQ_COMMENTS.nextval FROM DUAL
+        </selectKey>
+        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
+        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentId}, #{postId}, #{userId})
+    </insert>
+
+    <insert id="insertReply">
+        <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
+            SELECT SEQ_COMMENTS.nextval FROM DUAL
+        </selectKey>
+        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
+        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentGroup}, #{postId}, #{userId})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM COMMENTS
+        WHERE COMMENT_ID=#{commentId}
+    </delete>
+
+    <select id="selectById" resultType="commentDTO">
+        SELECT COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, COMMENT_REGISTER_DATE, USER_ID FROM COMMENTS
+        WHERE POST_ID=#{postId}
+    </select>
+</mapper>
