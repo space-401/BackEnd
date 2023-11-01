@@ -1,5 +1,7 @@
 package com.app.kkiri.repository;
 
+import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
+import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.mapper.MentionMapper;
 import lombok.RequiredArgsConstructor;

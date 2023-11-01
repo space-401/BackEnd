@@ -1,5 +1,6 @@
 package com.app.kkiri.mapper;
 
+import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import org.apache.ibatis.annotations.Mapper;
 

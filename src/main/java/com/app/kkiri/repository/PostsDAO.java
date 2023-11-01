@@ -1,7 +1,6 @@
 package com.app.kkiri.repository;
 
 import com.app.kkiri.domain.dto.PostDTO;
-import com.app.kkiri.domain.dto.PostDetailDTO;
 import com.app.kkiri.domain.vo.PostVO;
 import com.app.kkiri.mapper.PostsMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +20,5 @@ public class PostsDAO {
     public void set(PostDTO postDTO){ postsMapper.update(postDTO); }
 
     // 게시글 상세 조회
-    public PostDetailDTO findById(Long postId){ return postsMapper.selectById(postId); }
+    public PostVO findById(Long postId){ return postsMapper.selectById(postId); }
 }

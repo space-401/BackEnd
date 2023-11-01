@@ -1,7 +1,6 @@
 package com.app.kkiri.mapper;
 
 import com.app.kkiri.domain.dto.PostDTO;
-import com.app.kkiri.domain.dto.PostDetailDTO;
 import com.app.kkiri.domain.vo.PostVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,5 +16,5 @@ public interface PostsMapper {
     public void update(PostDTO postDTO);
 
     // 게시글 상세 조회
-    public PostDetailDTO selectById(Long postId);
+    public PostVO selectById(Long postId);
 }

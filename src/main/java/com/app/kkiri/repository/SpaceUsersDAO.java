@@ -1,5 +1,6 @@
 package com.app.kkiri.repository;
 
+import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
 import com.app.kkiri.mapper.SpaceUsersMapper;
 import org.springframework.stereotype.Repository;
 
