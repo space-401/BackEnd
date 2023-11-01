@@ -1,5 +1,6 @@
 package com.app.kkiri.mapper;
 
+import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -11,7 +12,7 @@ public interface MentionMapper {
     public void insert(Long postId, Long userId);
 
     // 멘션 조회
-    public List<SpaceUserVO> selectById(Long postId, Long spaceId);
+    public List<SpaceDetailUserDTO> selectById(Long postId, Long spaceId);
 
     // 멘션 삭제
     public void delete(Long postId);

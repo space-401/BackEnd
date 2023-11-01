@@ -14,5 +14,6 @@ public class SpaceListDTO {
     private Long spaceId;
     private String spaceName;
     private String spaceIconPath;
-    private List<SpaceUserVO> spaceUsers;
+    private List<SpaceDetailUserDTO> spaceUsers;
+
 }

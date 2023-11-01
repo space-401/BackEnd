@@ -2,6 +2,7 @@ package com.app.kkiri.mapper;
 
 import java.util.List;
 
+import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.app.kkiri.domain.vo.SpaceUserVO;
@@ -9,7 +10,7 @@ import com.app.kkiri.domain.vo.SpaceUserVO;
 @Mapper
 public interface SpaceUsersMapper {
 	// 스페이스 회원 목록
-	public List<SpaceUserVO> selectAll(Long spaceId, Long userId);
+	public List<SpaceDetailUserDTO> selectAll(Long spaceId, Long userId);
 
 	// 스페이스내 내 정보 조회
 	public SpaceUserVO selectById(Long spaceId, Long userId);

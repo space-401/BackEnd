@@ -2,6 +2,7 @@ package com.app.kkiri.service;
 
 import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.dto.SpaceDetailDTO;
+import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
 import com.app.kkiri.domain.dto.SpaceListDTO;
 import com.app.kkiri.domain.vo.*;
 import com.app.kkiri.exceptions.CustomException;
@@ -52,7 +53,7 @@ public class SpaceService {
 	public SpaceDetailDTO spaceDetail(Long spaceId, Long userId){
 		SpaceDetailDTO spaceDetailDTO = new SpaceDetailDTO();
 		SpaceVO spaceVO = new SpaceVO();
-		List<SpaceUserVO> spaceUsers = new ArrayList<>();
+		List<SpaceDetailUserDTO> spaceUsers = new ArrayList<>();
 		List<TagVO> tags = new ArrayList<>();
 
 		spaceVO = spacesDAO.findById(spaceId);
