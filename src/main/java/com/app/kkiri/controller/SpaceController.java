@@ -29,7 +29,7 @@ import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/space/*")
+@RequestMapping("/space")
 @Slf4j
 public class SpaceController {
 	private final SpaceService spaceService;
