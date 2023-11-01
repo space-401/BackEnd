@@ -24,8 +24,8 @@ public class PostDetailDTO {
     private String postBeginDate;
     private String postEndDate;
     private Long commentConut;
-    private List<SpaceUserVO> users;
-    private List<SpaceUserVO> selectedUsers;
+    private List<SpaceDetailUserDTO> users;
+    private List<SpaceDetailUserDTO> selectedUsers;
     private List<TagVO> tags;
     private List<String> imgsUrl;
     private Boolean isMine;

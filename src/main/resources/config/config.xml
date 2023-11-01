@@ -4,6 +4,7 @@
 <configuration>
     <typeAliases>
         <typeAlias type="com.app.kkiri.domain.vo.SpaceVO" alias="spaceVO"/>
+        <typeAlias type="com.app.kkiri.domain.dto.SpaceDetailUserDTO" alias="spaceDetailUserDTO"/>
         <typeAlias type="com.app.kkiri.domain.vo.SpaceUserVO" alias="spaceUserVO"/>
         <typeAlias type="com.app.kkiri.domain.vo.TagVO" alias="tagVO"/>
         <typeAlias type="com.app.kkiri.domain.vo.PostVO" alias="postVO"/>

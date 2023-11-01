@@ -1,5 +1,6 @@
 package com.app.kkiri.repository;
 
+import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
 import com.app.kkiri.mapper.SpaceUsersMapper;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public class SpaceUsersDAO {
 	private final SpaceUsersMapper spaceUsersMapper;
 	// 스페이스 회원 목록
-	public List<SpaceUserVO> findAll(Long spaceId, Long userId){ return spaceUsersMapper.selectAll(spaceId, userId); };
+	public List<SpaceDetailUserDTO> findAll(Long spaceId, Long userId){ return spaceUsersMapper.selectAll(spaceId, userId); };
 
 	// 스페이스내 내 정보 조회
 	public SpaceUserVO findById(Long spaceId, Long userId){ return spaceUsersMapper.selectById(spaceId, userId); };

@@ -18,6 +18,6 @@ public class SpaceDetailDTO {
     private String spacePw;
     private int isAdmin;
     private int isFirst;
-    private List<SpaceUserVO> spaceUsers;
+    private List<SpaceDetailUserDTO> spaceUsers;
     private List<TagVO> tags;
 }
