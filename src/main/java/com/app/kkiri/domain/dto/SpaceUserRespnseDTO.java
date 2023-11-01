@@ -1,19 +1,14 @@
 package com.app.kkiri.domain.dto;
 
-import com.app.kkiri.domain.vo.SpaceUserVO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @Data
 @NoArgsConstructor
-public class SpaceListDTO {
-    private Long spaceId;
-    private String spaceTitle;
+public class SpaceUserRespnseDTO {
+    private Long userId;
+    private String userName;
     private String imgUrl;
-    private List<SpaceUserRespnseDTO> userList;
-
 }

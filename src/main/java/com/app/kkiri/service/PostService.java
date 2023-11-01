@@ -1,16 +1,19 @@
 package com.app.kkiri.service;
 
-import com.app.kkiri.domain.dto.PostDTO;
-import com.app.kkiri.domain.dto.PostDetailDTO;
+import com.app.kkiri.domain.dto.*;
 import com.app.kkiri.domain.vo.PostImgVO;
+import com.app.kkiri.domain.vo.PostVO;
+import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
 import com.app.kkiri.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -87,22 +90,60 @@ public class PostService {
     }
 
     // 게시글 상세조회
-    public PostDetailDTO postDetail(Long postId, Long userId){
-        PostDetailDTO postDetailDTO = postsDAO.findById(postId);
+    public PostDetailResponseDTO postDetail(Long postId, Long userId){
+        PostVO postVO = postsDAO.findById(postId);
+        Long spaceId = postVO.getSpaceId();
 
-        Long spaceId = postDetailDTO.getSpaceId();
+        PostDetailResponseDTO postDetailResponseDTO = new PostDetailResponseDTO();
+        postDetailResponseDTO.setSpaceId(spaceId);
+        postDetailResponseDTO.setPostTitle(postVO.getPostTitle());
+        postDetailResponseDTO.setPostDescription(postVO.getPostContent());
+        postDetailResponseDTO.setPlaceTitle(postVO.getPostLocationKeyword());
 
-        postDetailDTO.setImgsUrl(postImgsDAO.findById(postId));
-        postDetailDTO.setTags(postTagsDAO.findById(postId));
-        postDetailDTO.setSelectedUsers(mentionDAO.selectById(postId, spaceId));
-        postDetailDTO.setUsers(spaceUsersDAO.findAll(spaceId, userId));
-        postDetailDTO.setIsMine(postDetailDTO.getUserId() == userId);
-        postDetailDTO.setIsBookmark(postBookmarksDAO.select(postId, userId) != 0);
+        PostPositionDTO postPositionDTO = new PostPositionDTO();
+        postPositionDTO.create(postVO.getPostLocationLat(), postVO.getPostLocationLng());
+        postDetailResponseDTO.setPosition(postPositionDTO);
+        postDetailResponseDTO.setPostCreatedAt(postVO.getPostRegisterDate());
+        postDetailResponseDTO.setPostUpdatedAt(postVO.getPostUpdateDate());
+        postDetailResponseDTO.setIsMine(postVO.getUserId() == userId);
+        postDetailResponseDTO.setIsBookmark(postBookmarksDAO.select(postId, userId) != 0);
+
+        PostDateDTO postDateDTO = new PostDateDTO();
+        postDateDTO.create(postVO.getPostBeginDate(), postVO.getPostEndDate());
+        postDetailResponseDTO.setDate(postDateDTO);
+
+        postDetailResponseDTO.setImgsUrl(postImgsDAO.findById(postId));
+
+        List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId, spaceId);
+        List<SpaceUserRespnseDTO> selectedUserList = new ArrayList<>();
+        for (SpaceUserVO user:selectedUsers) {
+            SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
+            spaceUserRespnseDTO.setUserId(user.getUserId());
+            spaceUserRespnseDTO.setUserName(user.getUserNickname());
+            spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+
+            selectedUserList.add(spaceUserRespnseDTO);
+        }
+
+        postDetailResponseDTO.setSelectedUsers(selectedUserList);
+
+        List<SpaceUserVO> users = spaceUsersDAO.findAll(spaceId, userId);
+        List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+        for (SpaceUserVO user:users) {
+            SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
+            spaceUserRespnseDTO.setUserId(user.getUserId());
+            spaceUserRespnseDTO.setUserName(user.getUserNickname());
+            spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+
+            userList.add(spaceUserRespnseDTO);
+        }
+        postDetailResponseDTO.setUserList(userList);
+        postDetailResponseDTO.setSelectedTags(postTagsDAO.findById(postId));
 //        postDetailDTO.setCommentConut();
 
-        log.info("postDetail: " + postDetailDTO);
+        log.info("postDetailResponseDTO: " + postDetailResponseDTO);
 
-        return postDetailDTO;
+        return postDetailResponseDTO;
     }
 
     // 게시글 북마크

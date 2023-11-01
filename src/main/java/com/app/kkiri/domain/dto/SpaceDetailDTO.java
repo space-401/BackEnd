@@ -12,12 +12,12 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class SpaceDetailDTO {
-    private String spaceName;
+    private String spaceTitle;
     private String spaceDescription;
-    private String spaceIconPath;
+    private String imgUrl;
     private String spacePw;
     private int isAdmin;
     private int isFirst;
-    private List<SpaceDetailUserDTO> spaceUsers;
-    private List<TagVO> tags;
+    private List<SpaceListDTO> userList;
+    private List<TagVO> tagList;
 }

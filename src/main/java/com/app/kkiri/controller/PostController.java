@@ -1,7 +1,7 @@
 package com.app.kkiri.controller;
 
 import com.app.kkiri.domain.dto.PostDTO;
-import com.app.kkiri.domain.dto.PostDetailDTO;
+import com.app.kkiri.domain.dto.PostDetailResponseDTO;
 import com.app.kkiri.domain.vo.PostBookmarkVO;
 import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.exceptions.StatusCode;
@@ -123,8 +123,8 @@ public class PostController {
     @GetMapping("")
     public ResponseEntity<?> postDetail(@RequestParam Long postId){
         Long userId = 1L;
-        PostDetailDTO postDetailDTO = postService.postDetail(postId, userId);
-        return ResponseEntity.ok().body(postDetailDTO);
+        PostDetailResponseDTO postDetailType = postService.postDetail(postId, userId);
+        return ResponseEntity.ok().body(postDetailType);
     }
 
     // 게시글 북마크

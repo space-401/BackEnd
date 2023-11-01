@@ -10,7 +10,7 @@ import com.app.kkiri.domain.vo.SpaceUserVO;
 @Mapper
 public interface SpaceUsersMapper {
 	// 스페이스 회원 목록
-	public List<SpaceDetailUserDTO> selectAll(Long spaceId, Long userId);
+	public List<SpaceUserVO> selectAll(Long spaceId, Long userId);
 
 	// 스페이스내 내 정보 조회
 	public SpaceUserVO selectById(Long spaceId, Long userId);

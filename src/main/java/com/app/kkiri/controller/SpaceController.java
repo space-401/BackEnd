@@ -1,9 +1,6 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.dto.SpaceDTO;
-import com.app.kkiri.domain.dto.SpaceDetailDTO;
-import com.app.kkiri.domain.dto.SpaceListDTO;
-import com.app.kkiri.domain.dto.SpaceUserDTO;
+import com.app.kkiri.domain.dto.*;
 import com.app.kkiri.domain.vo.*;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
@@ -23,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +37,7 @@ public class SpaceController {
 	public ResponseEntity<?> list(){
 //		userId 수정
 		Long userId = 1L;
-		List<SpaceListDTO> spaceList = spaceService.list(userId);
+		List<SpaceResponseDTO> spaceList = spaceService.list(userId);
 		return ResponseEntity.ok().body(spaceList);
 	};
 

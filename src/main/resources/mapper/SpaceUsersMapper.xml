@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.app.kkiri.mapper.SpaceUsersMapper">
-    <select id="selectAll" resultType="spaceDetailUserDTO">
+    <select id="selectAll" resultType="spaceUserVO">
         SELECT user_id, user_nickname, profile_img_path
         FROM SPACE_USERS
         WHERE SPACE_ID=#{spaceId}

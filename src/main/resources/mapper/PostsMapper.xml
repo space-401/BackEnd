@@ -24,7 +24,7 @@
         WHERE POST_ID=#{postId}
     </update>
 
-    <select id="selectById" resultType="postDetailDTO">
+    <select id="selectById" resultType="postVO">
         SELECT POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, POST_REGISTER_DATE, POST_UPDATE_DATE, SPACE_ID, USER_ID FROM POSTS
         WHERE POST_ID=#{postId}
     </select>

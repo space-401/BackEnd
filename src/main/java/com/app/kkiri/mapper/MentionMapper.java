@@ -12,7 +12,7 @@ public interface MentionMapper {
     public void insert(Long postId, Long userId);
 
     // 멘션 조회
-    public List<SpaceDetailUserDTO> selectById(Long postId, Long spaceId);
+    public List<SpaceUserVO> selectById(Long postId, Long spaceId);
 
     // 멘션 삭제
     public void delete(Long postId);

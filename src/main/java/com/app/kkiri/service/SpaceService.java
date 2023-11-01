@@ -1,9 +1,6 @@
 package com.app.kkiri.service;
 
-import com.app.kkiri.domain.dto.SpaceDTO;
-import com.app.kkiri.domain.dto.SpaceDetailDTO;
-import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
-import com.app.kkiri.domain.dto.SpaceListDTO;
+import com.app.kkiri.domain.dto.*;
 import com.app.kkiri.domain.vo.*;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
@@ -30,20 +27,32 @@ public class SpaceService {
 	private final TagsDAO tagsDAO;
 
 	// 목록 조회
-	public List<SpaceListDTO> list(Long userId){
-		List<SpaceListDTO> spaceList = new ArrayList<>();
-		List<SpaceVO> spaces = new ArrayList<>();
+	public List<SpaceResponseDTO> list(Long userId){
+		// 스페이스 정보, 상단 바에 뜨는 스페이스 정보 및 스페이스 유저 목록을 담는 객체
+		List<SpaceResponseDTO> spaceList = new ArrayList<>();
+		// 유저가 가입되어있는 스페이스 목록 객체
+		List<SpaceVO> spaces = spacesDAO.findAll(userId);
 
-		spaces = spacesDAO.findAll(userId);
-
+		// 유저가 가입되어 있는 각 스페이스 목록의 정보를 Response 형식에 맞춰 변경
 		for (SpaceVO space : spaces) {
-			SpaceListDTO spaceListDTO = new SpaceListDTO();
-			spaceListDTO.setSpaceId(space.getSpaceId());
-			spaceListDTO.setSpaceName(space.getSpaceName());
-			spaceListDTO.setSpaceIconPath(space.getSpaceIconPath());
-			spaceListDTO.setSpaceUsers(spaceUsersDAO.findAll(space.getSpaceId(), userId));
+			SpaceResponseDTO spaceResponseDTO = new SpaceResponseDTO();
+			spaceResponseDTO.setSpaceId(space.getSpaceId());
+			spaceResponseDTO.setSpaceTitle(space.getSpaceName());
+			spaceResponseDTO.setImgUrl(space.getSpaceIconPath());
 
-			spaceList.add(spaceListDTO);
+			List<SpaceUserVO> users = spaceUsersDAO.findAll(space.getSpaceId(), userId);
+			List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+
+			for (SpaceUserVO user:users) {
+				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
+				spaceUserRespnseDTO.setUserId(user.getUserId());
+				spaceUserRespnseDTO.setUserName(user.getUserNickname());
+				spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+
+				userList.add(spaceUserRespnseDTO);
+			}
+			spaceResponseDTO.setUserList(userList);
+			spaceList.add(spaceResponseDTO);
 		}
 
 		return spaceList;
@@ -51,23 +60,48 @@ public class SpaceService {
 
 	// 스페이스 상세 조회
 	public SpaceDetailDTO spaceDetail(Long spaceId, Long userId){
+		// spaceId인 스페이스의 정보를 담는다.
+		SpaceVO spaceVO = spacesDAO.findById(spaceId);
+
+		// 스페이스의 태그들을 가져온다.
+		List<TagVO> tags =  Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
+
+		// Response 객체 형식에 맞춰 변경
 		SpaceDetailDTO spaceDetailDTO = new SpaceDetailDTO();
-		SpaceVO spaceVO = new SpaceVO();
-		List<SpaceDetailUserDTO> spaceUsers = new ArrayList<>();
-		List<TagVO> tags = new ArrayList<>();
 
-		spaceVO = spacesDAO.findById(spaceId);
-		spaceUsers = spaceUsersDAO.findAll(spaceId, userId);
-		tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
-
-		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
+		spaceDetailDTO.setSpaceTitle(spaceVO.getSpaceName());
 		spaceDetailDTO.setSpaceDescription(spaceVO.getSpaceDescription());
-		spaceDetailDTO.setSpaceName(spaceVO.getSpaceName());
-		spaceDetailDTO.setSpaceIconPath(spaceVO.getSpaceIconPath());
-		spaceDetailDTO.setSpaceUsers(spaceUsers);
+		spaceDetailDTO.setImgUrl(spaceVO.getSpaceIconPath());
+		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
 		spaceDetailDTO.setIsAdmin(spaceUsersDAO.findByUserAdminYn(spaceId, userId));
 		spaceDetailDTO.setIsFirst(spaceUsersDAO.findByFirst(spaceId, userId) == 0 ? 1 : 0);
-		spaceDetailDTO.setTags(tags);
+
+		List<SpaceVO> spaces = spacesDAO.findAll(userId);
+		List<SpaceListDTO> spaceListDTOList = new ArrayList<>();
+		for (SpaceVO space:spaces) {
+			SpaceListDTO spaceListDTO = new SpaceListDTO();
+			spaceListDTO.setSpaceId(space.getSpaceId());
+			spaceListDTO.setSpaceTitle(space.getSpaceName());
+			spaceListDTO.setImgUrl(space.getSpaceIconPath());
+
+			List<SpaceUserVO> userList = spaceUsersDAO.findAll(space.getSpaceId(), userId);
+			List<SpaceUserRespnseDTO> spaceUserRespnseDTOList = new ArrayList<>();
+
+			for (SpaceUserVO user:userList) {
+				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
+				spaceUserRespnseDTO.setUserId(user.getUserId());
+				spaceUserRespnseDTO.setUserName(user.getUserNickname());
+				spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+
+				spaceUserRespnseDTOList.add(spaceUserRespnseDTO);
+			}
+
+			spaceListDTO.setUserList(spaceUserRespnseDTOList);
+
+			spaceListDTOList.add(spaceListDTO);
+		}
+		spaceDetailDTO.setUserList(spaceListDTOList);
+		spaceDetailDTO.setTagList(tags);
 
 		return spaceDetailDTO;
 	};
