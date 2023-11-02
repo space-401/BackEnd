@@ -1,10 +1,10 @@
 package com.app.kkiri.security.converters;
 
 import com.app.kkiri.security.enums.SocialType;
-import com.app.kkiri.security.utils.OAuth2LoginUtils;
 import com.app.kkiri.security.model.ProviderUserRequest;
 import com.app.kkiri.security.model.KakaoUser;
 import com.app.kkiri.security.model.CustomOAuth2User;
+import com.app.kkiri.security.utils.OAuth2LoginUtils;
 
 public class KakaoUserConverter implements CustomOAuth2UserConverter<ProviderUserRequest, CustomOAuth2User> {
 	@Override
@@ -14,7 +14,8 @@ public class KakaoUserConverter implements CustomOAuth2UserConverter<ProviderUse
 			return null;
 		}
 
-		KakaoUser kakaoUserUser = new KakaoUser(OAuth2LoginUtils.createSubAttributes(providerUserRequest.getOAuth2User(), "kakao_account")
+		KakaoUser kakaoUserUser = new KakaoUser(
+			OAuth2LoginUtils.createSubAttributes(providerUserRequest.getOAuth2User(), "kakao_account")
 			, providerUserRequest.getOAuth2User()
 			, providerUserRequest.getClientRegistration());
 

@@ -1,4 +1,4 @@
-package com.app.kkiri.security.filters;
+package com.app.kkiri.security.client;
 
 // @RequiredArgsConstructor
 // public class JwtAuthenticationFilter extends OncePerRequestFilter {
