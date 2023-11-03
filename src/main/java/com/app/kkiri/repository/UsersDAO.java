@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class UsersDAO {
+
 	private final UsersMapper usersMapper;
 
 	// 다음에 생성할 회원의 회원 고유 번호 조회

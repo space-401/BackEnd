@@ -38,6 +38,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
 		response.setStatus(HttpStatus.ACCEPTED.value());
 		response.getWriter().write(gson.toJson(userResponseDTO));
+		response.setContentType("application/json");
 		// ?? 성공적인 인증을 마치면 세션에 이미 저장되어 있는 이전 요청 정보를 추출해서 이전 요청 위치로 리다이렉트 해야하나 ??
 	}
 }

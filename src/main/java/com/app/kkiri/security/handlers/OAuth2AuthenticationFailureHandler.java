@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.app.kkiri.common.Response;
 import com.google.gson.Gson;
@@ -26,8 +27,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
 		entryPointErrorResponse.setMessage("인증에 실패하였습니다");
 
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
-		response.setContentType("application/json");
-		response.setCharacterEncoding("utf-8");
 		response.getWriter().write(gson.toJson(entryPointErrorResponse));
+		response.setContentType("application/json");
 	}
 }

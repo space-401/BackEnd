@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 import com.app.kkiri.common.Response;
 import com.google.gson.Gson;
 
-import lombok.RequiredArgsConstructor;
-
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
@@ -29,8 +27,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 		entryPointErrorResponse.setMessage("인증에 실패하였습니다");
 
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
-		response.setContentType("application/json");
-		response.setCharacterEncoding("utf-8");
 		response.getWriter().write(gson.toJson(entryPointErrorResponse));
+		response.setContentType("application/json");
 	}
 }

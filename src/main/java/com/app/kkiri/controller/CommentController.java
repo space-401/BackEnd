@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/comment/*")
 @Slf4j
 public class CommentController {
-    private CommentService commentService;
+    private final CommentService commentService;
 
     @PostMapping("")
     // 댓글 추가

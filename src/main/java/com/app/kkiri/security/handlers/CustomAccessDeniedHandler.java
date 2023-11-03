@@ -27,8 +27,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         entryPointErrorResponse.setMessage("인증에 실패하였습니다");
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
         response.getWriter().write(gson.toJson(entryPointErrorResponse));
+        response.setContentType("application/json");
     }
 }

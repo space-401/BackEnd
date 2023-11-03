@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -119,7 +120,7 @@ public class JwtTokenProvider {
 		}
 
 		if (header.equalsIgnoreCase(AUTHENTICATION_SCHEME_BEARER)) {
-			throw new BadCredentialsException("비어있는 토큰입니다");
+			throw new InsufficientAuthenticationException("비어있는 토큰입니다");
 		}
 
 		String result = header.substring(7);
