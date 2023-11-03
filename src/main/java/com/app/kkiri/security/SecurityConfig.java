@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import com.app.kkiri.security.configurer.CustomOAuth2LoginConfigurer;
 import com.app.kkiri.security.entryPoints.CustomAuthenticationEntryPoint;
 import com.app.kkiri.security.filters.JwtAuthenticationFilter;
+import com.app.kkiri.security.handlers.CustomAccessDeniedHandler;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationFailureHandler;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationSuccessHandler;
 import com.app.kkiri.security.service.CustomOAuth2UserService;
@@ -31,6 +32,7 @@ public class SecurityConfig {
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -46,13 +48,13 @@ public class SecurityConfig {
 
 		http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
 
+		http.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler);
 		http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
 		http.apply(customOAuth2LoginConfigurer()
 			.userInfoEndpoint(userInfo -> userInfo
 				.userService(customOAuth2UserService))
 			.successHandler(oAuth2AuthenticationSuccessHandler)
-			// .failureHandler(new OAuth2AuthenticationFailureHandler("/"))
 			.failureHandler(oAuth2AuthenticationFailureHandler)
 		);
 

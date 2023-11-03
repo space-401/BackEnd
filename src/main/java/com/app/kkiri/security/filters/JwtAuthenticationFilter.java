@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -39,13 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(!(antPathMatcher.match("/user/auth/**", requestURI) || antPathMatcher.match("/", requestURI))) {
             String accessToken = jwtTokenProvider.resolveToken(servletRequest);
             if(accessToken == null) {
-                throw new BadCredentialsException("올바르지 않은 형식의 토큰입니다");
+                throw new InsufficientAuthenticationException("올바르지 않은 형식의 토큰입니다");
             }
             LOGGER.info("[doFilterInternal()] returned value accessToken : {}", accessToken);
 
             if(!jwtTokenProvider.validateToken(accessToken)) {
-                System.out.println("들어옴");
-                throw new BadCredentialsException("만료된 토큰입니다");
+                throw new InsufficientAuthenticationException("만료된 토큰입니다.");
             }
 
             Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);

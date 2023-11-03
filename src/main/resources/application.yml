@@ -1,6 +1,12 @@
 server:
   port: 8081
 
+  # 인코딩을 위한 설정
+  servlet:
+    encoding:
+      charset: utf-8
+      force-response: true
+
 spring:
   datasource:
     hikari:
