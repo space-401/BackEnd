@@ -4,12 +4,21 @@ import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -22,16 +31,17 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
+
+	public static final String AUTHENTICATION_SCHEME_BEARER = "Bearer";
+
 	private final Logger LOGGER = LoggerFactory.getLogger(JwtTokenProvider.class);
+	private final Long accessTokenValidMilliSecond = 1000L * 60 * 30; // 30분
+	private final Long refreshTokenValidMilliSecond = 1000L * 60 * 60 * 24 * 14; // 2주
+	private final UserDetailsService userDetailsService;
 
 	@Value("${jwt.secret}")
 	private String secret;
-
 	private SecretKey secretKey;
-
-	private final Long accessTokenValidMilliSecond = 1000L * 60 * 30; // 30분
-
-	private final Long refreshTokenValidMilliSecond = 1000L * 60 * 60 * 24 * 14; // 2주
 
 	@PostConstruct
 	protected void init() {
@@ -78,7 +88,7 @@ public class JwtTokenProvider {
 	}
 
 	// 토큰의 유효성과 만료일 체크
-	public boolean validateAccessToken(String token) {
+	public boolean validateToken(String token) {
 		try {
 			Jws<Claims> jws = Jwts.parser()
 				.verifyWith(secretKey)
@@ -91,28 +101,47 @@ public class JwtTokenProvider {
 			return false;
 		}
 	}
+
+	// 헤더에서 토큰 추출
+	public String resolveToken(HttpServletRequest request) {
+
+		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+		if (header == null) {
+			return null;
+		}
+		LOGGER.info("[resolve()] returned value header : {}", header);
+
+		header = header.trim();
+		LOGGER.info("[resolve()] returned value header : {}", header);
+
+		if (!StringUtils.startsWithIgnoreCase(header, AUTHENTICATION_SCHEME_BEARER)) {
+			return null;
+		}
+
+		if (header.equalsIgnoreCase(AUTHENTICATION_SCHEME_BEARER)) {
+			throw new BadCredentialsException("비어있는 토큰입니다");
+		}
+
+		String result = header.substring(7);
+		LOGGER.info("[resolve()] returned value result : {}", result);
+
+		return result;
+	}
+
+	// 토큰으로 인증 정보 조회
+	public Authentication getAuthentication(String token) throws AuthenticationException {
+
+		Long userId = this.getUserId(token);
+		if(userId == null) {
+			throw new UsernameNotFoundException("존재하지 않는 사용자입니다");
+		}
+		LOGGER.info("[getAuthentication()] returned value userId : {}", userId);
+
+		String userIdStr = String.valueOf(this.getUserId(token));
+		UserDetails userDetails = userDetailsService.loadUserByUsername(userIdStr);
+		LOGGER.info("[getAuthentication()] returned value userDetails : {}", userDetails);
+
+		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+	}
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

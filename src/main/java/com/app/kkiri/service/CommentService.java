@@ -1,16 +1,16 @@
 package com.app.kkiri.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.app.kkiri.domain.dto.CommentDTO;
-import com.app.kkiri.domain.dto.PostDTO;
-import com.app.kkiri.domain.dto.PostDetailDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.SpaceUsersDAO;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

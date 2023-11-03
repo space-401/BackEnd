@@ -4,33 +4,33 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.app.kkiri.security.configurer.CustomOAuth2LoginConfigurer;
-import com.app.kkiri.security.configurer.CustomSecurityContextConfigurer;
-import com.app.kkiri.security.converters.CustomOAuth2UserConverter;
-import com.app.kkiri.security.converters.DelegationCustomOAuth2UserConverter;
-import com.app.kkiri.security.filters.CustomOAuth2LoginAuthenticationFilter;
+import com.app.kkiri.security.entryPoints.CustomAuthenticationEntryPoint;
+import com.app.kkiri.security.filters.JwtAuthenticationFilter;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationFailureHandler;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationSuccessHandler;
-import com.app.kkiri.security.model.CustomOAuth2User;
-import com.app.kkiri.security.model.ProviderUserRequest;
 import com.app.kkiri.security.service.CustomOAuth2UserService;
-import com.app.kkiri.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
 @Configuration
+@EnableWebMvc
 @RequiredArgsConstructor
 public class SecurityConfig {
+
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,13 +40,19 @@ public class SecurityConfig {
 
 		http.authorizeRequests(requests -> requests
 			.antMatchers("/").permitAll()
+			.antMatchers("/user/auth/*").permitAll()
 			.anyRequest().authenticated()
 		);
+
+		http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
+
+		http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
 		http.apply(customOAuth2LoginConfigurer()
 			.userInfoEndpoint(userInfo -> userInfo
 				.userService(customOAuth2UserService))
 			.successHandler(oAuth2AuthenticationSuccessHandler)
+			// .failureHandler(new OAuth2AuthenticationFailureHandler("/"))
 			.failureHandler(oAuth2AuthenticationFailureHandler)
 		);
 
