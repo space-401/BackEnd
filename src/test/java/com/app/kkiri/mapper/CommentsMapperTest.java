@@ -28,11 +28,17 @@ class CommentsMapperTest {
 
     @Test
     void delete() {
-        commentsMapper.delete(2L);
+        commentsMapper.delete(3L);
     }
 
     @Test
     void selectById() {
         commentsMapper.selectById(44L);
     }
+
+    @Test
+    void selectByGroup(){ commentsMapper.selectByGroup(3L); }
+
+    @Test
+    void getTotal(){ commentsMapper.getTotal(44L); }
 }

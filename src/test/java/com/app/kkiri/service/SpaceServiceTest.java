@@ -3,6 +3,7 @@ package com.app.kkiri.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.app.kkiri.domain.dto.SpaceResponseDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +21,7 @@ class SpaceServiceTest {
 
     @Test
     void list() {
-        List<SpaceListDTO> spaces = new ArrayList<>();
+        List<SpaceResponseDTO> spaces = new ArrayList<>();
         spaces = spaceService.list(21L);
 
         log.info("spaceList : " + spaces);
