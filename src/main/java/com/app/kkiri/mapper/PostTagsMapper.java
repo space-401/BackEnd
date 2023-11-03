@@ -1,5 +1,6 @@
 package com.app.kkiri.mapper;
 
+import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.vo.TagVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,5 +15,5 @@ public interface PostTagsMapper {
     public void delete(Long postId);
 
     // 태그 조회
-    public List<TagVO> selectById(Long postId);
+    public List<TagDTO> selectById(Long postId);
 }

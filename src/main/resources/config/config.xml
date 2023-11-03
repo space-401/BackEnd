@@ -7,6 +7,7 @@
         <typeAlias type="com.app.kkiri.domain.dto.SpaceDetailUserDTO" alias="spaceDetailUserDTO"/>
         <typeAlias type="com.app.kkiri.domain.vo.SpaceUserVO" alias="spaceUserVO"/>
         <typeAlias type="com.app.kkiri.domain.vo.TagVO" alias="tagVO"/>
+        <typeAlias type="com.app.kkiri.domain.dto.TagDTO" alias="tagDTO"/>
         <typeAlias type="com.app.kkiri.domain.vo.PostVO" alias="postVO"/>
         <typeAlias type="com.app.kkiri.domain.dto.PostDTO" alias="postDTO"/>
         <typeAlias type="com.app.kkiri.domain.vo.PostImgVO" alias="postImgVO"/>

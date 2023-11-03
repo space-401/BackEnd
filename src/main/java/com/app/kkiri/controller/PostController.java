@@ -4,7 +4,9 @@ import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.PostDetailResponseDTO;
 import com.app.kkiri.domain.vo.PostBookmarkVO;
 import com.app.kkiri.domain.vo.PostImgVO;
+import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.security.utils.JwtTokenProvider;
 import com.app.kkiri.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -29,11 +32,21 @@ import java.util.UUID;
 @Slf4j
 public class PostController {
     private final PostService postService;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    private Long getUserId(HttpServletRequest request){
+        try{
+            String token = jwtTokenProvider.resolveToken(request);
+            return  jwtTokenProvider.getUserId(token);
+        } catch (Exception e){
+            throw new CustomException(StatusCode.INVALID_TOKEN);
+        }
+    }
 
     // 게시글 작성
     @PostMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> register(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs) throws IOException{
-        Long userId = 1L;
+    public ResponseEntity<?> register(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs, HttpServletRequest request) throws IOException{
+        Long userId = getUserId(request);
 
         postDTO.setUserId(userId);
 
@@ -121,16 +134,16 @@ public class PostController {
 
     // 게시글 상세 조회
     @GetMapping("")
-    public ResponseEntity<?> postDetail(@RequestParam Long postId){
-        Long userId = 1L;
+    public ResponseEntity<?> postDetail(@RequestParam Long postId, HttpServletRequest request){
+        Long userId = getUserId(request);
         PostDetailResponseDTO postDetailType = postService.postDetail(postId, userId);
         return ResponseEntity.ok().body(postDetailType);
     }
 
     // 게시글 북마크
     @PostMapping(path = "/bookmark")
-    public ResponseEntity<?> bookmark(@RequestBody PostBookmarkVO postId){
-        Long userId = 1L;
+    public ResponseEntity<?> bookmark(@RequestBody PostBookmarkVO postId, HttpServletRequest request){
+        Long userId = getUserId(request);
         log.info("postId: " + postId.getPostId());
         postService.bookmark(postId.getPostId(), userId);
         return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);

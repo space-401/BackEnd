@@ -6,6 +6,9 @@ import com.app.kkiri.mapper.PostsMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
 @Repository
 @RequiredArgsConstructor
 public class PostsDAO {
@@ -21,4 +24,10 @@ public class PostsDAO {
 
     // 게시글 상세 조회
     public PostVO findById(Long postId){ return postsMapper.selectById(postId); }
+
+    // 게시글 필터 조회
+    public List<PostVO> findByfilter(Map<String, Object> param){ return postsMapper.selectByfilter(param); }
+
+    // 필터된 게시글 총 개수
+    public int getTotal(Map<String, Object> param){ return postsMapper.getTotal(param); }
 }

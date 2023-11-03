@@ -4,6 +4,7 @@ import com.app.kkiri.domain.dto.*;
 import com.app.kkiri.domain.vo.*;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.repository.PostsDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +57,7 @@ public class SpaceService {
 		}
 
 		return spaceList;
-	};
+	}
 
 	// 스페이스 상세 조회
 	public SpaceDetailDTO spaceDetail(Long spaceId, Long userId){
@@ -104,7 +105,7 @@ public class SpaceService {
 		spaceDetailDTO.setTagList(tags);
 
 		return spaceDetailDTO;
-	};
+	}
 
 	// 스페이스 생성
 	@Transactional(rollbackFor = Exception.class)
@@ -113,7 +114,7 @@ public class SpaceService {
 		spaceUserVO.setSpaceId(spaceVO.getSpaceId());
 		spaceUsersDAO.save(spaceUserVO);
 		return spaceVO.getSpaceId();
-	};
+	}
 
 	// 스페이스 삭제
 	public void remove(Long spaceId){
@@ -122,7 +123,7 @@ public class SpaceService {
 		}catch(Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	// 스페이스 수정
 	public void modify(SpaceDTO spaceDTO){
@@ -131,16 +132,12 @@ public class SpaceService {
 		}catch(Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
-
-	// 게시글 필터 조회
-	public void filter(){
-	};
+	}
 
 	// 스페이스 태그 조회
 	public  List<TagVO> tagList(Long spaceId){
 		return tagsDAO.findAll(spaceId);
-	};
+	}
 
 	// 스페이스 태그 추가
 	public void addTag(TagVO tagVO){
@@ -149,7 +146,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	// 스페이스 태그 삭제
 	public void removeTag(Long tagId){
@@ -158,7 +155,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	@Transactional(rollbackFor = Exception.class)
 	// 스페이스 회원 입장 (초대코드 입력)
@@ -181,7 +178,7 @@ public class SpaceService {
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 		return spaceId;
-	};
+	}
 
 	// 스페이스 회원 탈퇴
 	public void withdrawSpace(Long spaceId, Long userId){
@@ -190,7 +187,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	// 스페이스 회원 상태 변경
 	@Transactional(rollbackFor = Exception.class)
@@ -201,7 +198,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 
 	// 스페이스 내 유저 정보 변경
@@ -211,5 +208,5 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 }

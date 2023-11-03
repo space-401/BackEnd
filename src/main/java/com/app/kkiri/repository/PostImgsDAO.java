@@ -13,11 +13,11 @@ public class PostImgsDAO {
     private final PostImgsMapper postImgsMapper;
 
     // 이미지 저장
-    public void save(PostImgVO postImgVO){ postImgsMapper.insert(postImgVO);} ;
+    public void save(PostImgVO postImgVO){ postImgsMapper.insert(postImgVO);}
 
     // 이미지 조회
-    public List<String> findById(Long postId){ return postImgsMapper.selectById(postId); };
+    public List<String> findById(Long postId){ return postImgsMapper.selectById(postId); }
 
     // 이미지 삭제
-    public void delete(Long postId){ postImgsMapper.delete(postId); };
+    public void delete(Long postId){ postImgsMapper.delete(postId); }
 }

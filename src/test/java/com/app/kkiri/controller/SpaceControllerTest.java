@@ -180,10 +180,6 @@ class SpaceControllerTest {
     }
 
     @Test
-    void filter() {
-    }
-
-    @Test
     void tagList() throws Exception {
         log.info("tagList: " + mockMvc.perform(MockMvcRequestBuilders.get("/space/tag")
                         .param("spaceId", "44"))
@@ -330,5 +326,16 @@ class SpaceControllerTest {
                                 .characterEncoding("UTF-8"))
 //                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    void filter() throws Exception{
+        log.info("filter: " + mockMvc.perform(MockMvcRequestBuilders.get("/space/search")
+                        .param("spaceId", "46")
+//                         .param("tagId", "61")
+//                        .param("keyword", "수정")
+                        .param("page", "2"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print()));
     }
 }

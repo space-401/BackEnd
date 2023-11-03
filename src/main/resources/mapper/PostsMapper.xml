@@ -29,4 +29,81 @@
         WHERE POST_ID=#{postId}
     </select>
 
+    <select id="selectByfilter" parameterType="hashmap" resultType="postVO">
+        SELECT POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
+        POST_LOCATION_LAT, POST_LOCATION_LNG
+        FROM
+            (
+            SELECT ROWNUM R, POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
+            POST_LOCATION_LAT, POST_LOCATION_LNG
+            FROM
+                (SELECT DISTINCT(p.POST_ID) POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
+                POST_LOCATION_LAT, POST_LOCATION_LNG
+                FROM POSTS p LEFT JOIN POST_TAGS t
+                ON p.POST_ID=t.POST_ID
+                WHERE p.SPACE_ID=#{spaceId}
+                <if test="keyword != null">
+                    AND POST_TITLE LIKE '%'||#{keyword}||'%' OR POST_CONTENT LIKE '%'||#{keyword}||'%'
+                </if>
+                <if test="dateList != null and dateList.size != 0">
+                    <foreach collection="dateList" item="date">
+                        AND #{date} BETWEEN (POST_BEGIN_DATE, POST_END_DATE)
+                    </foreach>
+                </if>
+                <if test="tags != null and tags.size != 0">
+                    AND t.TAG_ID IN
+                    <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
+                        #{tag}
+                    </foreach>
+                </if>
+                <if test="writers != null and writers.size != 0">
+                    AND USER_ID IN
+                    <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
+                        #{writer}
+                    </foreach>
+                </if>
+                ORDER BY
+                POST_REGISTER_DATE DESC
+                ) D2
+            <![CDATA[
+            WHERE ROWNUM <= #{page} * #{amount}
+        ) WHERE R > (#{page} - 1) * #{amount}
+        ]]>
+    </select>
+
+    <select id="getTotal" resultType="_int">
+        SELECT COUNT(POST_ID)
+        FROM
+        (
+        SELECT ROWNUM R, POST_ID
+        FROM
+        (SELECT DISTINCT(p.POST_ID) POST_ID
+        FROM POSTS p LEFT JOIN POST_TAGS t
+        ON p.POST_ID=t.POST_ID
+        WHERE p.SPACE_ID=#{spaceId}
+        <if test="keyword != null">
+            AND POST_TITLE LIKE '%'||#{keyword}||'%' OR POST_CONTENT LIKE '%'||#{keyword}||'%'
+        </if>
+        <if test="dateList != null and dateList.size != 0">
+            <foreach collection="dateList" item="date">
+                AND #{date} BETWEEN (POST_BEGIN_DATE, POST_END_DATE)
+            </foreach>
+        </if>
+        <if test="tags != null and tags.size != 0">
+            AND t.TAG_ID IN
+            <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
+                #{tag}
+            </foreach>
+        </if>
+        <if test="writers != null and writers.size != 0">
+            AND USER_ID IN
+            <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
+                #{writer}
+            </foreach>
+        </if>) D2
+        <![CDATA[
+            WHERE ROWNUM <= #{page} * #{amount}
+        ) WHERE R > (#{page} - 1) * #{amount}
+        ]]>
+    </select>
 </mapper>
