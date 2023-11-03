@@ -4,6 +4,8 @@ import com.app.kkiri.domain.dto.*;
 import com.app.kkiri.domain.vo.*;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.security.utils.JwtTokenProvider;
+import com.app.kkiri.service.PostService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,13 +19,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,32 +38,45 @@ import java.util.UUID;
 @Slf4j
 public class SpaceController {
 	private final SpaceService spaceService;
+	private final PostService postService;
+	private final JwtTokenProvider jwtTokenProvider;
+
+	private Long getUserId(HttpServletRequest request){
+		try{
+			String token = jwtTokenProvider.resolveToken(request);
+			return  jwtTokenProvider.getUserId(token);
+		} catch (Exception e){
+			throw new CustomException(StatusCode.INVALID_TOKEN);
+		}
+	}
 
 	// 목록 조회
 	@GetMapping("/list")
-	public ResponseEntity<?> list(){
-//		userId 수정
-		Long userId = 1L;
-		List<SpaceResponseDTO> spaceList = spaceService.list(userId);
-		return ResponseEntity.ok().body(spaceList);
-	};
+	public ResponseEntity<?> list(HttpServletRequest request){
+		Long userId = getUserId(request);
+			List<SpaceResponseDTO> spaceList = spaceService.list(userId);
+			return ResponseEntity.ok().body(spaceList);
+	}
 
 	// 스페이스 상세 조회
 	@GetMapping("")
-	public ResponseEntity<?> spaceDetail(@RequestParam Long spaceId){
-		Long userId = 1L;
+	public ResponseEntity<?> spaceDetail(@RequestParam Long spaceId, HttpServletRequest request){
+		Long userId = getUserId(request);
 		SpaceDetailDTO spaceDetailDTO = spaceService.spaceDetail(spaceId, userId);
 		return ResponseEntity.ok().body(spaceDetailDTO);
-	};
+	}
 
 	// 사진 업로드 위치 (해당 이미지를 업로드한 년/월/일)
 	private String getUploadPath(){
 		return new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-	};
+	}
 
 	// 스페이스 생성
 	@PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<?> register(@RequestPart SpaceDTO spaceDTO, @RequestPart(required = false) MultipartFile imgUrl) throws IOException {
+	public ResponseEntity<?> register(@RequestPart SpaceDTO spaceDTO,
+									  @RequestPart(required = false) MultipartFile imgUrl,
+									  HttpServletRequest request) throws IOException {
+		Long userId = getUserId(request);
 		SpaceVO spaceVO = new SpaceVO();
 		spaceVO.setSpaceName(spaceDTO.getSpaceName());
 		spaceVO.setSpacePw(spaceDTO.getSpacePw());
@@ -69,7 +89,6 @@ public class SpaceController {
 		Long defaultImg = spaceDTO.getDefaultImg();
 
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
-		Long userId = 1L;
 
 		UUID uuid = UUID.randomUUID();
 		
@@ -121,7 +140,7 @@ public class SpaceController {
 
 		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
 		return ResponseEntity.ok().body(spaceId);
-	};
+	}
 
 	// 스페이스 삭제
 	@DeleteMapping("")
@@ -129,11 +148,12 @@ public class SpaceController {
 		spaceService.remove(spaceId);
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
 
-	};
+	}
 
 	// 스페이스 수정
 	@PatchMapping("")
-	public ResponseEntity<StatusCode> modify(@RequestPart SpaceDTO spaceDTO, @RequestPart(required = false) MultipartFile imgUrl) throws IOException{
+	public ResponseEntity<StatusCode> modify(@RequestPart SpaceDTO spaceDTO,
+											 @RequestPart(required = false) MultipartFile imgUrl) throws IOException{
 
 		log.info("------------------- 여기 ---------------");
 		log.info("spaceDTO: " + spaceDTO);
@@ -181,19 +201,14 @@ public class SpaceController {
 
 		spaceService.modify(spaceDTO);
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
-	};
-
-	// 게시글 필터 조회
-//	?spaceId={spaceId}&userId={userId}&tagId={tagId}&keyword={keyword}&startDate={startDate}&endDate={endDate}
-	@GetMapping("/search")
-	public void filter(){};
+	}
 
 	// 스페이스 태그 조회
 	@GetMapping("/tag")
 	public ResponseEntity<?> tagList(@RequestParam Long spaceId){
 		List<TagVO> tags = spaceService.tagList(spaceId);
 		return ResponseEntity.ok().body(tags);
-	};
+	}
 
 	// 스페이스 태그 추가
 	@PostMapping("/tag")
@@ -201,34 +216,36 @@ public class SpaceController {
 	public ResponseEntity<StatusCode> addTag(@RequestBody TagVO tagVO){
 		spaceService.addTag(tagVO);
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
-	};
+	}
 
 	// 스페이스 태그 삭제
 	@DeleteMapping("/tag")
 	public ResponseEntity<StatusCode> removeTag(@RequestParam Long spaceId, @RequestParam Long tagId){
 		spaceService.removeTag(tagId);
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
-	};
+	}
 
 	// 스페이스 회원 입장 (초대코드 입력)
 	@PostMapping("/user")
-	public ResponseEntity<?> enterSpace(@RequestBody SpaceVO spaceVO){
-		Long userId = 1L;
+	public ResponseEntity<?> enterSpace(@RequestBody SpaceVO spaceVO, HttpServletRequest request){
+		Long userId = getUserId(request);
 		Long spaceId = spaceService.enter(userId, spaceVO);
 		return ResponseEntity.ok().body(spaceId);
-	};
+	}
 
 	// 스페이스 회원 탈퇴
 	@DeleteMapping("/user")
 	public ResponseEntity<StatusCode> withdrawSpace(@RequestParam Long spaceId, @RequestParam Long userId){
 		spaceService.withdrawSpace(spaceId, userId);
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
-	};
+	}
 
 	// 스페이스 내 유저 정보 변경
 	@PatchMapping(value = "/user", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<StatusCode> modifyInfo(@RequestPart SpaceUserDTO spaceUserDTO, @RequestPart(required = false) MultipartFile image) throws IOException{
-		Long userId = 1L;
+	public ResponseEntity<StatusCode> modifyInfo(@RequestPart SpaceUserDTO spaceUserDTO,
+												 @RequestPart(required = false) MultipartFile image,
+												 HttpServletRequest request) throws IOException{
+		Long userId = getUserId(request);
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		spaceUserVO.setUserId(userId);
 
@@ -238,7 +255,7 @@ public class SpaceController {
 		if(spaceUserDTO.getIsAdmin()){
 			log.info("방장 변경 들어옴");
 			// 방장 변경
-			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), userId);
+			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), spaceUserDTO.getUserId());
 		} else {
 			log.info("이미지 저장 들어옴");
 //			이미지 저장
@@ -275,5 +292,45 @@ public class SpaceController {
 		}
 
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
-	};
+	}
+
+	// 게시글 필터 조회
+	@GetMapping("/search")
+	public ResponseEntity<?> filter(@RequestParam Long spaceId, @RequestParam Long page,
+					   @RequestParam(required = false) List<Long> userId,
+					   @RequestParam(required = false) List<Long> tagId,
+					   @RequestParam(required = false) String keyword,
+					   @RequestParam(required = false) String startDate,
+					   @RequestParam(required = false) String endDate, HttpServletRequest request){
+		Long id = getUserId(request);
+		Map<String, Object> param = new HashMap<>();
+		List<LocalDate> dateList = new ArrayList<>();
+		int amount = 10;
+		param.put("spaceId", spaceId);
+		param.put("page", page);
+		param.put("writers", userId);
+		param.put("tags", tagId);
+		param.put("keyword", keyword);
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/d");
+		if(startDate != null || endDate !=null){
+			LocalDate start = LocalDate.parse(startDate, formatter);
+			LocalDate end = LocalDate.parse(endDate, formatter);
+
+			Long numOfDaysBetween = ChronoUnit.DAYS.between(start, end);
+			dateList = IntStream.iterate(0, i -> i + 1)
+			.limit(numOfDaysBetween)
+			.mapToObj(i -> start.plusDays(i))
+			.collect(Collectors.toList());
+		} else if (startDate != null) {
+			dateList.add(LocalDate.parse(startDate, formatter));
+		} else if(endDate != null){
+			dateList.add(LocalDate.parse(endDate, formatter));
+		}
+
+		param.put("dateList", dateList);
+		param.put("amount", amount);
+
+		return ResponseEntity.ok().body(postService.filter(param, id));
+	}
 }

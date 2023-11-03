@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class PostService {
     private final PostBookmarksDAO postBookmarksDAO;
     private final MentionDAO mentionDAO;
     private final SpaceUsersDAO  spaceUsersDAO;
+    private final CommentsDAO commentsDAO;
 
     @Transactional(rollbackFor = Exception.class)
     // 게시글 작성
@@ -139,7 +141,7 @@ public class PostService {
         }
         postDetailResponseDTO.setUserList(userList);
         postDetailResponseDTO.setSelectedTags(postTagsDAO.findById(postId));
-//        postDetailDTO.setCommentConut();
+        postDetailResponseDTO.setCommentConut(commentsDAO.getTotal(postId));
 
         log.info("postDetailResponseDTO: " + postDetailResponseDTO);
 
@@ -155,6 +157,54 @@ public class PostService {
                 postBookmarksDAO.delete(postId, userId);
             }
         } catch (Exception e){
+            throw new CustomException(StatusCode.BAD_REQUEST);
+        }
+    }
+
+    // 게시글 필터 조회
+    public PostFilterResponseDTO filter(Map<String, Object> param, Long userId){
+        try{
+            PostFilterResponseDTO postFilterResponseDTO = new PostFilterResponseDTO();
+            List<PostVO> postVOListst = postsDAO.findByfilter(param);
+            List<PostFilterDTO> postList = new ArrayList<>();
+
+            for (PostVO post: postVOListst) {
+                Long postId = post.getPostId();
+                PostFilterDTO postFilterDTO = new PostFilterDTO();
+                postFilterDTO.setPostId(post.getPostId());
+                postFilterDTO.setPostTitle(post.getPostTitle());
+                postFilterDTO.setPlaceTitle(post.getPostLocationKeyword());
+                postFilterDTO.setPostCreatedAt(post.getPostRegisterDate());
+                postFilterDTO.setPostUpdatedAt(post.getPostUpdateDate());
+
+                PostPositionDTO postPositionDTO = new PostPositionDTO();
+                postPositionDTO.create(post.getPostLocationLat(), post.getPostLocationLng());
+                postFilterDTO.setPosition(postPositionDTO);
+
+                postFilterDTO.setImgUrl(postImgsDAO.findById(postId));
+                postFilterDTO.setSelectedTags(postTagsDAO.findById(postId));
+
+                List<SpaceUserVO> users = spaceUsersDAO.findAll((Long)param.get("spaceId"), userId);
+                List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+                for (SpaceUserVO user:users) {
+                    SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
+                    spaceUserRespnseDTO.setUserId(user.getUserId());
+                    spaceUserRespnseDTO.setUserName(user.getUserNickname());
+                    spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+
+                    userList.add(spaceUserRespnseDTO);
+                }
+                postFilterDTO.setUsersList(userList);
+
+                postList.add(postFilterDTO);
+            }
+
+            postFilterResponseDTO.setPostList(postList);
+            postFilterResponseDTO.setItemLength((Integer)param.get("amount"));
+            postFilterResponseDTO.setTotal(postsDAO.getTotal(param));
+
+            return postFilterResponseDTO;
+        } catch (Exception e) {
             throw new CustomException(StatusCode.BAD_REQUEST);
         }
     }
