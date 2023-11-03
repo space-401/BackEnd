@@ -21,6 +21,7 @@ spring:
 #            client-secret: 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
 #            redirect-uri: http://localhost:8081/login/oauth2/code/google
             client-name: kkiri-google
+            redirect-uri: http://localhost:3000/auth
             scope: profile,email
 
           naver:

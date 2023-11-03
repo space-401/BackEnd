@@ -12,6 +12,7 @@ import lombok.ToString;
 @Builder
 @ToString
 public class UserVO {
+
 	private Long userId;
 	private String socialType;
 	private String userStatus;

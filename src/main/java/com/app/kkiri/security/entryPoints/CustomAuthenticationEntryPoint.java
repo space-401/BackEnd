@@ -1,4 +1,4 @@
-package com.app.kkiri.security.handlers;
+package com.app.kkiri.security.entryPoints;
 
 import java.io.IOException;
 
@@ -8,17 +8,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.app.kkiri.common.Response;
 import com.google.gson.Gson;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
-public class OAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
 	@Override
-	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-		AuthenticationException exception) throws IOException, ServletException {
+	public void commence(HttpServletRequest request, HttpServletResponse response,
+		AuthenticationException authException) throws IOException, ServletException {
 
 		Gson gson = new Gson();
 
