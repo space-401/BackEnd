@@ -21,27 +21,10 @@ public interface UsersMapper {
 	// userEmail 을 사용하여 회원 조회
 	UserVO selectUserByUserEmail(String userEmail);
 
-	// // 목록 조회
-	// public List<SpaceVO> selectAll(Long userId);
-	//
-	// // 스페이스 상세 조회
-	// public SpaceVO selectById(Long spaceId);
-	//
-	// // 스페이스 입장
-	// public Long selectByCodeAndPw(SpaceVO spaceVO);
-	//
-	// // 스페이스 생성
-	// public void insert(SpaceVO spaceVO);
-	//
-	// // 스페이스 삭제
-	// public void delete(Long spaceId);
-	//
-	// // 스페이스 수정
-	// public void update(SpaceDTO spaceDTO);
-	//
-	// // 스페이스 회원 전체수
-	//  public int getTally(Long spaceId);
-	//
-	// // 스페이스 인원 업데이트
-	// public void updateTally(Long spaceId, int spaceUserTally);
+	// 엑세스 토큰 재발급 후 수정
+	void updateAccessToken(Long userId, String accessToken);
+
+	// 엑세스 토큰과 리프레쉬 토큰 재발급 후 수정
+	void updateAccessTokenAndRefreshToken(Long userId, String accessToken, String refreshToken);
+
 }

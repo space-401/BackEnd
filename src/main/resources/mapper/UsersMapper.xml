@@ -35,57 +35,17 @@
         WHERE user_email = #{userEmail}
     </select>
 
-<!--    <select id="selectAll" resultType="spaceVO">-->
-<!--            SELECT s.SPACE_ID, SPACE_NAME, SPACE_ICON_PATH-->
-<!--            FROM SPACES s-->
-<!--            INNER JOIN SPACE_USERS su-->
-<!--            ON s.SPACE_ID = su.SPACE_ID-->
-<!--            WHERE su.USER_ID = #{userId}-->
-<!--            ORDER BY SPACE_SIGNUP_DATE DESC-->
-<!--    </select>-->
+    <update id="updateAccessToken">
+        UPDATE users
+        SET access_token = #{accessToken}
+        WHERE user_id = #{userId}
+    </update>
 
-<!--    <select id="selectById" resultType="spaceVO">-->
-<!--        SELECT SPACE_NAME, SPACE_DESCRIPTION, SPACE_ICON_PATH, SPACE_PW-->
-<!--        FROM SPACES-->
-<!--        WHERE SPACE_ID=#{spaceId}-->
-<!--    </select>-->
+    <update id="updateAccessTokenAndRefreshToken">
+        UPDATE users
+        SET access_token = #{accessToken}, refresh_token = #{refreshToken}
+        WHERE user_id = #{userId}
+    </update>
 
-<!--    <select id="selectByCodeAndPw" resultType="Long">-->
-<!--        SELECT SPACE_ID-->
-<!--        FROM SPACES-->
-<!--        WHERE SPACE_CODE=#{spaceCode} AND SPACE_PW=#{spacePw}-->
-<!--    </select>-->
 
-<!--    <insert id="insert">-->
-<!--        <selectKey keyProperty="spaceId" order="BEFORE" resultType="long">-->
-<!--            SELECT SEQ_SPACES.NEXTVAL FROM DUAL-->
-<!--        </selectKey>-->
-<!--        INSERT INTO SPACES (SPACE_ID, SPACE_NAME, SPACE_DESCRIPTION, SPACE_PW, SPACE_CODE, SPACE_USER_TALLY, SPACE_ICON_NAME, SPACE_ICON_PATH, SPACE_ICON_UUID, SPACE_ICON_SIZE)-->
-<!--        VALUES(#{spaceId}, #{spaceName}, #{spaceDescription}, #{spacePw}, #{spaceCode}, #{spaceUserTally}, #{spaceIconName}, #{spaceIconPath}, #{spaceIconUuid}, #{spaceIconSize})-->
-<!--    </insert>-->
-
-<!--    <delete id="delete">-->
-<!--        DELETE FROM SPACES-->
-<!--        WHERE SPACE_ID=#{spaceId}-->
-<!--    </delete>-->
-
-<!--    <update id="update">-->
-<!--        UPDATE SPACES-->
-<!--        SET SPACE_NAME=#{spaceName}, SPACE_DESCRIPTION=#{spaceDescription},-->
-<!--                           SPACE_PW=#{spacePw}, SPACE_ICON_NAME=#{spaceIconName},-->
-<!--                           SPACE_ICON_PATH=#{spaceIconPath}, SPACE_ICON_UUID=#{spaceIconUuid},-->
-<!--                           SPACE_ICON_SIZE=#{spaceIconSize}, SPACE_UPDATE_DATE = SYSDATE-->
-<!--        WHERE SPACE_ID=#{spaceId}-->
-<!--    </update>-->
-
-<!--    <select id="getTally" resultType="int">-->
-<!--        SELECT SPACE_USER_TALLY FROM SPACES-->
-<!--        WHERE SPACE_ID=#{spaceId}-->
-<!--    </select>-->
-
-<!--    <update id="updateTally">-->
-<!--        UPDATE SPACES-->
-<!--        SET SPACE_USER_TALLY=#{spaceUserTally}-->
-<!--        WHERE SPACE_ID=#{spaceId}-->
-<!--    </update>-->
 </mapper>

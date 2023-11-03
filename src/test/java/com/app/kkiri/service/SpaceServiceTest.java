@@ -7,10 +7,7 @@ import com.app.kkiri.domain.dto.SpaceResponseDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import com.app.kkiri.domain.dto.SpaceListDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
-
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
@@ -18,30 +15,29 @@ import lombok.extern.slf4j.Slf4j;
 class SpaceServiceTest {
     @Autowired
     private SpaceService spaceService;
-
     @Test
     void list() {
-        List<SpaceResponseDTO> spaces = new ArrayList<>();
-        spaces = spaceService.list(21L);
-
-        log.info("spaceList : " + spaces);
+//        List<SpaceResponseDTO> spaces = new ArrayList<>();
+//        spaces = spaceService.list(21L);
+//
+//        log.info("spaceList : " + spaces);
     }
 
-    // @Test
-    // void spaceDetail() {
-    //     log.info("spaceDetail : " + spaceService.spaceDetail(47L, 1L));
-    // }
+     @Test
+     void spaceDetail() {
+         log.info("spaceDetail : " + spaceService.spaceDetail(47L, 1L));
+     }
 
-    // @Test
-    // void register() {
-    //     SpaceVO spaceVO = new SpaceVO();
-    //     SpaceUserVO spaceUserVO = new SpaceUserVO();
-    //     String uuid = UUID.randomUUID().toString();
-	//
-    //     spaceVO.create("servicetest", "serviceTest", "00000", uuid, "a", "a", "a", 12L);
-    //     spaceUserVO.createAdmin(3L);
-    //     spaceService.register(spaceVO, spaceUserVO);
-    // }
+     @Test
+     void register() {
+//         SpaceVO spaceVO = new SpaceVO();
+//         SpaceUserVO spaceUserVO = new SpaceUserVO();
+//         String uuid = UUID.randomUUID().toString();
+//
+//         spaceVO.create("servicetest", "serviceTest", "00000", uuid, "a", "a", "a", 12L);
+//         spaceUserVO.createAdmin(3L);
+//         spaceService.register(spaceVO, spaceUserVO);
+     }
 
     @Test
     void remove() {

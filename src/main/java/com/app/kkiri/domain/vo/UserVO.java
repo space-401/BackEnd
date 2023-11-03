@@ -10,8 +10,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class UserVO {
+
 	private Long userId;
 	private String socialType;
 	private String userStatus;

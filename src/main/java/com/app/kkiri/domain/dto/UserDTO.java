@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserDTO {
+
 	private Long userId;
 	private String socialType;
 	private String userStatus;
