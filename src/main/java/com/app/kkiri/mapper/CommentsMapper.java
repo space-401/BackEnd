@@ -18,5 +18,11 @@ public interface CommentsMapper {
     public void delete(Long commentId);
 
     // 댓글 조회
-    public List<CommentDTO> selectById(Long postId);
+    public List<CommentVO> selectById(Long postId);
+
+    // 댓글 번호가 GROUP인 userId
+    public Long selectByGroup(Long commentGroup);
+
+    // 게시글 댓글 총 개수
+    public Long getTotal(Long postId);
 }

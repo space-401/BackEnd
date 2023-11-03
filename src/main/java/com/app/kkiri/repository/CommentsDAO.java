@@ -23,5 +23,11 @@ public class CommentsDAO {
     public void delete(Long commentId){ commentsMapper.delete(commentId); }
 
     // 댓글 조회
-    public List<CommentDTO> findById(Long postId){ return commentsMapper.selectById(postId); }
+    public List<CommentVO> findById(Long postId){ return commentsMapper.selectById(postId); }
+
+    // 댓글 번호가 GROUP인 userId
+    public Long selectByGroup(Long commentGroup){ return commentsMapper.selectByGroup(commentGroup); }
+
+    // 게시글 댓글 총 개수
+    public Long getTotal(Long postId){ return commentsMapper.getTotal(postId); }
 }

@@ -23,8 +23,19 @@
         WHERE COMMENT_ID=#{commentId}
     </delete>
 
-    <select id="selectById" resultType="commentDTO">
+    <select id="selectById" resultType="commentVO">
         SELECT COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, COMMENT_REGISTER_DATE, USER_ID FROM COMMENTS
+        WHERE POST_ID=#{postId}
+        ORDER BY COMMENT_GROUP, COMMENT_ID
+    </select>
+
+    <select id="selectByGroup" resultType="long">
+        SELECT USER_ID FROM COMMENTS
+        WHERE COMMENT_ID=#{commentGroup}
+    </select>
+
+    <select id="getTotal" resultType="long">
+        SELECT COUNT(COMMENT_ID) FROM COMMENTS
         WHERE POST_ID=#{postId}
     </select>
 </mapper>
