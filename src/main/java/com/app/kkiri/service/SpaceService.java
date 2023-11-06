@@ -65,7 +65,15 @@ public class SpaceService {
 		SpaceVO spaceVO = spacesDAO.findById(spaceId);
 
 		// 스페이스의 태그들을 가져온다.
-		List<TagVO> tags =  Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
+		List<TagVO> tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
+		List<TagDTO> tagList = new ArrayList<>();
+		for (TagVO tag:tags) {
+			TagDTO tagDTO = new TagDTO();
+			tagDTO.setTagId(tag.getTagId());
+			tagDTO.setTagTitle(tag.getTagName());
+
+			tagList.add(tagDTO);
+		}
 
 		// Response 객체 형식에 맞춰 변경
 		SpaceDetailDTO spaceDetailDTO = new SpaceDetailDTO();
@@ -102,7 +110,7 @@ public class SpaceService {
 			spaceListDTOList.add(spaceListDTO);
 		}
 		spaceDetailDTO.setUserList(spaceListDTOList);
-		spaceDetailDTO.setTagList(tags);
+		spaceDetailDTO.setTagList(tagList);
 
 		return spaceDetailDTO;
 	}
