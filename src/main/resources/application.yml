@@ -27,7 +27,7 @@ spring:
 #            client-secret: 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
 #            redirect-uri: http://localhost:8081/login/oauth2/code/google
             client-name: kkiri-google
-            redirect-uri: http://localhost:3000/auth
+            redirect-uri: http://localhost:3000/auth/google
             scope: profile,email
 
           naver:
@@ -37,7 +37,7 @@ spring:
 #            client-secret: 9wyMXiX4zn
             authorization-grant-type: authorization_code
             client-name: kkiri-naver
-            redirect-uri: http://localhost:3000/auth
+            redirect-uri: http://localhost:3000/auth/naver
 
           kakao:
             client-id: 589c5b3cc0bf60c60e8185acda5bfed7
@@ -47,7 +47,7 @@ spring:
             authorization-grant-type: authorization_code
             client-authentication-method: POST
             client-name: kkiri-kakao
-            redirect-uri: http://localhost:3000/auth
+            redirect-uri: http://localhost:3000/auth/kakao
             scope: profile_nickname,account_email
 
         provider:
