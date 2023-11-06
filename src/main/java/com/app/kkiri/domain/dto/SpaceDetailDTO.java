@@ -19,5 +19,5 @@ public class SpaceDetailDTO {
     private int isAdmin;
     private int isFirst;
     private List<SpaceListDTO> userList;
-    private List<TagVO> tagList;
+    private List<TagDTO> tagList;
 }
