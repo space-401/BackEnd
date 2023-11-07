@@ -19,5 +19,5 @@ public class PostTagsDAO {
     public void delete(Long postId){ postTagsMapper.delete(postId); }
 
     // 태그 조회
-    public List<TagDTO> findById(Long postId){ return postTagsMapper.selectById(postId); }
+    public List<TagVO> findById(Long postId){ return postTagsMapper.selectById(postId); }
 }

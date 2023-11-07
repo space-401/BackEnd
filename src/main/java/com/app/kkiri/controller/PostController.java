@@ -135,7 +135,8 @@ public class PostController {
     // 게시글 상세 조회
     @GetMapping("")
     public ResponseEntity<?> postDetail(@RequestParam Long postId, HttpServletRequest request){
-        Long userId = getUserId(request);
+//        Long userId = getUserId(request);
+        Long userId = 1L;
         PostDetailResponseDTO postDetailType = postService.postDetail(postId, userId);
         return ResponseEntity.ok().body(postDetailType);
     }

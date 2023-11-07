@@ -24,6 +24,6 @@ public class PostDetailResponseDTO {
     private Boolean isBookmark;
     private List<SpaceUserRespnseDTO> userList;
     private List<SpaceUserRespnseDTO> selectedUsers;
-    private List<TagDTO> selectedTags;
+    private List<TagVO> selectedTags;
     private List<String> imgsUrl;
 }

@@ -61,6 +61,7 @@ public class SpaceController {
 	// 스페이스 상세 조회
 	@GetMapping("")
 	public ResponseEntity<?> spaceDetail(@RequestParam Long spaceId, HttpServletRequest request){
+//		Long userId = 1L;
 		Long userId = getUserId(request);
 		SpaceDetailDTO spaceDetailDTO = spaceService.spaceDetail(spaceId, userId);
 		return ResponseEntity.ok().body(spaceDetailDTO);
@@ -310,7 +311,8 @@ public class SpaceController {
 					   @RequestParam(required = false) String keyword,
 					   @RequestParam(required = false) String startDate,
 					   @RequestParam(required = false) String endDate, HttpServletRequest request){
-		Long id = getUserId(request);
+//		Long id = getUserId(request);
+		Long id = 1L;
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;

@@ -4,6 +4,7 @@ import com.app.kkiri.domain.dto.*;
 import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.domain.vo.PostVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
 import com.app.kkiri.repository.*;
@@ -140,6 +141,18 @@ public class PostService {
             userList.add(spaceUserRespnseDTO);
         }
         postDetailResponseDTO.setUserList(userList);
+
+//        List<TagVO> tagVOList = postTagsDAO.findById(postId);
+//        List<TagDTO> tagList = new ArrayList<>();
+//
+//        for (TagVO tag:tagVOList) {
+//            TagDTO tagDTO = new TagDTO();
+//            tagDTO.setTagId(tag.getTagId());
+//            tagDTO.setTagTitle(tag.getTagName());
+//
+//            tagList.add(tagDTO);
+//        }
+//        postDetailResponseDTO.setSelectedTags(tagList);
         postDetailResponseDTO.setSelectedTags(postTagsDAO.findById(postId));
         postDetailResponseDTO.setCommentConut(commentsDAO.getTotal(postId));
 
@@ -182,7 +195,18 @@ public class PostService {
                 postFilterDTO.setPosition(postPositionDTO);
 
                 postFilterDTO.setImgUrl(postImgsDAO.findById(postId));
-                postFilterDTO.setSelectedTags(postTagsDAO.findById(postId));
+                List<TagVO> tagVOList = postTagsDAO.findById(postId);
+                List<TagDTO> tagList = new ArrayList<>();
+
+                for (TagVO tag:tagVOList) {
+                    TagDTO tagDTO = new TagDTO();
+                    tagDTO.setTagId(tag.getTagId());
+                    tagDTO.setTagTitle(tag.getTagName());
+
+                    tagList.add(tagDTO);
+                }
+
+                postFilterDTO.setSelectedTags(tagList);
 
                 List<SpaceUserVO> users = spaceUsersDAO.findAll((Long)param.get("spaceId"), userId);
                 List<SpaceUserRespnseDTO> userList = new ArrayList<>();

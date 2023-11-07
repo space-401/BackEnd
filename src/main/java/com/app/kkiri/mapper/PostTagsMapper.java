@@ -15,5 +15,5 @@ public interface PostTagsMapper {
     public void delete(Long postId);
 
     // 태그 조회
-    public List<TagDTO> selectById(Long postId);
+    public List<TagVO> selectById(Long postId);
 }
