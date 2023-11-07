@@ -54,8 +54,8 @@ public class SpaceController {
 	@GetMapping("/list")
 	public ResponseEntity<?> list(HttpServletRequest request){
 		Long userId = getUserId(request);
-			List<SpaceResponseDTO> spaceList = spaceService.list(userId);
-			return ResponseEntity.ok().body(spaceList);
+		List<SpaceResponseDTO> spaceList = spaceService.list(userId);
+		return ResponseEntity.ok().body(spaceList);
 	}
 
 	// 스페이스 상세 조회
@@ -82,17 +82,13 @@ public class SpaceController {
 		spaceVO.setSpacePw(spaceDTO.getSpacePw());
 		spaceVO.setSpaceDescription(spaceDTO.getSpaceDescription());
 
-		log.info("spaceName: " + spaceDTO.getSpaceName());
-		log.info("spaceName: " + spaceDTO.getSpaceDescription());
-		log.info("spaceName: " + spaceDTO.getSpacePw());
-
 		Long defaultImg = spaceDTO.getDefaultImg();
 
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 
 		UUID uuid = UUID.randomUUID();
 		
-		if(!imgUrl.isEmpty()){
+		if(imgUrl != null){
 			// 이미지를 업로드했을 경우
 			String rootPath = "/home/ec2-user/upload/space";
 			String uploadPath = getUploadPath();
@@ -124,7 +120,7 @@ public class SpaceController {
 				spaceVO.setSpaceIconName(defaultImg + ".jpg");
 				spaceVO.setSpaceIconSize(0L);
 			} else {
-				throw new CustomException(StatusCode.BAD_REQUEST);
+				throw new CustomException(StatusCode.MISSING_IMAGE);
 			}
 		}
 		spaceVO.setSpaceCode(uuid.toString());
@@ -257,34 +253,44 @@ public class SpaceController {
 			// 방장 변경
 			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), spaceUserDTO.getUserId());
 		} else {
-			log.info("이미지 저장 들어옴");
-//			이미지 저장
-			String rootPath = "/home/ec2-user/upload/profile";
-			String uploadPath = getUploadPath();
-			String uploadFileName = "";
-			String profilePath = "";
-			MultipartFile file = image;
+			if(image != null){
+				log.info("이미지 저장 들어옴");
+	//			이미지 저장
+				String rootPath = "/home/ec2-user/upload/profile";
+				String uploadPath = getUploadPath();
+				String uploadFileName = "";
+				String profilePath = "";
+				MultipartFile file = image;
 
-			File uploadFullPath = new File(rootPath, uploadPath);
-			if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+				File uploadFullPath = new File(rootPath, uploadPath);
+				if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
 
-			UUID uuid = UUID.randomUUID();
-			String fileName = file.getOriginalFilename();
-			uploadFileName = uuid.toString() + "_" + fileName;
+				UUID uuid = UUID.randomUUID();
+				String fileName = file.getOriginalFilename();
+				uploadFileName = uuid.toString() + "_" + fileName;
 
-			File fullPath = new File(uploadFullPath, uploadFileName);
-			file.transferTo(fullPath);
-			log.info("uploadPath: " + uploadPath);
+				File fullPath = new File(uploadFullPath, uploadFileName);
+				file.transferTo(fullPath);
+				log.info("uploadPath: " + uploadPath);
 
-			profilePath = uploadPath + "/" + uploadFileName;
+				profilePath = uploadPath + "/" + uploadFileName;
 
-			// 유저 정보 수정
+				spaceUserVO.setProfileImgPath(profilePath);
+				spaceUserVO.setProfileImgName(uploadFileName);
+				spaceUserVO.setProfileImgUuid(fileName);
+				spaceUserVO.setProfileImgSize(file.getSize());
+			} else {
+				log.info("기본이미지 저장 들어옴");
+				// 기본이미지로 저장
+				spaceUserVO.setProfileImgPath("/home/ec2-user/upload/default/defaultProfile.png");
+				spaceUserVO.setProfileImgName("defaultProfile.png");
+				spaceUserVO.setProfileImgUuid("default");
+				spaceUserVO.setProfileImgSize(0L);
+			}
+
+			// 유저정보 수정
 			spaceUserVO.setSpaceId(spaceUserDTO.getSpaceId());
 			spaceUserVO.setUserNickname(spaceUserDTO.getUserNickname());
-			spaceUserVO.setProfileImgPath(profilePath);
-			spaceUserVO.setProfileImgName(uploadFileName);
-			spaceUserVO.setProfileImgUuid(fileName);
-			spaceUserVO.setProfileImgSize(file.getSize());
 
 			log.info("spaceUserVO: " + spaceUserVO);
 
