@@ -7,7 +7,7 @@
             SELECT SEQ_POSTS.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO POSTS (POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, SPACE_ID, USER_ID)
-        VALUES (#{postId}, #{postTitle}, #{postLocationKeyword}, #{postLocationLat}, #{postLocationLng}, #{postBeginDate}, #{postEndDate}, #{postContent}, #{spaceId}, #{userId})
+        VALUES (#{postId}, #{postTitle}, #{postLocationKeyword}, #{postLocationLat}, #{postLocationLng}, TO_DATE(#{postBeginDate}, 'YYYY/MM/DD'), TO_DATE(#{postEndDate}, 'YYYY/MM/DD'), #{postContent}, #{spaceId}, #{userId})
     </insert>
 
     <delete id="delete">

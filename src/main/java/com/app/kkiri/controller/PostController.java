@@ -50,7 +50,7 @@ public class PostController {
 
         postDTO.setUserId(userId);
 
-        String rootPath = "/home/ec2-user/upload/space";
+        String rootPath = "/home/ec2-user/upload/post";
         String uploadPath = getUploadPath();
         String uploadFileName = "";
         String spaceIconPath = "";
@@ -98,7 +98,7 @@ public class PostController {
     // 게시글 수정
     @PatchMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> modify(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs) throws IOException {
-        String rootPath = "/home/ec2-user/upload/space";
+        String rootPath = "/home/ec2-user/upload/post";
         String uploadPath = getUploadPath();
         String uploadFileName = "";
         String spaceIconPath = "";

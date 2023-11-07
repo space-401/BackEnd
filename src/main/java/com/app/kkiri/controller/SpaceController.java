@@ -88,7 +88,7 @@ public class SpaceController {
 
 		UUID uuid = UUID.randomUUID();
 		
-		if(imgUrl != null){
+		if(!imgUrl.isEmpty()){
 			// 이미지를 업로드했을 경우
 			String rootPath = "/home/ec2-user/upload/space";
 			String uploadPath = getUploadPath();
@@ -157,7 +157,7 @@ public class SpaceController {
 		log.info("dd");
 
 		// 이미지 저장
-		if(imgUrl != null){
+		if(!imgUrl.isEmpty()){
 			// 이미지를 업로드했을 경우
 			String rootPath = "/home/ec2-user/upload/space";
 			String uploadPath = getUploadPath();
@@ -242,8 +242,10 @@ public class SpaceController {
 												 @RequestPart(required = false) MultipartFile image,
 												 HttpServletRequest request) throws IOException{
 		Long userId = getUserId(request);
+		log.info("userId: " + userId);
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		spaceUserVO.setUserId(userId);
+		spaceUserDTO.setUserId(userId);
 
 		log.info(" ----------- 여기  -----------");
 		log.info("spaceUserDTO: " + spaceUserDTO);
@@ -253,7 +255,7 @@ public class SpaceController {
 			// 방장 변경
 			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), spaceUserDTO.getUserId());
 		} else {
-			if(image != null){
+			if(!image.isEmpty()){
 				log.info("이미지 저장 들어옴");
 	//			이미지 저장
 				String rootPath = "/home/ec2-user/upload/profile";
@@ -276,8 +278,8 @@ public class SpaceController {
 				profilePath = uploadPath + "/" + uploadFileName;
 
 				spaceUserVO.setProfileImgPath(profilePath);
-				spaceUserVO.setProfileImgName(uploadFileName);
-				spaceUserVO.setProfileImgUuid(fileName);
+				spaceUserVO.setProfileImgName(fileName);
+				spaceUserVO.setProfileImgUuid(uploadFileName);
 				spaceUserVO.setProfileImgSize(file.getSize());
 			} else {
 				log.info("기본이미지 저장 들어옴");
