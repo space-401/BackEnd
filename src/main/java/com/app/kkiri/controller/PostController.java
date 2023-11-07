@@ -69,7 +69,7 @@ public class PostController {
             File fullPath = new File(uploadFullPath, uploadFileName);
             file.transferTo(fullPath);
 
-            spaceIconPath = uploadPath + "/" + uploadFileName;
+            spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
 
             postImgVO.setPostImgUuid(uploadFileName);
             postImgVO.setPostImgPath(spaceIconPath);
@@ -117,7 +117,7 @@ public class PostController {
             File fullPath = new File(uploadFullPath, uploadFileName);
             file.transferTo(fullPath);
 
-            spaceIconPath = uploadPath + "/" + uploadFileName;
+            spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
 
             postImgVO.setPostImgUuid(uploadFileName);
             postImgVO.setPostImgPath(spaceIconPath);
