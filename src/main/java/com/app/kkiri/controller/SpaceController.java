@@ -104,7 +104,7 @@ public class SpaceController {
 			File fullPath = new File(uploadFullPath, uploadFileName);
 			imgUrl.transferTo(fullPath);
 
-			spaceIconPath = uploadPath + "/" + uploadFileName;
+			spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
 
 			spaceVO.setSpaceIconUuid(uploadFileName);
 			spaceVO.setSpaceIconPath(spaceIconPath);
@@ -175,7 +175,7 @@ public class SpaceController {
 			imgUrl.transferTo(fullPath);
 			log.info("uploadPath: " + uploadPath);
 
-			spaceIconPath = uploadPath + "/" + uploadFileName;
+			spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
 
 			spaceDTO.setSpaceIconUuid(uploadFileName);
 			spaceDTO.setSpaceIconPath(spaceIconPath);
@@ -275,7 +275,7 @@ public class SpaceController {
 				file.transferTo(fullPath);
 				log.info("uploadPath: " + uploadPath);
 
-				profilePath = uploadPath + "/" + uploadFileName;
+				profilePath = rootPath + uploadPath + "/" + uploadFileName;
 
 				spaceUserVO.setProfileImgPath(profilePath);
 				spaceUserVO.setProfileImgName(fileName);
