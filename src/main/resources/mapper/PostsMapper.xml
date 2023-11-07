@@ -46,8 +46,15 @@
                     AND POST_TITLE LIKE '%'||#{keyword}||'%' OR POST_CONTENT LIKE '%'||#{keyword}||'%'
                 </if>
                 <if test="dateList != null and dateList.size != 0">
-                    <foreach collection="dateList" item="date">
-                        AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                    <foreach collection="dateList" item="date" index="index">
+                        <choose>
+                            <when test="index == 0">
+                                AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                            </when>
+                            <when test="index != 0">
+                                OR #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                            </when>
+                        </choose>
                     </foreach>
                 </if>
                 <if test="tags != null and tags.size != 0">
@@ -85,8 +92,15 @@
             AND POST_TITLE LIKE '%'||#{keyword}||'%' OR POST_CONTENT LIKE '%'||#{keyword}||'%'
         </if>
         <if test="dateList != null and dateList.size != 0">
-            <foreach collection="dateList" item="date">
-                AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+            <foreach collection="dateList" item="date" index="index">
+                <choose>
+                    <when test="index == 0">
+                        AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                    </when>
+                    <when test="index != 0">
+                        OR #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                    </when>
+                </choose>
             </foreach>
         </if>
         <if test="tags != null and tags.size != 0">
