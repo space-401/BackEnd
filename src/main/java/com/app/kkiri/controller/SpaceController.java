@@ -321,7 +321,7 @@ public class SpaceController {
 		param.put("keyword", keyword);
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/d");
-		if(startDate != null || endDate !=null){
+		if(startDate != null && endDate !=null){
 			LocalDate start = LocalDate.parse(startDate, formatter);
 			LocalDate end = LocalDate.parse(endDate, formatter);
 
