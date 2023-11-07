@@ -19,7 +19,7 @@
         UPDATE POSTS
         SET POST_TITLE=#{postTitle}, POST_LOCATION_KEYWORD=#{postLocationKeyword},
             POST_LOCATION_LAT=#{postLocationLat}, POST_LOCATION_LNG=#{postLocationLng},
-            POST_BEGIN_DATE=TO_DATE(#{postBeginDate}, 'YYYY/MM/DD'), POST_END_DATE=TO_DATE(#{postEndDate}, 'YYYY/MM/DD'),
+            POST_BEGIN_DATE=TO_DATE(#{postBeginDate}, 'YYYY-MM-DD HH24:MI:SS'), POST_END_DATE=TO_DATE(#{postEndDate}, 'YYYY-MM-DD HH24:MI:SS'),
             POST_CONTENT=#{postContent}, POST_UPDATE_DATE=SYSDATE
         WHERE POST_ID=#{postId}
     </update>
