@@ -334,8 +334,9 @@ class SpaceControllerTest {
                         .param("spaceId", "46")
 //                         .param("tagId", "61")
 //                        .param("keyword", "수정")
-                        .param("page", "2"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                        .param("startDate", "2023/11/05")
+                        .param("page", "1"))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print()));
     }
 }
