@@ -1,11 +1,12 @@
 package com.app.kkiri.mapper;
 
-import com.app.kkiri.domain.dto.PostDTO;
-import com.app.kkiri.domain.vo.PostVO;
-import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.app.kkiri.domain.dto.PostDTO;
+import com.app.kkiri.domain.vo.PostVO;
 
 @Mapper
 public interface PostsMapper {

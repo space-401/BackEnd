@@ -1,5 +1,11 @@
 package com.app.kkiri.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.app.kkiri.domain.dto.CommentResponseDTO;
 import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
@@ -8,12 +14,9 @@ import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.SpaceUsersDAO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service

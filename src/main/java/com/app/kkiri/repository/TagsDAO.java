@@ -1,12 +1,13 @@
 package com.app.kkiri.repository;
 
-import com.app.kkiri.domain.vo.TagVO;
-import com.app.kkiri.mapper.TagsMapper;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
+import com.app.kkiri.domain.vo.TagVO;
+import com.app.kkiri.mapper.TagsMapper;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

@@ -1,8 +1,9 @@
 package com.app.kkiri.domain.vo;
 
+import org.springframework.stereotype.Component;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @Data

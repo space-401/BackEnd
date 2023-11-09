@@ -1,10 +1,10 @@
 package com.app.kkiri.mapper;
 
-import com.app.kkiri.domain.dto.SpaceDetailUserDTO;
-import com.app.kkiri.domain.vo.SpaceUserVO;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+import com.app.kkiri.domain.vo.SpaceUserVO;
 
 @Mapper
 public interface MentionMapper {

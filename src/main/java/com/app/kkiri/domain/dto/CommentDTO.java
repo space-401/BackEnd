@@ -1,10 +1,11 @@
 package com.app.kkiri.domain.dto;
 
+import org.springframework.stereotype.Component;
+
 import com.app.kkiri.domain.vo.SpaceUserVO;
-import com.app.kkiri.domain.vo.UserVO;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @Data

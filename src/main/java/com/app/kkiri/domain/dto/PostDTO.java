@@ -1,11 +1,11 @@
 package com.app.kkiri.domain.dto;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Component
 @Data

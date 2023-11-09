@@ -1,36 +1,52 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.dto.*;
-import com.app.kkiri.domain.vo.*;
-import com.app.kkiri.exceptions.CustomException;
-import com.app.kkiri.exceptions.StatusCode;
-import com.app.kkiri.security.utils.JwtTokenProvider;
-import com.app.kkiri.service.PostService;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import com.app.kkiri.service.SpaceService;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceDetailDTO;
+import com.app.kkiri.domain.dto.SpaceResponseDTO;
+import com.app.kkiri.domain.dto.SpaceUserDTO;
+import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.domain.vo.SpaceVO;
+import com.app.kkiri.domain.vo.TagVO;
+import com.app.kkiri.exceptions.CustomException;
+import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.security.jwt.JwtTokenProvider;
+import com.app.kkiri.service.PostService;
+import com.app.kkiri.service.SpaceService;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor

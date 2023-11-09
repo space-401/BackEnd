@@ -1,13 +1,14 @@
 package com.app.kkiri.repository;
 
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
 import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.mapper.SpacesMapper;
-import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor

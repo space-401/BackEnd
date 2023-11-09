@@ -32,9 +32,9 @@ spring:
 
           naver:
             client-id: TmC2zgdKuyI4RA4R8qta
-#            client-id: voa6ErTaNMtmcKMrC2VE
+#            client-id: OFiZmNW9QeHG7DSd75Bf
             client-secret: sKgaWD5MMq
-#            client-secret: 9wyMXiX4zn
+#            client-secret: vwSRzQ7VbD
             authorization-grant-type: authorization_code
             client-name: kkiri-naver
             redirect-uri: http://localhost:3000/auth/naver
