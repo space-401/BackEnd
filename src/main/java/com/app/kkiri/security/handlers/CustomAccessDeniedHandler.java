@@ -11,7 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import com.app.kkiri.common.Response;
+import com.app.kkiri.security.Response;
 import com.google.gson.Gson;
 
 @Component

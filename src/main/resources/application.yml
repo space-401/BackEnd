@@ -1,3 +1,15 @@
+file:
+  rootPath:
+    post: upload/post
+    profile: upload/profile
+    space: upload/space
+    default: upload/default
+
+jwt:
+  secret:
+    ZnBwMmltV1pzWnI4bFpvV0Z3SGFnTEN4M1o0Znlrd2l2dFJ6dXltVG8wVXJoQ2taUEFzMXZJaXhkQ3c2cWFLdw==
+  # fpp2imWZsZr8lZoWFwHagLCx3Z4fykwivtRzuymTo0UrhCkZPAs1vIixdCw6qaKw
+
 server:
   port: 8081
 
@@ -7,6 +19,7 @@ server:
       charset: utf-8
       force-response: true
 
+# DBMS
 spring:
   datasource:
     hikari:
@@ -15,35 +28,33 @@ spring:
       username: hr
       password: hr
 
-
+  # OAUTH2
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: 1056152786225-ssoboempquap25h5h6hghcsp21tk5n7j.apps.googleusercontent.com
-#            client-id: 227302417113-j672tg79f1mtdj8rarrrk829ig15rq4a.apps.googleusercontent.com
-            client-secret: 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
-#            client-secret: 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
-#            redirect-uri: http://localhost:8081/login/oauth2/code/google
+#            client-id: 1056152786225-ssoboempquap25h5h6hghcsp21tk5n7j.apps.googleusercontent.com
+            client-id: 227302417113-j672tg79f1mtdj8rarrrk829ig15rq4a.apps.googleusercontent.com
+#            client-secret: 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
+            client-secret: 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
             client-name: kkiri-google
             redirect-uri: http://localhost:3000/auth/google
-            scope: profile,email
 
           naver:
-            client-id: TmC2zgdKuyI4RA4R8qta
-#            client-id: OFiZmNW9QeHG7DSd75Bf
-            client-secret: sKgaWD5MMq
-#            client-secret: vwSRzQ7VbD
+#            client-id: TmC2zgdKuyI4RA4R8qta
+            client-id: OFiZmNW9QeHG7DSd75Bf
+#            client-secret: sKgaWD5MMq
+            client-secret: vwSRzQ7VbD
             authorization-grant-type: authorization_code
             client-name: kkiri-naver
             redirect-uri: http://localhost:3000/auth/naver
 
           kakao:
-            client-id: 589c5b3cc0bf60c60e8185acda5bfed7
-#            client-id: d17ae8b9f4f682aaba42421ce469dd76
-            client-secret: Wv3VHLNCX8HM3LbmqwaeTnRrMUUb1yJ5
-#            client-secret: 8UKeCB2FmJmu7q9kVrwGEGKxqae9XmLH
+#            client-id: 589c5b3cc0bf60c60e8185acda5bfed7
+            client-id: d17ae8b9f4f682aaba42421ce469dd76
+#            client-secret: Wv3VHLNCX8HM3LbmqwaeTnRrMUUb1yJ5
+            client-secret: 8UKeCB2FmJmu7q9kVrwGEGKxqae9XmLH
             authorization-grant-type: authorization_code
             client-authentication-method: POST
             client-name: kkiri-kakao
@@ -64,7 +75,7 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: kakao_account
 
-# log4jdbc, Mybatis Console Log
+# LOGGING
 logging:
   level:
     com:
@@ -79,7 +90,7 @@ logging:
       resultsettable: INFO #SQL 결과 데이터 Table을 로그로 남긴다.
       sqlonly: OFF #SQL만 로그로 남긴다.
       sqltiming: INFO #SQL과 소요시간을 표기한다.
-      connection : OFF # 커넥션 확인가능
+      connection: OFF # 커넥션 확인가능
     org:
       hibernate:
         SQL: DEBUG
@@ -88,7 +99,16 @@ logging:
             sql:
               BasicBinder: TRACE
 
-jwt:
-  secret:
-    ZnBwMmltV1pzWnI4bFpvV0Z3SGFnTEN4M1o0Znlrd2l2dFJ6dXltVG8wVXJoQ2taUEFzMXZJaXhkQ3c2cWFLdw==
-#    fpp2imWZsZr8lZoWFwHagLCx3Z4fykwivtRzuymTo0UrhCkZPAs1vIixdCw6qaKw
+# AWS
+cloud:
+  aws:
+    s3:
+      bucket: kkiri-bucket
+    credentials:
+      access-key: AKIAVOIGCZTYGARW33H3
+      secret-key: 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
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false

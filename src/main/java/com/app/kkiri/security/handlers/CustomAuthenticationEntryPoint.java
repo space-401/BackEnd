@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import com.app.kkiri.common.Response;
+import com.app.kkiri.security.Response;
 import com.google.gson.Gson;
 
 @Component
