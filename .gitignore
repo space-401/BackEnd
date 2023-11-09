@@ -183,4 +183,4 @@ Temporary Items
 # End of https://www.toptal.com/developers/gitignore/api/macos
 
 ### application.yml
-application.yml
+*.yml
