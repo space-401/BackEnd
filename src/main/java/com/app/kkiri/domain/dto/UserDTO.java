@@ -1,6 +1,6 @@
 package com.app.kkiri.domain.dto;
 
-import com.app.kkiri.security.model.CustomOAuth2User;
+import com.app.kkiri.security.oAuth2Login.CustomOAuth2User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

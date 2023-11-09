@@ -1,22 +1,36 @@
 package com.app.kkiri.service;
 
-import com.app.kkiri.domain.dto.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.kkiri.domain.dto.PostDTO;
+import com.app.kkiri.domain.dto.PostDateDTO;
+import com.app.kkiri.domain.dto.PostDetailResponseDTO;
+import com.app.kkiri.domain.dto.PostFilterDTO;
+import com.app.kkiri.domain.dto.PostFilterResponseDTO;
+import com.app.kkiri.domain.dto.PostPositionDTO;
+import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.domain.vo.PostVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
-import com.app.kkiri.repository.*;
+import com.app.kkiri.repository.CommentsDAO;
+import com.app.kkiri.repository.MentionDAO;
+import com.app.kkiri.repository.PostBookmarksDAO;
+import com.app.kkiri.repository.PostImgsDAO;
+import com.app.kkiri.repository.PostTagsDAO;
+import com.app.kkiri.repository.PostsDAO;
+import com.app.kkiri.repository.SpaceUsersDAO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

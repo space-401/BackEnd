@@ -1,13 +1,15 @@
 package com.app.kkiri.repository;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Repository;
+
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.vo.PostVO;
 import com.app.kkiri.mapper.PostsMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

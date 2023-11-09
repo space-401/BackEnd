@@ -2,32 +2,34 @@ package com.app.kkiri.security.handlers;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import com.app.kkiri.common.Response;
 import com.google.gson.Gson;
 
 @Component
 public class OAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
+
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-		AuthenticationException exception) throws IOException, ServletException {
+		AuthenticationException authException) throws IOException {
+
+		OAuth2AuthenticationException oAuth2AuthenticationException = (OAuth2AuthenticationException)authException;
 
 		Gson gson = new Gson();
+		Response oAuth2AuthenticationFailureHandlerResponse = new Response();
 
-		Response entryPointErrorResponse = new Response();
-		entryPointErrorResponse.setMessage("인증에 실패하였습니다");
-
+		oAuth2AuthenticationFailureHandlerResponse.setMessage(oAuth2AuthenticationException.getMessage());
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
-		response.getWriter().write(gson.toJson(entryPointErrorResponse));
+
+		response.getWriter().write(gson.toJson(oAuth2AuthenticationFailureHandlerResponse));
 		response.setContentType("application/json");
 	}
 }

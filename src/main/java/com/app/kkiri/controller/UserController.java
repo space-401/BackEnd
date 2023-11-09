@@ -1,20 +1,24 @@
 package com.app.kkiri.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.kkiri.security.model.AuthenticatedUser;
+import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,34 +29,30 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+	private final JwtTokenProvider jwtTokenProvider;
 	private final UserService userService;
 
 	@GetMapping("/refreshToken")
-	public ResponseEntity<Map<String, Object>> refreshToken(Authentication authentication) {
-		LOGGER.info("refreshToken() param authentication : {}", authentication);
+	public ResponseEntity<Map<String, Object>> refreshToken(HttpServletRequest httpServletRequest) throws AuthenticationException, IOException {
 
-		AuthenticatedUser oAuth2User = (AuthenticatedUser)authentication.getPrincipal();
-		String refreshToken = oAuth2User.getRefreshToken();
-		LOGGER.info("refreshToken() returned value refreshToken : {}", refreshToken);
+		String refreshToken = jwtTokenProvider.resolveToken(httpServletRequest);
+		if(refreshToken == null) {
+			OAuth2Error oAuth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
+			throw new OAuth2AuthenticationException(oAuth2Error, "헤더 정보가 잘못되었습니다");
+		}
+		LOGGER.info("refreshToken() value refreshToken : {}", refreshToken);
+
+		if(!jwtTokenProvider.validateToken(refreshToken)) {
+			OAuth2Error oAuth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN);
+			throw new OAuth2AuthenticationException(oAuth2Error, "유효하지 않은 토큰입니다");
+		}
 
 		String newAccessToken = userService.reissueAccessToken(refreshToken);
-		LOGGER.info("refreshToken() returned value newAccessToken : {}", newAccessToken);
+		LOGGER.info("refreshToken() value newAccessToken : {}", newAccessToken);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("newAccessToken", newAccessToken);
-		map.forEach((key, value) -> {
-			LOGGER.info("refreshToken() returned value key : {}, value : {}", key, value);
-		});
 
-		return ResponseEntity.status(HttpStatus.OK.value()).body(map);
-	}
-
-	@ExceptionHandler(value = UsernameNotFoundException.class)
-	public ResponseEntity<Map<String, Object>> UsernameNotFoundExceptionHandler(RuntimeException e) {
-
-		Map<String, Object> map = new HashMap<>();
-		map.put("message", e.getMessage());
-
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(map);
+		return ResponseEntity.status(HttpStatus.OK).body(map);
 	}
 }

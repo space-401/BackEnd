@@ -2,9 +2,9 @@ package com.app.kkiri.mapper;
 
 import java.util.List;
 
-import com.app.kkiri.domain.dto.SpaceDTO;
 import org.apache.ibatis.annotations.Mapper;
 
+import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.vo.SpaceVO;
 
 @Mapper

@@ -1,10 +1,10 @@
 package com.app.kkiri.domain.dto;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
-
-import java.util.List;
 
 @CommonsLog
 @Data

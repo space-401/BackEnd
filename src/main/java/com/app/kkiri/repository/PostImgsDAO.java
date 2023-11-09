@@ -1,11 +1,13 @@
 package com.app.kkiri.repository;
 
-import com.app.kkiri.domain.vo.PostImgVO;
-import com.app.kkiri.mapper.PostImgsMapper;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.app.kkiri.domain.vo.PostImgVO;
+import com.app.kkiri.mapper.PostImgsMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

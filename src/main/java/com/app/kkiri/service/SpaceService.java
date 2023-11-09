@@ -1,23 +1,29 @@
 package com.app.kkiri.service;
 
-import com.app.kkiri.domain.dto.*;
-import com.app.kkiri.domain.vo.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceDetailDTO;
+import com.app.kkiri.domain.dto.SpaceListDTO;
+import com.app.kkiri.domain.dto.SpaceResponseDTO;
+import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.TagDTO;
+import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.domain.vo.SpaceVO;
+import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
-import com.app.kkiri.repository.PostsDAO;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import com.app.kkiri.repository.SpaceUsersDAO;
 import com.app.kkiri.repository.SpacesDAO;
 import com.app.kkiri.repository.TagsDAO;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor

@@ -11,14 +11,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.app.kkiri.security.configurer.CustomOAuth2LoginConfigurer;
-import com.app.kkiri.security.entryPoints.CustomAuthenticationEntryPoint;
-import com.app.kkiri.security.filters.JwtAuthenticationFilter;
-import com.app.kkiri.security.filters.JwtExceptionFilter;
-import com.app.kkiri.security.handlers.CustomAccessDeniedHandler;
+import com.app.kkiri.security.handlers.CustomAuthenticationEntryPoint;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationFailureHandler;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationSuccessHandler;
-import com.app.kkiri.security.service.CustomOAuth2UserService;
+import com.app.kkiri.security.jwt.JwtFilter;
+import com.app.kkiri.security.oAuth2Login.CustomOAuth2LoginConfigurer;
+import com.app.kkiri.security.oAuth2Login.CustomOAuth2UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,10 +29,9 @@ public class SecurityConfig {
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-	private final CustomAccessDeniedHandler customAccessDeniedHandler;
-	private final JwtExceptionFilter jwtExceptionFilter;
+	// private final JwtTokenProvider jwtTokenProvider;
+	// private final UsersDAO usersDAO;
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -43,22 +40,24 @@ public class SecurityConfig {
 		http.csrf().disable();
 
 		http.authorizeRequests(requests -> requests
-			.antMatchers("/").permitAll()
-			.antMatchers("/user/auth/*").permitAll()
-			.anyRequest().authenticated()
+			// .antMatchers("/").permitAll()
+			// .antMatchers("/user/auth/*").permitAll()
+			// .antMatchers("/user/refreshToken").permitAll()
+			.antMatchers("/**").permitAll()
+			// .anyRequest().authenticated()
 		);
 
-		http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
-		http.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
+		http.addFilterAfter(jwtFilter(), LogoutFilter.class);
 
-		http.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler);
 		http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
+
+		// http.addFilterAfter(jwtAuthenticationFilter(jwtTokenProvider, usersDAO), LogoutFilter.class);
 
 		http.apply(customOAuth2LoginConfigurer()
 			.userInfoEndpoint(userInfo -> userInfo
 				.userService(customOAuth2UserService))
-			.successHandler(oAuth2AuthenticationSuccessHandler)
 			.failureHandler(oAuth2AuthenticationFailureHandler)
+			.successHandler(oAuth2AuthenticationSuccessHandler)
 		);
 
 		return http.build();
@@ -90,5 +89,18 @@ public class SecurityConfig {
 	@Bean
 	public CustomOAuth2LoginConfigurer customOAuth2LoginConfigurer() {
 		return new CustomOAuth2LoginConfigurer();
+	}
+
+	// @Bean
+	// public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UsersDAO usersDAO) {
+	// 	JwtAuthenticationProvider jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtTokenProvider, usersDAO);
+	// 	AuthenticationManager authenticationManager = new ProviderManager(jwtAuthenticationProvider);
+	//
+	// 	return new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
+	// }
+
+	@Bean
+	public JwtFilter jwtFilter() {
+		return new JwtFilter();
 	}
 }

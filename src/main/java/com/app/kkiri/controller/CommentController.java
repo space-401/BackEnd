@@ -4,7 +4,7 @@ import com.app.kkiri.domain.dto.CommentResponseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
-import com.app.kkiri.security.utils.JwtTokenProvider;
+import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

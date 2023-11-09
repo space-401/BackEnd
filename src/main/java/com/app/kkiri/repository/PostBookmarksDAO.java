@@ -1,8 +1,10 @@
 package com.app.kkiri.repository;
 
-import com.app.kkiri.mapper.PostBookmarksMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import com.app.kkiri.mapper.PostBookmarksMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
