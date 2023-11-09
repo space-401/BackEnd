@@ -10,6 +10,9 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,7 @@ import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
+import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,8 +45,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/post")
 @Slf4j
 public class PostController {
+
     private final PostService postService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final FileService fileService;
+    private final Logger LOGGER = LoggerFactory.getLogger(PostController.class);
+
+    @Value("${file.rootPath.post}")
+    private String rootPath;
 
     private Long getUserId(HttpServletRequest request){
         try{
@@ -56,40 +66,41 @@ public class PostController {
     // 게시글 작성
     @PostMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> register(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs, HttpServletRequest request) throws IOException{
-        Long userId = getUserId(request);
 
+        Long userId = getUserId(request);
         postDTO.setUserId(userId);
 
-        String rootPath = "/home/ec2-user/upload/post";
-        String uploadPath = getUploadPath();
-        String uploadFileName = "";
-        String spaceIconPath = "";
-        String uuid = "";
+        String uploadPath = getUploadPath(); // 2023/11/10
+        File uploadFullPath = new File(rootPath, uploadPath); // upload/post/2023/11/10
+        if(!uploadFullPath.exists()) {
+            uploadFullPath.mkdirs();
+        }
+
         List<PostImgVO> imgList = new ArrayList<>();
 
-        File uploadFullPath = new File(rootPath, uploadPath);
-        if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+        for (MultipartFile multipartFile : imgs) {
 
-        for (MultipartFile file :imgs) {
             PostImgVO postImgVO = new PostImgVO();
-            uuid = UUID.randomUUID().toString();
-            String fileName = file.getOriginalFilename();
-            uploadFileName = uuid.toString() + "_" + fileName;
 
-            File fullPath = new File(uploadFullPath, uploadFileName);
-            file.transferTo(fullPath);
+            String uuid = UUID.randomUUID().toString();
+            String originalFileName = multipartFile.getOriginalFilename();
+            String uploadFileName = uuid.toString() + "_" + originalFileName;
+            File fullPath = new File(uploadFullPath, uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
+            LOGGER.info("[register()] value fullPath : {}", fullPath);
 
-            spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
+            String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
+            LOGGER.info("[register()] value uploadUrl : {}", uploadUrl);
 
-            postImgVO.setPostImgUuid(uploadFileName);
-            postImgVO.setPostImgPath(spaceIconPath);
-            postImgVO.setPostImgName(fileName);
-            postImgVO.setPostImgSize(file.getSize());
+            postImgVO.setPostImgName(originalFileName); // post.jpg
+            postImgVO.setPostImgPath(fullPath.toString()); // upload/post/2023/11/10/uuid_post.jpg
+            postImgVO.setPostImgUuid(uuid); // uuid
+            postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
 
             imgList.add(postImgVO);
         }
 
         postService.register(postDTO, imgList);
+
         return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
     }
 
@@ -108,31 +119,32 @@ public class PostController {
     // 게시글 수정
     @PatchMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> modify(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs) throws IOException {
-        String rootPath = "/home/ec2-user/upload/post";
-        String uploadPath = getUploadPath();
-        String uploadFileName = "";
-        String spaceIconPath = "";
-        String uuid = "";
+
+        String uploadPath = getUploadPath(); // 2023/11/10
+        File uploadFullPath = new File(rootPath, uploadPath); // upload/post/2023/11/10
+        if(!uploadFullPath.exists()) {
+            uploadFullPath.mkdirs();
+        }
+
         List<PostImgVO> imgList = new ArrayList<>();
 
-        File uploadFullPath = new File(rootPath, uploadPath);
-        if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+        for (MultipartFile multipartFile : imgs) {
 
-        for (MultipartFile file : imgs) {
             PostImgVO postImgVO = new PostImgVO();
-            uuid = UUID.randomUUID().toString();
-            String fileName = file.getOriginalFilename();
-            uploadFileName = uuid.toString() + "_" + fileName;
 
-            File fullPath = new File(uploadFullPath, uploadFileName);
-            file.transferTo(fullPath);
+            String uuid = UUID.randomUUID().toString();
+            String originalFileName = multipartFile.getOriginalFilename();
+            String uploadFileName = uuid.toString() + "_" + originalFileName;
+            File fullPath = new File(uploadFullPath, uploadFileName); // upload/post/2023/11/10/uuid_dog.jpg
+            LOGGER.info("[modify()] value fullPath : {}", fullPath);
 
-            spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
+            String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
+            LOGGER.info("[modify()] value uploadUrl : {}", uploadUrl);
 
-            postImgVO.setPostImgUuid(uploadFileName);
-            postImgVO.setPostImgPath(spaceIconPath);
-            postImgVO.setPostImgName(fileName);
-            postImgVO.setPostImgSize(file.getSize());
+            postImgVO.setPostImgName(originalFileName); // post.jpg
+            postImgVO.setPostImgPath(fullPath.toString()); // upload/post/2023/11/10/uuid_post.jpg
+            postImgVO.setPostImgUuid(uuid); // uuid
+            postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
 
             imgList.add(postImgVO);
         }
@@ -159,4 +171,5 @@ public class PostController {
         postService.bookmark(postId.getPostId(), userId);
         return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
     }
+
 }

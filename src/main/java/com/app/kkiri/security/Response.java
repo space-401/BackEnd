@@ -1,4 +1,4 @@
-package com.app.kkiri.common;
+package com.app.kkiri.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -17,6 +17,9 @@ import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +44,7 @@ import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
+import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
 import com.app.kkiri.service.SpaceService;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -53,9 +57,21 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/space")
 @Slf4j
 public class SpaceController {
+
 	private final SpaceService spaceService;
 	private final PostService postService;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final FileService fileService;
+	private final Logger LOGGER = LoggerFactory.getLogger(SpaceController.class);
+
+	@Value("${file.rootPath.space}")
+	private String spaceRootPath;
+
+	@Value("${file.rootPath.default}")
+	private String defaultRootPath;
+
+	@Value("${file.rootPath.profile}")
+	private String profileRootPath;
 
 	private Long getUserId(HttpServletRequest request){
 		try{
@@ -91,55 +107,59 @@ public class SpaceController {
 	// 스페이스 생성
 	@PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<?> register(@RequestPart SpaceDTO spaceDTO,
-									  @RequestPart(required = false) MultipartFile imgUrl,
+									  @RequestPart(required = false) MultipartFile multipartFile,
 									  HttpServletRequest request) throws IOException {
+
 		Long userId = getUserId(request);
+		LOGGER.info("[register()] param userId : {}", userId);
+
 		SpaceVO spaceVO = new SpaceVO();
 		spaceVO.setSpaceName(spaceDTO.getSpaceName());
 		spaceVO.setSpacePw(spaceDTO.getSpacePw());
 		spaceVO.setSpaceDescription(spaceDTO.getSpaceDescription());
 
-		Long defaultImg = spaceDTO.getDefaultImg();
-
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 
-		UUID uuid = UUID.randomUUID();
-		
-		if(!imgUrl.isEmpty()){
-			// 이미지를 업로드했을 경우
-			String rootPath = "/home/ec2-user/upload/space";
-			String uploadPath = getUploadPath();
-			String uploadFileName = "";
-			String spaceIconPath = "";
+		if(!multipartFile.isEmpty()){ // 사용자가 이미지를 지정한 경우
 
-			File uploadFullPath = new File(rootPath, uploadPath);
-			if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+			String uploadPath = getUploadPath(); // 2023/11/10
+			File uploadFullPath = new File(spaceRootPath, uploadPath); // upload/space/2023/11/10
+			if(!uploadFullPath.exists()) {
+				uploadFullPath.mkdirs();
+			}
 
-			String fileName = imgUrl.getOriginalFilename();
-			uploadFileName = uuid.toString() + "_" + fileName;
+			String uuid = UUID.randomUUID().toString();
+			String originalFileName = multipartFile.getOriginalFilename();
+			String uploadFileName = uuid.toString() + "_" + originalFileName;
+			File fullPath = new File(uploadFullPath, uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
+			LOGGER.info("[register()] value fullPath : {}", fullPath);
 
-			File fullPath = new File(uploadFullPath, uploadFileName);
-			imgUrl.transferTo(fullPath);
+			String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
+			LOGGER.info("[register()] value uploadUrl : {}", uploadUrl);
 
-			spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
+			spaceVO.setSpaceIconName(originalFileName); // space.jpg
+			spaceVO.setSpaceIconPath(fullPath.toString()); // upload/space/2023/11/10/uuid_space.jpg
+			spaceVO.setSpaceIconUuid(uuid); // uuid
+			spaceVO.setSpaceIconSize(multipartFile.getSize()); // ...bytes
 
-			spaceVO.setSpaceIconUuid(uploadFileName);
-			spaceVO.setSpaceIconPath(spaceIconPath);
-			spaceVO.setSpaceIconName(fileName);
-			spaceVO.setSpaceIconSize(imgUrl.getSize());
+		} else { // 기본이미지를 사용한 경우
 
+			Long defaultImg = spaceDTO.getDefaultImg();
 
-		} else{
-			// 기본이미지를 사용한 경우
 			if(defaultImg != null){
-				spaceVO.setSpaceIconUuid("default");
-				spaceVO.setSpaceIconPath("/home/ec2-user/upload/default/" + defaultImg +".jpg");
-				spaceVO.setSpaceIconName(defaultImg + ".jpg");
-				spaceVO.setSpaceIconSize(0L);
+
+				spaceVO.setSpaceIconName(defaultImg + ".jpg"); // 1.jpg
+				spaceVO.setSpaceIconUuid("default"); // default
+				spaceVO.setSpaceIconPath(defaultRootPath + "/" + defaultImg + ".jpg"); // upload/default/1.jpg
+				spaceVO.setSpaceIconSize(0L); // 0L
 			} else {
+
 				throw new CustomException(StatusCode.MISSING_IMAGE);
 			}
 		}
+
+		UUID uuid = UUID.randomUUID();
+
 		spaceVO.setSpaceCode(uuid.toString());
 		spaceVO.setSpaceUserTally(1);
 
@@ -152,6 +172,7 @@ public class SpaceController {
 		spaceUserVO.setProfileImgSize(0L);
 
 		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
+
 		return ResponseEntity.ok().body(spaceId);
 	}
 
@@ -165,54 +186,51 @@ public class SpaceController {
 
 	// 스페이스 수정
 	@PatchMapping("")
-	public ResponseEntity<StatusCode> modify(@RequestPart SpaceDTO spaceDTO,
-											 @RequestPart(required = false) MultipartFile imgUrl) throws IOException{
-
-		log.info("------------------- 여기 ---------------");
-		log.info("spaceDTO: " + spaceDTO);
-		log.info("imgUrl: " + imgUrl);
-		log.info("dd");
+	public ResponseEntity<StatusCode> modify(
+		@RequestPart SpaceDTO spaceDTO,
+		@RequestPart(required = false) MultipartFile multipartFile) throws IOException {
 
 		// 이미지 저장
-		if(!imgUrl.isEmpty()){
-			// 이미지를 업로드했을 경우
-			String rootPath = "/home/ec2-user/upload/space";
-			String uploadPath = getUploadPath();
-			String uploadFileName = "";
-			String spaceIconPath = "";
+		if(!multipartFile.isEmpty()){ // 사용자가 이미지를 지정한 경우
 
-			File uploadFullPath = new File(rootPath, uploadPath);
-			if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+			String uploadPath = getUploadPath(); // 2023/11/10
+			File uploadFullPath = new File(spaceRootPath, uploadPath); // upload/space/2023/11/10
+			if(!uploadFullPath.exists()) {
+				uploadFullPath.mkdirs();
+			}
 
-			UUID uuid = UUID.randomUUID();
-			String fileName = imgUrl.getOriginalFilename();
-			uploadFileName = uuid.toString() + "_" + fileName;
+			String uuid = UUID.randomUUID().toString();
+			String originalFileName = multipartFile.getOriginalFilename();
+			String uploadFileName = uuid.toString() + "_" + originalFileName;
+			File fullPath = new File(uploadFullPath, uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
+			LOGGER.info("[modify()] value fullPath : {}", fullPath);
 
-			File fullPath = new File(uploadFullPath, uploadFileName);
-			imgUrl.transferTo(fullPath);
-			log.info("uploadPath: " + uploadPath);
+			String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
+			LOGGER.info("[modify()] value uploadUrl : {}", uploadUrl);
 
-			spaceIconPath = rootPath + uploadPath + "/" + uploadFileName;
+			spaceDTO.setSpaceIconName(originalFileName); // space.jpg
+			spaceDTO.setSpaceIconPath(fullPath.toString()); // upload/space/2023/11/10/uuid_space.jpg
+			spaceDTO.setSpaceIconUuid(uuid); // uuid
+			spaceDTO.setSpaceIconSize(multipartFile.getSize()); // ...bytes
 
-			spaceDTO.setSpaceIconUuid(uploadFileName);
-			spaceDTO.setSpaceIconPath(spaceIconPath);
-			spaceDTO.setSpaceIconName(fileName);
-			spaceDTO.setSpaceIconSize(imgUrl.getSize());
+		} else { // 기본이미지를 사용한 경우
 
-			log.info("spaceDTO: " + spaceDTO);
-		} else {
-			// 기본이미지를 사용한 경우
-			if(spaceDTO.getDefaultImg() != null){
-				spaceDTO.setSpaceIconUuid("default");
-				spaceDTO.setSpaceIconPath("/home/ec2-user/upload/default/" + spaceDTO.getDefaultImg() +".jpg");
-				spaceDTO.setSpaceIconName(spaceDTO.getDefaultImg() + ".jpg");
-				spaceDTO.setSpaceIconSize(0L);
+			if(spaceDTO.getDefaultImg() != null) {
+
+				Long defaultImg = spaceDTO.getDefaultImg();
+
+				spaceDTO.setSpaceIconName(defaultImg + ".jpg"); // 1.jpg
+				spaceDTO.setSpaceIconUuid("default"); // default
+				spaceDTO.setSpaceIconPath(defaultRootPath + "/" + defaultImg + ".jpg"); // upload/default/1.jpg
+				spaceDTO.setSpaceIconSize(0L); // 0L
 			} else {
+
 				throw new CustomException(StatusCode.BAD_REQUEST);
 			}
 		}
 
 		spaceService.modify(spaceDTO);
+
 		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
 	}
 
@@ -255,11 +273,14 @@ public class SpaceController {
 
 	// 스페이스 내 유저 정보 변경
 	@PatchMapping(value = "/user", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<StatusCode> modifyInfo(@RequestPart SpaceUserDTO spaceUserDTO,
-												 @RequestPart(required = false) MultipartFile image,
-												 HttpServletRequest request) throws IOException{
+	public ResponseEntity<StatusCode> modifyInfo(
+		@RequestPart SpaceUserDTO spaceUserDTO,
+		@RequestPart(required = false) MultipartFile multipartFile,
+		HttpServletRequest request) throws IOException {
+
 		Long userId = getUserId(request);
 		log.info("userId: " + userId);
+
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		spaceUserVO.setUserId(userId);
 		spaceUserDTO.setUserId(userId);
@@ -268,43 +289,45 @@ public class SpaceController {
 		log.info("spaceUserDTO: " + spaceUserDTO);
 
 		if(spaceUserDTO.getIsAdmin()){
+
 			log.info("방장 변경 들어옴");
+
 			// 방장 변경
 			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), spaceUserDTO.getUserId());
 		} else {
-			if(!image.isEmpty()){
+
+			if(!multipartFile.isEmpty()){ // 이미지 변경 시
+
 				log.info("이미지 저장 들어옴");
-	//			이미지 저장
-				String rootPath = "/home/ec2-user/upload/profile";
-				String uploadPath = getUploadPath();
-				String uploadFileName = "";
-				String profilePath = "";
-				MultipartFile file = image;
 
-				File uploadFullPath = new File(rootPath, uploadPath);
-				if(!uploadFullPath.exists()){uploadFullPath.mkdirs();}
+				String uploadPath = getUploadPath(); // 2023/11/10
+				File uploadFullPath = new File(spaceRootPath, uploadPath); // upload/profile/2023/11/10
+				if(!uploadFullPath.exists()) {
+					uploadFullPath.mkdirs();
+				}
 
-				UUID uuid = UUID.randomUUID();
-				String fileName = file.getOriginalFilename();
-				uploadFileName = uuid.toString() + "_" + fileName;
+				String uuid = UUID.randomUUID().toString();
+				String originalFileName = multipartFile.getOriginalFilename();
+				String uploadFileName = uuid.toString() + "_" + originalFileName;
+				File fullPath = new File(uploadFullPath, uploadFileName); // upload/profile/2023/11/10/uuid_profile.jpg
+				LOGGER.info("[modifyInfo()] value fullPath : {}", fullPath);
 
-				File fullPath = new File(uploadFullPath, uploadFileName);
-				file.transferTo(fullPath);
-				log.info("uploadPath: " + uploadPath);
+				String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
+				LOGGER.info("[modifyInfo()] value uploadUrl : {}", uploadUrl);
 
-				profilePath = rootPath + uploadPath + "/" + uploadFileName;
+				spaceUserVO.setProfileImgName(originalFileName); // profile.jpg
+				spaceUserVO.setProfileImgPath(fullPath.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
+				spaceUserVO.setProfileImgUuid(uuid); // uuid
+				spaceUserVO.setProfileImgSize(multipartFile.getSize()); // ...bytes
 
-				spaceUserVO.setProfileImgPath(profilePath);
-				spaceUserVO.setProfileImgName(fileName);
-				spaceUserVO.setProfileImgUuid(uploadFileName);
-				spaceUserVO.setProfileImgSize(file.getSize());
-			} else {
+			} else { // 기본이미지로 저장
+
 				log.info("기본이미지 저장 들어옴");
-				// 기본이미지로 저장
-				spaceUserVO.setProfileImgPath("/home/ec2-user/upload/default/defaultProfile.png");
-				spaceUserVO.setProfileImgName("defaultProfile.png");
-				spaceUserVO.setProfileImgUuid("default");
-				spaceUserVO.setProfileImgSize(0L);
+
+				spaceUserVO.setProfileImgName("defaultProfile.png"); // defaultProfile.png
+				spaceUserVO.setProfileImgPath(defaultRootPath + "/defaultProfile.png"); // upload/default/defaultProfile.png
+				spaceUserVO.setProfileImgUuid("default"); // default
+				spaceUserVO.setProfileImgSize(0L); // 0L
 			}
 
 			// 유저정보 수정
