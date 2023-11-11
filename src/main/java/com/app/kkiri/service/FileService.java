@@ -3,6 +3,8 @@ package com.app.kkiri.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -14,15 +16,23 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.encryption.s3.S3EncryptionClient;
 
 @Service
 @RequiredArgsConstructor
 public class FileService {
 
 	private final AmazonS3 amazonS3;
+	private final Logger LOGGER = LoggerFactory.getLogger(FileService.class);
 
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
+
+	@Value("${kms.key}")
+	private String kmsKeyId;
 
 	public void uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
 
@@ -65,5 +75,23 @@ public class FileService {
 
 	public void deleteFile(String fileName) {
 		amazonS3.deleteObject(bucket, fileName);
+	}
+
+	public String decrypt(String objectKey) throws Exception {
+
+		try(S3Client s3Client = S3EncryptionClient.builder().kmsKeyId(kmsKeyId).build()){
+			ResponseBytes<GetObjectResponse> objectResponse = s3Client.getObjectAsBytes(builder -> builder
+				.bucket(bucket)
+				.key(objectKey));
+			LOGGER.info("[decrypt()] objectResponse : {}", objectResponse);
+
+			String output = objectResponse.asUtf8String();
+			LOGGER.info("[decrypt()] output : {}", output);
+
+			return output;
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+
 	}
 }
