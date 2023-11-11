@@ -1,9 +1,12 @@
 package com.app.kkiri.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,7 @@ public class PostService {
     private final MentionDAO mentionDAO;
     private final SpaceUsersDAO  spaceUsersDAO;
     private final CommentsDAO commentsDAO;
+    private final FileService fileService;
 
     @Transactional(rollbackFor = Exception.class)
     // 게시글 작성
@@ -129,7 +133,10 @@ public class PostService {
         postDateDTO.create(postVO.getPostBeginDate(), postVO.getPostEndDate());
         postDetailResponseDTO.setDate(postDateDTO);
 
-        postDetailResponseDTO.setImgsUrl(postImgsDAO.findById(postId));
+        List<String> fileKeys = postImgsDAO.findById(postId);
+        List<String> fileURIs = new ArrayList<>();
+        fileKeys.forEach(fileKey -> fileURIs.add(fileService.displayFile(fileKey)));
+        postDetailResponseDTO.setImgsUrl(fileURIs);
 
         List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId, spaceId);
         List<SpaceUserRespnseDTO> selectedUserList = new ArrayList<>();
@@ -137,7 +144,7 @@ public class PostService {
             SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
             spaceUserRespnseDTO.setUserId(user.getUserId());
             spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+            spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
 
             selectedUserList.add(spaceUserRespnseDTO);
         }
@@ -150,7 +157,7 @@ public class PostService {
             SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
             spaceUserRespnseDTO.setUserId(user.getUserId());
             spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+            spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
 
             userList.add(spaceUserRespnseDTO);
         }
@@ -208,7 +215,11 @@ public class PostService {
                 postPositionDTO.create(post.getPostLocationLat(), post.getPostLocationLng());
                 postFilterDTO.setPosition(postPositionDTO);
 
-                postFilterDTO.setImgUrl(postImgsDAO.findById(postId));
+                List<String> fileKeys = postImgsDAO.findById(postId);
+                List<String> fileURIs = new ArrayList<>();
+                fileKeys.forEach(fileKey -> fileURIs.add(fileService.displayFile(fileKey)));
+                postFilterDTO.setImgUrl(fileURIs);
+
                 List<TagVO> tagVOList = postTagsDAO.findById(postId);
                 List<TagDTO> tagList = new ArrayList<>();
 
@@ -228,7 +239,7 @@ public class PostService {
                     SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
                     spaceUserRespnseDTO.setUserId(user.getUserId());
                     spaceUserRespnseDTO.setUserName(user.getUserNickname());
-                    spaceUserRespnseDTO.setImgUrl(user.getProfileImgPath());
+                    spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
 
                     userList.add(spaceUserRespnseDTO);
                 }

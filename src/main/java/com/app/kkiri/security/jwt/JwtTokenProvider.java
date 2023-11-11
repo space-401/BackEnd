@@ -73,15 +73,10 @@ public class JwtTokenProvider {
 
 	// 엑세스 토큰으로 회원 고유 번호 추출
 	public Long getUserId(String token) {
-		Jws<Claims> jws;
 
 		try {
-			jws = Jwts.parser()
-				.verifyWith(secretKey)
-				.build()
-				.parseSignedClaims(token);
-
-			return Long.valueOf(jws.getPayload().getSubject());
+			String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
+			return Long.valueOf(sub);
 
 		} catch (JwtException ex){
 			return null;
@@ -90,14 +85,9 @@ public class JwtTokenProvider {
 
 	// 토큰의 유효성과 만료일 체크
 	public boolean validateToken(String token) {
+
 		try {
-			Jws<Claims> jws = Jwts.parser()
-				.verifyWith(secretKey)
-				.build()
-				.parseSignedClaims(token);
-
-			return !jws.getPayload().getExpiration().before(new Date());
-
+			return !Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
 		} catch (JwtException ex){
 			return false;
 		}
@@ -120,9 +110,7 @@ public class JwtTokenProvider {
 			return null;
 		}
 
-		String result = header.substring(7);
-
-		return result;
+		return header.substring(7);
 	}
 
 	// 토큰으로 인증 정보 조회
@@ -132,11 +120,9 @@ public class JwtTokenProvider {
 		if(userId == null) {
 			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT), "존재하지 않는 사용자입니다");
 		}
-		LOGGER.info("[getAuthentication()] returned value userId : {}", userId);
 
 		String userIdStr = String.valueOf(this.getUserId(token));
 		UserDetails userDetails = userDetailsService.loadUserByUsername(userIdStr);
-		LOGGER.info("[getAuthentication()] returned value userDetails : {}", userDetails);
 
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}

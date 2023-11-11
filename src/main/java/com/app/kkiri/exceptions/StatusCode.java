@@ -9,9 +9,10 @@ public enum StatusCode {
     OK(200, "success"),
     ALREADY_SAVED_SPACE(400, "이미 가입된 회원입니다."),
     BAD_REQUEST(400, "failure"),
-    INVALID_TOKEN(401, "인증에 실패했습니다."),
+    INVALID_TOKEN(401, "유효하지 않은 토큰입니다."),
     MISSING_PARAMETER(400, "인 파라미터 값이 넘어오지 않았습니다."),
-    MISSING_IMAGE(400, "기본이미지가 없습니다.");
+    MISSING_IMAGE(400, "기본이미지가 없습니다."),
+    INSUFFICIENT_HEADER(400, "헤더정보가 충분하지 않습니다.");
 
     private final int status;
     private final String message;

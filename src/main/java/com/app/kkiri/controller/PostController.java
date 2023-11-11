@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +35,11 @@ import com.app.kkiri.domain.vo.PostBookmarkVO;
 import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.security.Response;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
+import com.google.gson.Gson;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,56 +56,79 @@ public class PostController {
     private final Logger LOGGER = LoggerFactory.getLogger(PostController.class);
 
     @Value("${file.rootPath.post}")
-    private String rootPath;
+    private String postRootPath;
 
-    private Long getUserId(HttpServletRequest request){
-        try{
-            String token = jwtTokenProvider.resolveToken(request);
-            return  jwtTokenProvider.getUserId(token);
-        } catch (Exception e){
+    private Long getUserId(HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveToken(request);
+
+        if(token == null) { // 헤더 이상
+            throw new CustomException(StatusCode.INSUFFICIENT_HEADER);
+        }
+
+        Long userId = jwtTokenProvider.getUserId(token);
+
+        if(userId == null) { // 만료되거나 이상이 있는 토큰
             throw new CustomException(StatusCode.INVALID_TOKEN);
         }
+
+        return userId;
     }
 
     // 게시글 작성
     @PostMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> register(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs, HttpServletRequest request) throws IOException{
+    public ResponseEntity<Map<String, Object>> register(
+        @RequestPart PostDTO postDTO,
+        @RequestPart("imgs") List<MultipartFile> multipartFiles,
+        HttpServletRequest request) throws IOException{
 
         Long userId = getUserId(request);
+
         postDTO.setUserId(userId);
 
-        String uploadPath = getUploadPath(); // 2023/11/10
-        File uploadFullPath = new File(rootPath, uploadPath); // upload/post/2023/11/10
-        if(!uploadFullPath.exists()) {
-            uploadFullPath.mkdirs();
-        }
+        StringBuffer uploadPath = new StringBuffer();
+        StringBuffer uploadFileName = new StringBuffer();
+        StringBuffer uploadFullPathAndFileName = new StringBuffer();
+
+        uploadPath.append(postRootPath); // upload/post
+        uploadPath.append("/");
+        uploadPath.append(getUploadPath()); // 2023/11/10
 
         List<PostImgVO> imgList = new ArrayList<>();
 
-        for (MultipartFile multipartFile : imgs) {
-
+        for (MultipartFile multipartFile : multipartFiles) {
             PostImgVO postImgVO = new PostImgVO();
 
             String uuid = UUID.randomUUID().toString();
             String originalFileName = multipartFile.getOriginalFilename();
-            String uploadFileName = uuid.toString() + "_" + originalFileName;
-            File fullPath = new File(uploadFullPath, uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
-            LOGGER.info("[register()] value fullPath : {}", fullPath);
 
-            String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
-            LOGGER.info("[register()] value uploadUrl : {}", uploadUrl);
+            uploadFileName.append(uuid);
+            uploadFileName.append("_");
+            uploadFileName.append(originalFileName); // uuid_post.jpg
+
+            uploadFullPathAndFileName.append(uploadPath);
+            uploadFullPathAndFileName.append("/");
+            uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
+
+            fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
 
             postImgVO.setPostImgName(originalFileName); // post.jpg
-            postImgVO.setPostImgPath(fullPath.toString()); // upload/post/2023/11/10/uuid_post.jpg
+            postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
             postImgVO.setPostImgUuid(uuid); // uuid
             postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
 
             imgList.add(postImgVO);
+
+            uploadFileName.delete(0, uploadFileName.length());
+            uploadFullPathAndFileName.delete(0, uploadFullPathAndFileName.length());
         }
 
-        postService.register(postDTO, imgList);
+        Long postId = postService.register(postDTO, imgList);
 
-        return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+        Map<String, Object> map = new HashMap<>();
+        map.put("postId", postId);
+
+        return ResponseEntity.ok(map);
     }
 
     // 게시글 삭제
@@ -118,48 +145,62 @@ public class PostController {
 
     // 게시글 수정
     @PatchMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> modify(@RequestPart PostDTO postDTO, @RequestPart List<MultipartFile> imgs) throws IOException {
+    public ResponseEntity<Response> modify(
+        @RequestPart PostDTO postDTO,
+        @RequestPart("imgs") List<MultipartFile> multipartFiles) throws IOException {
 
-        String uploadPath = getUploadPath(); // 2023/11/10
-        File uploadFullPath = new File(rootPath, uploadPath); // upload/post/2023/11/10
-        if(!uploadFullPath.exists()) {
-            uploadFullPath.mkdirs();
-        }
+        StringBuffer uploadPath = new StringBuffer();
+        StringBuffer uploadFileName = new StringBuffer();
+        StringBuffer uploadFullPathAndFileName = new StringBuffer();
+
+        uploadPath.append(postRootPath); // upload/post
+        uploadPath.append("/");
+        uploadPath.append(getUploadPath()); // 2023/11/10
 
         List<PostImgVO> imgList = new ArrayList<>();
 
-        for (MultipartFile multipartFile : imgs) {
-
+        for (MultipartFile multipartFile : multipartFiles) {
             PostImgVO postImgVO = new PostImgVO();
 
             String uuid = UUID.randomUUID().toString();
             String originalFileName = multipartFile.getOriginalFilename();
-            String uploadFileName = uuid.toString() + "_" + originalFileName;
-            File fullPath = new File(uploadFullPath, uploadFileName); // upload/post/2023/11/10/uuid_dog.jpg
-            LOGGER.info("[modify()] value fullPath : {}", fullPath);
 
-            String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
-            LOGGER.info("[modify()] value uploadUrl : {}", uploadUrl);
+            uploadFileName.append(uuid);
+            uploadFileName.append("_");
+            uploadFileName.append(originalFileName); // uuid_post.jpg
+
+            uploadFullPathAndFileName.append(uploadPath);
+            uploadFullPathAndFileName.append("/");
+            uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
+
+            fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
 
             postImgVO.setPostImgName(originalFileName); // post.jpg
-            postImgVO.setPostImgPath(fullPath.toString()); // upload/post/2023/11/10/uuid_post.jpg
+            postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
             postImgVO.setPostImgUuid(uuid); // uuid
             postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
 
             imgList.add(postImgVO);
+
+            uploadFileName.delete(0, uploadFileName.length());
+            uploadFullPathAndFileName.delete(0, uploadFullPathAndFileName.length());
         }
 
         postService.modify(postDTO, imgList);
 
-        return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+        Response response = new Response("success");
+
+        return ResponseEntity.ok(response);
     }
 
     // 게시글 상세 조회
     @GetMapping("")
     public ResponseEntity<?> postDetail(@RequestParam Long postId, HttpServletRequest request){
-//        Long userId = getUserId(request);
-        Long userId = 1L;
+
+        Long userId = getUserId(request);
+
         PostDetailResponseDTO postDetailType = postService.postDetail(postId, userId);
+
         return ResponseEntity.ok().body(postDetailType);
     }
 
