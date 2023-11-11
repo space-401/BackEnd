@@ -24,13 +24,21 @@ public class CommentController {
     private final CommentService commentService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    private Long getUserId(HttpServletRequest request){
-        try{
-            String token = jwtTokenProvider.resolveToken(request);
-            return  jwtTokenProvider.getUserId(token);
-        } catch (Exception e){
+    private Long getUserId(HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveToken(request);
+
+        if(token == null) { // 헤더 이상
+            throw new CustomException(StatusCode.INSUFFICIENT_HEADER);
+        }
+
+        Long userId = jwtTokenProvider.getUserId(token);
+
+        if(userId == null) { // 만료되거나 이상이 있는 토큰
             throw new CustomException(StatusCode.INVALID_TOKEN);
         }
+
+        return userId;
     }
 
     @PostMapping("")

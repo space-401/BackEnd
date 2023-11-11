@@ -43,11 +43,13 @@ import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.security.Response;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
 import com.app.kkiri.service.SpaceService;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.gson.Gson;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,13 +75,21 @@ public class SpaceController {
 	@Value("${file.rootPath.profile}")
 	private String profileRootPath;
 
-	private Long getUserId(HttpServletRequest request){
-		try{
-			String token = jwtTokenProvider.resolveToken(request);
-			return  jwtTokenProvider.getUserId(token);
-		} catch (Exception e){
+	private Long getUserId(HttpServletRequest request) {
+
+		String token = jwtTokenProvider.resolveToken(request);
+
+		if(token == null) { // 헤더 이상
+			throw new CustomException(StatusCode.INSUFFICIENT_HEADER);
+		}
+
+		Long userId = jwtTokenProvider.getUserId(token);
+
+		if(userId == null) { // 만료되거나 이상이 있는 토큰
 			throw new CustomException(StatusCode.INVALID_TOKEN);
 		}
+
+		return userId;
 	}
 
 	// 목록 조회
@@ -106,9 +116,10 @@ public class SpaceController {
 
 	// 스페이스 생성
 	@PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<?> register(@RequestPart SpaceDTO spaceDTO,
-									  @RequestPart(required = false) MultipartFile multipartFile,
-									  HttpServletRequest request) throws IOException {
+	public ResponseEntity<?> register(
+		@RequestPart SpaceDTO spaceDTO,
+		@RequestPart(required = false, value = "imgUrl") MultipartFile multipartFile,
+		HttpServletRequest request) throws IOException {
 
 		Long userId = getUserId(request);
 		LOGGER.info("[register()] param userId : {}", userId);
@@ -117,28 +128,34 @@ public class SpaceController {
 		spaceVO.setSpaceName(spaceDTO.getSpaceName());
 		spaceVO.setSpacePw(spaceDTO.getSpacePw());
 		spaceVO.setSpaceDescription(spaceDTO.getSpaceDescription());
-
-		SpaceUserVO spaceUserVO = new SpaceUserVO();
+		spaceVO.setSpaceCode(UUID.randomUUID().toString());
+		spaceVO.setSpaceUserTally(1);
 
 		if(!multipartFile.isEmpty()){ // 사용자가 이미지를 지정한 경우
 
-			String uploadPath = getUploadPath(); // 2023/11/10
-			File uploadFullPath = new File(spaceRootPath, uploadPath); // upload/space/2023/11/10
-			if(!uploadFullPath.exists()) {
-				uploadFullPath.mkdirs();
-			}
+			StringBuffer uploadPath = new StringBuffer();
+			StringBuffer uploadFileName = new StringBuffer();
+			StringBuffer uploadFullPathAndFileName = new StringBuffer();
+
+			uploadPath.append(spaceRootPath); // upload/space
+			uploadPath.append("/");
+			uploadPath.append(getUploadPath()); // 2023/11/10
 
 			String uuid = UUID.randomUUID().toString();
 			String originalFileName = multipartFile.getOriginalFilename();
-			String uploadFileName = uuid.toString() + "_" + originalFileName;
-			File fullPath = new File(uploadFullPath, uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
-			LOGGER.info("[register()] value fullPath : {}", fullPath);
 
-			String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
-			LOGGER.info("[register()] value uploadUrl : {}", uploadUrl);
+			uploadFileName.append(uuid);
+			uploadFileName.append("_");
+			uploadFileName.append(originalFileName); // uuid_space.jpg
+
+			uploadFullPathAndFileName.append(uploadPath);
+			uploadFullPathAndFileName.append("/");
+			uploadFullPathAndFileName.append(uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
+
+			fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
 
 			spaceVO.setSpaceIconName(originalFileName); // space.jpg
-			spaceVO.setSpaceIconPath(fullPath.toString()); // upload/space/2023/11/10/uuid_space.jpg
+			spaceVO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
 			spaceVO.setSpaceIconUuid(uuid); // uuid
 			spaceVO.setSpaceIconSize(multipartFile.getSize()); // ...bytes
 
@@ -148,6 +165,7 @@ public class SpaceController {
 
 			if(defaultImg != null){
 
+				// ?? 디폴트 이미지 번호는 랜덤으로 생성되서 넘어오는가 ??
 				spaceVO.setSpaceIconName(defaultImg + ".jpg"); // 1.jpg
 				spaceVO.setSpaceIconUuid("default"); // default
 				spaceVO.setSpaceIconPath(defaultRootPath + "/" + defaultImg + ".jpg"); // upload/default/1.jpg
@@ -158,13 +176,10 @@ public class SpaceController {
 			}
 		}
 
-		UUID uuid = UUID.randomUUID();
-
-		spaceVO.setSpaceCode(uuid.toString());
-		spaceVO.setSpaceUserTally(1);
-
+		// ?? 스페이스 생성 시 생성자 정보는 아래처럼 작성하는 것이 맞나 ??
+		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		spaceUserVO.setUserId(userId);
-		spaceUserVO.setUserAdminYn("1");
+		spaceUserVO.setUserAdminYn(true);
 		spaceUserVO.setUserNickname("default");
 		spaceUserVO.setProfileImgName("default");
 		spaceUserVO.setProfileImgPath("default");
@@ -186,30 +201,36 @@ public class SpaceController {
 
 	// 스페이스 수정
 	@PatchMapping("")
-	public ResponseEntity<StatusCode> modify(
+	public ResponseEntity<Response> modify(
 		@RequestPart SpaceDTO spaceDTO,
-		@RequestPart(required = false) MultipartFile multipartFile) throws IOException {
+		@RequestPart(required = false, value = "imgUrl") MultipartFile multipartFile) throws IOException {
 
 		// 이미지 저장
 		if(!multipartFile.isEmpty()){ // 사용자가 이미지를 지정한 경우
 
-			String uploadPath = getUploadPath(); // 2023/11/10
-			File uploadFullPath = new File(spaceRootPath, uploadPath); // upload/space/2023/11/10
-			if(!uploadFullPath.exists()) {
-				uploadFullPath.mkdirs();
-			}
+			StringBuffer uploadPath = new StringBuffer();
+			StringBuffer uploadFileName = new StringBuffer();
+			StringBuffer uploadFullPathAndFileName = new StringBuffer();
+
+			uploadPath.append(spaceRootPath); // upload/space
+			uploadPath.append("/");
+			uploadPath.append(getUploadPath()); // 2023/11/10
 
 			String uuid = UUID.randomUUID().toString();
 			String originalFileName = multipartFile.getOriginalFilename();
-			String uploadFileName = uuid.toString() + "_" + originalFileName;
-			File fullPath = new File(uploadFullPath, uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
-			LOGGER.info("[modify()] value fullPath : {}", fullPath);
 
-			String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
-			LOGGER.info("[modify()] value uploadUrl : {}", uploadUrl);
+			uploadFileName.append(uuid);
+			uploadFileName.append("_");
+			uploadFileName.append(originalFileName); // uuid_space.jpg
+
+			uploadFullPathAndFileName.append(uploadPath);
+			uploadFullPathAndFileName.append("/");
+			uploadFullPathAndFileName.append(uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
+
+			fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
 
 			spaceDTO.setSpaceIconName(originalFileName); // space.jpg
-			spaceDTO.setSpaceIconPath(fullPath.toString()); // upload/space/2023/11/10/uuid_space.jpg
+			spaceDTO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
 			spaceDTO.setSpaceIconUuid(uuid); // uuid
 			spaceDTO.setSpaceIconSize(multipartFile.getSize()); // ...bytes
 
@@ -231,7 +252,7 @@ public class SpaceController {
 
 		spaceService.modify(spaceDTO);
 
-		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+		return ResponseEntity.ok(new Response("success"));
 	}
 
 	// 스페이스 태그 조회
@@ -244,9 +265,12 @@ public class SpaceController {
 	// 스페이스 태그 추가
 	@PostMapping("/tag")
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	public ResponseEntity<StatusCode> addTag(@RequestBody TagVO tagVO){
+	public ResponseEntity<Response> addTag(@RequestBody TagVO tagVO){
+
 		spaceService.addTag(tagVO);
-		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+
+		Response response = new Response("success");
+		return ResponseEntity.ok(response);
 	}
 
 	// 스페이스 태그 삭제
@@ -258,10 +282,15 @@ public class SpaceController {
 
 	// 스페이스 회원 입장 (초대코드 입력)
 	@PostMapping("/user")
-	public ResponseEntity<?> enterSpace(@RequestBody SpaceVO spaceVO, HttpServletRequest request){
+	public ResponseEntity<Map<String, Object>> enterSpace(@RequestBody SpaceVO spaceVO, HttpServletRequest request){
+
 		Long userId = getUserId(request);
 		Long spaceId = spaceService.enter(userId, spaceVO);
-		return ResponseEntity.ok().body(spaceId);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("spaceId", spaceId);
+
+		return ResponseEntity.ok(map);
 	}
 
 	// 스페이스 회원 탈퇴
@@ -273,9 +302,9 @@ public class SpaceController {
 
 	// 스페이스 내 유저 정보 변경
 	@PatchMapping(value = "/user", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<StatusCode> modifyInfo(
+	public ResponseEntity<Response> modifyInfo(
 		@RequestPart SpaceUserDTO spaceUserDTO,
-		@RequestPart(required = false) MultipartFile multipartFile,
+		@RequestPart(required = false, value = "image") MultipartFile multipartFile,
 		HttpServletRequest request) throws IOException {
 
 		Long userId = getUserId(request);
@@ -289,34 +318,37 @@ public class SpaceController {
 		log.info("spaceUserDTO: " + spaceUserDTO);
 
 		if(spaceUserDTO.getIsAdmin()){
-
 			log.info("방장 변경 들어옴");
 
 			// 방장 변경
 			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), spaceUserDTO.getUserId());
 		} else {
-
 			if(!multipartFile.isEmpty()){ // 이미지 변경 시
-
 				log.info("이미지 저장 들어옴");
 
-				String uploadPath = getUploadPath(); // 2023/11/10
-				File uploadFullPath = new File(spaceRootPath, uploadPath); // upload/profile/2023/11/10
-				if(!uploadFullPath.exists()) {
-					uploadFullPath.mkdirs();
-				}
+				StringBuffer uploadPath = new StringBuffer();
+				StringBuffer uploadFileName = new StringBuffer();
+				StringBuffer uploadFullPathAndFileName = new StringBuffer();
+
+				uploadPath.append(profileRootPath); // upload/profile
+				uploadPath.append("/");
+				uploadPath.append(getUploadPath()); // 2023/11/10
 
 				String uuid = UUID.randomUUID().toString();
 				String originalFileName = multipartFile.getOriginalFilename();
-				String uploadFileName = uuid.toString() + "_" + originalFileName;
-				File fullPath = new File(uploadFullPath, uploadFileName); // upload/profile/2023/11/10/uuid_profile.jpg
-				LOGGER.info("[modifyInfo()] value fullPath : {}", fullPath);
 
-				String uploadUrl = fileService.uploadFile(multipartFile, fullPath.toString());
-				LOGGER.info("[modifyInfo()] value uploadUrl : {}", uploadUrl);
+				uploadFileName.append(uuid);
+				uploadFileName.append("_");
+				uploadFileName.append(originalFileName); // uuid_profile.jpg
+
+				uploadFullPathAndFileName.append(uploadPath);
+				uploadFullPathAndFileName.append("/");
+				uploadFullPathAndFileName.append(uploadFileName); // upload/profile/2023/11/10/uuid_profile.jpg
+
+				fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
 
 				spaceUserVO.setProfileImgName(originalFileName); // profile.jpg
-				spaceUserVO.setProfileImgPath(fullPath.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
+				spaceUserVO.setProfileImgPath(uploadFullPathAndFileName.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
 				spaceUserVO.setProfileImgUuid(uuid); // uuid
 				spaceUserVO.setProfileImgSize(multipartFile.getSize()); // ...bytes
 
@@ -339,7 +371,7 @@ public class SpaceController {
 			spaceService.modifyInfo(spaceUserVO);
 		}
 
-		return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+		return ResponseEntity.ok(new Response("success"));
 	}
 
 	// 게시글 필터 조회

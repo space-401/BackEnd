@@ -24,7 +24,7 @@ public class FileService {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
-	public String uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
+	public void uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
 
 		// fileName은 파일 전체 경로가 포함된 파일 이름이다.
 		// 2023/11/09/uuid_dog.jpg
@@ -37,7 +37,7 @@ public class FileService {
 		amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), metadata);
 
 		// 파일이 저장된 URL을 return 한다.
-		return amazonS3.getUrl(bucket, fileName).toString();
+		// return amazonS3.getUrl(bucket, fileName).toString();
 	}
 
 	public ResponseEntity<UrlResource> downloadFile(String fileName) throws UnsupportedEncodingException {

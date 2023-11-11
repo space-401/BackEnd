@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -14,7 +13,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import com.app.kkiri.security.handlers.CustomAuthenticationEntryPoint;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationFailureHandler;
 import com.app.kkiri.security.handlers.OAuth2AuthenticationSuccessHandler;
-import com.app.kkiri.security.jwt.JwtFilter;
 import com.app.kkiri.security.oAuth2Login.CustomOAuth2LoginConfigurer;
 import com.app.kkiri.security.oAuth2Login.CustomOAuth2UserService;
 
@@ -44,14 +42,11 @@ public class SecurityConfig {
 			// .antMatchers("/user/auth/*").permitAll()
 			// .antMatchers("/user/refreshToken").permitAll()
 			.antMatchers("/**").permitAll()
-			// .anyRequest().authenticated()
 		);
 
-		http.addFilterAfter(jwtFilter(), LogoutFilter.class);
+		// http.addFilterAfter(jwtFilter(), LogoutFilter.class);
 
 		http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
-
-		// http.addFilterAfter(jwtAuthenticationFilter(jwtTokenProvider, usersDAO), LogoutFilter.class);
 
 		http.apply(customOAuth2LoginConfigurer()
 			.userInfoEndpoint(userInfo -> userInfo
@@ -98,9 +93,4 @@ public class SecurityConfig {
 	//
 	// 	return new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
 	// }
-
-	@Bean
-	public JwtFilter jwtFilter() {
-		return new JwtFilter();
-	}
 }

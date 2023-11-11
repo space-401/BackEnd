@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class SpaceUserVO {
 	private Long spaceId;
 	private Long userId;
-	private String userAdminYn;
+	private boolean userAdminYn;
 	private String userNickname;
 	private String profileImgName;
 	private String profileImgPath;
@@ -19,7 +19,7 @@ public class SpaceUserVO {
 	private Long profileImgSize;
 	private String spaceSignupDate;
 
-	public void create(Long spaceId, Long userId, String userAdminYn, String userNickname, String profileImgName,
+	public void create(Long spaceId, Long userId, boolean userAdminYn, String userNickname, String profileImgName,
 		String profileImgPath, String profileImgUuid, Long profileImgSize) {
 		this.spaceId = spaceId;
 		this.userId = userId;
@@ -33,7 +33,7 @@ public class SpaceUserVO {
 
 	public void createAdmin(Long userId) {
 		this.userId = userId;
-		this.userAdminYn = "1";
+		this.userAdminYn = true;
 		this.userNickname = "default";
 		this.profileImgName = "default";
 		this.profileImgPath = "default";
@@ -43,7 +43,7 @@ public class SpaceUserVO {
 
 	public void createNormal(Long userId) {
 		this.userId = userId;
-		this.userAdminYn = "0";
+		this.userAdminYn = false;
 		this.userNickname = "default";
 		this.profileImgName = "default";
 		this.profileImgPath = "default";
