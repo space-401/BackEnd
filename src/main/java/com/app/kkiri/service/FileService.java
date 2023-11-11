@@ -2,7 +2,9 @@ package com.app.kkiri.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,14 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.kms.AWSKMS;
+import com.amazonaws.services.kms.AWSKMSClientBuilder;
+import com.amazonaws.services.kms.model.DecryptRequest;
+import com.amazonaws.services.kms.model.EncryptionAlgorithmSpec;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.encryption.s3.S3EncryptionClient;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +31,10 @@ public class FileService {
 	private final AmazonS3 amazonS3;
 	private final Logger LOGGER = LoggerFactory.getLogger(FileService.class);
 
-	@Value("${cloud.aws.s3.bucket}")
-	private String bucket;
+	@Value("${aws.s3.bucket-name}")
+	private String bucketName;
 
-	@Value("${kms.key}")
+	@Value("${aws.kms.key-id}")
 	private String kmsKeyId;
 
 	public void uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
@@ -44,7 +47,7 @@ public class FileService {
 		metadata.setContentType(multipartFile.getContentType());
 
 		// 파일을 S3에 저장한다.
-		amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), metadata);
+		amazonS3.putObject(bucketName, fileName, multipartFile.getInputStream(), metadata);
 
 		// 파일이 저장된 URL을 return 한다.
 		// return amazonS3.getUrl(bucket, fileName).toString();
@@ -53,7 +56,7 @@ public class FileService {
 	public ResponseEntity<UrlResource> downloadFile(String fileName) throws UnsupportedEncodingException {
 
 		// 파일 전체 경로가 포함된 파일 이름을 통해 파일을 가져온다.
-		UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, fileName));
+		UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucketName, fileName));
 
 		// 파일의 원본 이름 추출
 		// dog.jpg
@@ -70,28 +73,35 @@ public class FileService {
 	}
 
 	public String displayFile(String fileName) {
-		return amazonS3.getUrl(bucket, fileName).toString();
+		return amazonS3.getUrl(bucketName, fileName).toString();
 	}
 
 	public void deleteFile(String fileName) {
-		amazonS3.deleteObject(bucket, fileName);
+		amazonS3.deleteObject(bucketName, fileName);
 	}
 
 	public String decrypt(String objectKey) throws Exception {
 
-		try(S3Client s3Client = S3EncryptionClient.builder().kmsKeyId(kmsKeyId).build()){
-			ResponseBytes<GetObjectResponse> objectResponse = s3Client.getObjectAsBytes(builder -> builder
-				.bucket(bucket)
-				.key(objectKey));
-			LOGGER.info("[decrypt()] objectResponse : {}", objectResponse);
+		try {
+			AWSKMS kmsClient = AWSKMSClientBuilder.standard()
+				.withRegion(Regions.AP_NORTHEAST_2)
+				.build();
 
-			String output = objectResponse.asUtf8String();
-			LOGGER.info("[decrypt()] output : {}", output);
+			String s3Object = amazonS3.getObjectAsString(bucketName, objectKey);
+			LOGGER.info("[decrypt()] s3Object : {}", s3Object);
 
-			return output;
+			DecryptRequest request = new DecryptRequest();
+			request.withCiphertextBlob(ByteBuffer.wrap(Base64.decodeBase64(s3Object)));
+			request.withKeyId(kmsKeyId);
+			request.withEncryptionAlgorithm(EncryptionAlgorithmSpec.RSAES_OAEP_SHA_256);
+
+			ByteBuffer plainText = kmsClient.decrypt(request).getPlaintext();
+			LOGGER.info("[decrypt()] plainText : {}", plainText);
+
+			return new String(plainText.array());
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
-
 	}
+
 }
