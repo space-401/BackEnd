@@ -24,7 +24,7 @@ public class TestController {
 
 	@GetMapping("/file/test")
 	public String fileTest(String objectKey) throws Exception {
-		return fileService.decrypt(objectKey);
+		return fileService.displayFile(objectKey);
 	}
 
 	@ExceptionHandler(Exception.class)

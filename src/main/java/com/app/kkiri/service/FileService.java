@@ -83,6 +83,7 @@ public class FileService {
 	public String decrypt(String objectKey) throws Exception {
 
 		try {
+
 			AWSKMS kmsClient = AWSKMSClientBuilder.standard()
 				.withRegion(Regions.AP_NORTHEAST_2)
 				.build();
@@ -92,7 +93,6 @@ public class FileService {
 
 			DecryptRequest request = new DecryptRequest();
 			request.withCiphertextBlob(ByteBuffer.wrap(Base64.decodeBase64(s3Object)));
-			request.withKeyId(kmsKeyId);
 			request.withEncryptionAlgorithm(EncryptionAlgorithmSpec.RSAES_OAEP_SHA_256);
 
 			ByteBuffer plainText = kmsClient.decrypt(request).getPlaintext();

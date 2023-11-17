@@ -176,7 +176,6 @@ public class SpaceController {
 			}
 		}
 
-		// ?? 스페이스 생성 시 생성자 정보는 아래처럼 작성하는 것이 맞나 ??
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		spaceUserVO.setUserId(userId);
 		spaceUserVO.setUserAdminYn(true);
