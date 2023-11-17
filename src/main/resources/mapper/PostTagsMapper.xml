@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.PostTagsMapper">
+    <insert id="insert">
+        INSERT INTO POST_TAGS (POST_ID, TAG_ID)
+        VALUES (#{postId}, #{tagId})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM POST_TAGS
+        WHERE POST_ID=#{postId}
+    </delete>
+
+    <select id="selectById" resultType="tagVO">
+        SELECT pt.TAG_ID, t.TAG_NAME
+        FROM POST_TAGS pt INNER JOIN TAGS t
+        ON pt.TAG_ID=t.TAG_ID
+        WHERE POST_ID=#{postId}
+    </select>
+</mapper>

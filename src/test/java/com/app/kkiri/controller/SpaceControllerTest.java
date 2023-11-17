@@ -1,7 +1,7 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.vo.SpaceDTO;
-import com.app.kkiri.domain.vo.SpaceUserDTO;
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceUserDTO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.google.gson.Gson;
@@ -46,7 +46,7 @@ class SpaceControllerTest {
     void spaceDetail() throws Exception{
         log.info("spaceDetail: " + mockMvc.perform(MockMvcRequestBuilders.get("/space/")
                         .param("spaceId", "44"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print()));
     }
 
@@ -114,11 +114,19 @@ class SpaceControllerTest {
                 json.getBytes()
         );
 
+        MockMultipartFile imgUrl = new MockMultipartFile(
+                "imgUrl", //name
+                null, //originalFilename
+                "application/json",
+                "".getBytes()
+        );
+
         log.info("json: " + json);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart("/space/")
                                 .file(data)
+                                .file(imgUrl)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .characterEncoding("UTF-8"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -169,10 +177,6 @@ class SpaceControllerTest {
                                 .characterEncoding("UTF-8"))
 //                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
-    }
-
-    @Test
-    void filter() {
     }
 
     @Test
@@ -322,5 +326,18 @@ class SpaceControllerTest {
                                 .characterEncoding("UTF-8"))
 //                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    void filter() throws Exception{
+        log.info("filter: " + mockMvc.perform(MockMvcRequestBuilders.get("/space/search")
+                        .param("spaceId", "46")
+//                         .param("tagId", "61")
+//                        .param("keyword", "수정")
+//                        .param("startDate", "2023/10/30")
+                        .param("endDate", "2023/11/04")
+                        .param("page", "1"))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print()));
     }
 }

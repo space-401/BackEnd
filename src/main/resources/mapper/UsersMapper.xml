@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.UsersMapper">
+    <select id="selectNextUserId" resultType="long">
+        SELECT seq_users.NEXTVAL
+        FROM DUAL
+    </select>
+
+    <select id="selectUser" resultType="userVO">
+        SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertUser">
+        INSERT INTO users
+        (user_id, social_type, user_status, access_token, refresh_token, user_email)
+        VALUES (#{userId}, #{socialType}, #{userStatus}, #{accessToken}, #{refreshToken}, #{userEmail})
+    </insert>
+
+    <select id="selectRecentUser" resultType="userVO">
+        SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
+        FROM (
+            SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
+            FROM users
+            ORDER BY user_id DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
+
+    <select id="selectUserByUserEmail" resultType="userVO">
+        SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
+        FROM users
+        WHERE user_email = #{userEmail}
+    </select>
+
+    <update id="updateAccessToken">
+        UPDATE users
+        SET access_token = #{accessToken}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateAccessTokenAndRefreshToken">
+        UPDATE users
+        SET access_token = #{accessToken}, refresh_token = #{refreshToken}
+        WHERE user_id = #{userId}
+    </update>
+
+
+</mapper>

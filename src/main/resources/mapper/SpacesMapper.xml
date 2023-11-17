@@ -38,10 +38,14 @@
 
     <update id="update">
         UPDATE SPACES
-        SET SPACE_NAME=#{spaceName}, SPACE_DESCRIPTION=#{spaceDescription},
-                           SPACE_PW=#{spacePw}, SPACE_ICON_NAME=#{spaceIconName},
-                           SPACE_ICON_PATH=#{spaceIconPath}, SPACE_ICON_UUID=#{spaceIconUuid},
-                           SPACE_ICON_SIZE=#{spaceIconSize}, SPACE_UPDATE_DATE = SYSDATE
+        SET SPACE_NAME=#{spaceName},
+            SPACE_DESCRIPTION=#{spaceDescription},
+            SPACE_PW=#{spacePw},
+            SPACE_ICON_NAME=#{spaceIconName},
+            SPACE_ICON_PATH=#{spaceIconPath},
+            SPACE_ICON_UUID=#{spaceIconUuid},
+            SPACE_ICON_SIZE=#{spaceIconSize},
+            SPACE_UPDATE_DATE = SYSDATE
         WHERE SPACE_ID=#{spaceId}
     </update>
 

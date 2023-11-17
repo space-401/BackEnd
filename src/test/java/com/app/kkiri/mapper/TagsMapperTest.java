@@ -22,7 +22,7 @@ class TagsMapperTest {
     @Test
     void insert() {
         TagVO tagVO = new TagVO();
-        tagVO.create("정기모임", 41L);
+        tagVO.create("데이트", 44L);
         tagsMapper.insert(tagVO);
     }
 

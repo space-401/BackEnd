@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.kkiri.mapper.PostImgsMapper">
+
+    <insert id="insert">
+        <selectKey keyProperty="postImgId" order="BEFORE" resultType="long">
+            SELECT SEQ_IMGS.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO POST_IMGS(POST_IMG_ID, POST_IMG_NAME, POST_IMG_PATH, POST_IMG_UUID, POST_IMG_SIZE, POST_ID)
+        VALUES (#{postImgId}, #{postImgName}, #{postImgPath}, #{postImgUuid}, #{postImgSize}, #{postId})
+    </insert>
+
+    <select id="selectById" resultType="string">
+        SELECT POST_IMG_PATH  FROM POST_IMGS
+        WHERE POST_ID=#{postId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM POST_IMGS
+        WHERE POST_ID=#{postId}
+    </delete>
+</mapper>

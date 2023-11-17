@@ -1,29 +1,29 @@
 package com.app.kkiri.repository;
 
-import com.app.kkiri.mapper.SpaceUsersMapper;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.mapper.SpaceUsersMapper;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class SpaceUsersDAO {
 	private final SpaceUsersMapper spaceUsersMapper;
 	// 스페이스 회원 목록
-	public List<SpaceUserVO> findAll(Long spaceId, Long userId){ return spaceUsersMapper.selectAll(spaceId, userId); };
+	public List<SpaceUserVO> findAll(Long spaceId, Long userId){ return spaceUsersMapper.selectAll(spaceId, userId); }
 
 	// 스페이스내 내 정보 조회
-	public SpaceUserVO findById(Long spaceId, Long userId){ return spaceUsersMapper.selectById(spaceId, userId); };
+	public SpaceUserVO findById(Long spaceId, Long userId){ return spaceUsersMapper.selectById(spaceId, userId); }
 
 	// 스페이스 회원 상태 체크
-	public int findByUserAdminYn(Long spaceId, Long userId){ return spaceUsersMapper.selectByUserAdminYn(spaceId, userId); };
+	public int findByUserAdminYn(Long spaceId, Long userId){ return spaceUsersMapper.selectByUserAdminYn(spaceId, userId); }
 
 	// 스페이스 첫 방문 체크
-	public int findByFirst(Long spaceId, Long userId){ return spaceUsersMapper.selectByFirst(spaceId, userId); };
+	public int findByFirst(Long spaceId, Long userId){ return spaceUsersMapper.selectByFirst(spaceId, userId); }
 
 	// 스페이스 회원 입장 (추가)
 	public void save(SpaceUserVO spaceUserVO){ spaceUsersMapper.insert(spaceUserVO); };

@@ -1,21 +1,29 @@
 package com.app.kkiri.service;
 
-import com.app.kkiri.domain.vo.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.kkiri.domain.dto.SpaceDTO;
+import com.app.kkiri.domain.dto.SpaceDetailDTO;
+import com.app.kkiri.domain.dto.SpaceListDTO;
+import com.app.kkiri.domain.dto.SpaceResponseDTO;
+import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.TagDTO;
+import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.domain.vo.SpaceVO;
+import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.exceptions.CustomException;
 import com.app.kkiri.exceptions.StatusCode;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import com.app.kkiri.repository.SpaceUsersDAO;
 import com.app.kkiri.repository.SpacesDAO;
 import com.app.kkiri.repository.TagsDAO;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -24,49 +32,93 @@ public class SpaceService {
 	private final SpacesDAO spacesDAO;
 	private final SpaceUsersDAO spaceUsersDAO;
 	private final TagsDAO tagsDAO;
-
+	private final FileService fileService;
 	// 목록 조회
-	public List<SpaceListDTO> list(Long userId){
-		List<SpaceListDTO> spaceList = new ArrayList<>();
-		List<SpaceVO> spaces = new ArrayList<>();
+	public List<SpaceResponseDTO> list(Long userId){
+		// 스페이스 정보, 상단 바에 뜨는 스페이스 정보 및 스페이스 유저 목록을 담는 객체
+		List<SpaceResponseDTO> spaceList = new ArrayList<>();
+		// 유저가 가입되어있는 스페이스 목록 객체
+		List<SpaceVO> spaces = spacesDAO.findAll(userId);
 
-		spaces = spacesDAO.findAll(userId);
-
+		// 유저가 가입되어 있는 각 스페이스 목록의 정보를 Response 형식에 맞춰 변경
 		for (SpaceVO space : spaces) {
-			SpaceListDTO spaceListDTO = new SpaceListDTO();
-			spaceListDTO.setSpaceId(space.getSpaceId());
-			spaceListDTO.setSpaceName(space.getSpaceName());
-			spaceListDTO.setSpaceIconPath(space.getSpaceIconPath());
-			spaceListDTO.setSpaceUsers(spaceUsersDAO.findAll(space.getSpaceId(), userId));
+			SpaceResponseDTO spaceResponseDTO = new SpaceResponseDTO();
+			spaceResponseDTO.setSpaceId(space.getSpaceId());
+			spaceResponseDTO.setSpaceTitle(space.getSpaceName());
+			spaceResponseDTO.setImgUrl(fileService.displayFile(space.getSpaceIconPath()));
 
-			spaceList.add(spaceListDTO);
+			List<SpaceUserVO> users = spaceUsersDAO.findAll(space.getSpaceId(), userId);
+			List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+
+			for (SpaceUserVO user:users) {
+				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
+				spaceUserRespnseDTO.setUserId(user.getUserId());
+				spaceUserRespnseDTO.setUserName(user.getUserNickname());
+				spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+
+				userList.add(spaceUserRespnseDTO);
+			}
+			spaceResponseDTO.setUserList(userList);
+			spaceList.add(spaceResponseDTO);
 		}
 
 		return spaceList;
-	};
+	}
 
 	// 스페이스 상세 조회
 	public SpaceDetailDTO spaceDetail(Long spaceId, Long userId){
+		// spaceId인 스페이스의 정보를 담는다.
+		SpaceVO spaceVO = spacesDAO.findById(spaceId);
+
+		// Response 객체 형식에 맞춰 변경
 		SpaceDetailDTO spaceDetailDTO = new SpaceDetailDTO();
-		SpaceVO spaceVO = new SpaceVO();
-		List<SpaceUserVO> spaceUsers = new ArrayList<>();
-		List<TagVO> tags = new ArrayList<>();
 
-		spaceVO = spacesDAO.findById(spaceId);
-		spaceUsers = spaceUsersDAO.findAll(spaceId, userId);
-		tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
-
-		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
+		spaceDetailDTO.setSpaceTitle(spaceVO.getSpaceName());
 		spaceDetailDTO.setSpaceDescription(spaceVO.getSpaceDescription());
-		spaceDetailDTO.setSpaceName(spaceVO.getSpaceName());
-		spaceDetailDTO.setSpaceIconPath(spaceVO.getSpaceIconPath());
-		spaceDetailDTO.setSpaceUsers(spaceUsers);
+		spaceDetailDTO.setImgUrl(fileService.displayFile(spaceVO.getSpaceIconPath()));
+		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
 		spaceDetailDTO.setIsAdmin(spaceUsersDAO.findByUserAdminYn(spaceId, userId));
 		spaceDetailDTO.setIsFirst(spaceUsersDAO.findByFirst(spaceId, userId) == 0 ? 1 : 0);
-		spaceDetailDTO.setTags(tags);
+
+		List<SpaceVO> spaces = spacesDAO.findAll(userId);
+		List<SpaceListDTO> spaceListDTOList = new ArrayList<>();
+		for (SpaceVO space:spaces) {
+			SpaceListDTO spaceListDTO = new SpaceListDTO();
+			spaceListDTO.setSpaceId(space.getSpaceId());
+			spaceListDTO.setSpaceTitle(space.getSpaceName());
+			spaceListDTO.setImgUrl(fileService.displayFile(space.getSpaceIconPath()));
+
+			List<SpaceUserVO> userList = spaceUsersDAO.findAll(space.getSpaceId(), userId);
+			List<SpaceUserRespnseDTO> spaceUserRespnseDTOList = new ArrayList<>();
+
+			for (SpaceUserVO user:userList) {
+				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
+				spaceUserRespnseDTO.setUserId(user.getUserId());
+				spaceUserRespnseDTO.setUserName(user.getUserNickname());
+				spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+
+				spaceUserRespnseDTOList.add(spaceUserRespnseDTO);
+			}
+
+			spaceListDTO.setUserList(spaceUserRespnseDTOList);
+
+			spaceListDTOList.add(spaceListDTO);
+		}
+		spaceDetailDTO.setUserList(spaceListDTOList);
+
+		List<TagVO> tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
+		List<TagDTO> tagList = new ArrayList<>();
+		for (TagVO tag:tags) {
+			TagDTO tagDTO = new TagDTO();
+			tagDTO.setTagId(tag.getTagId());
+			tagDTO.setTagTitle(tag.getTagName());
+
+			tagList.add(tagDTO);
+		}
+		spaceDetailDTO.setTagList(tagList);
 
 		return spaceDetailDTO;
-	};
+	}
 
 	// 스페이스 생성
 	@Transactional(rollbackFor = Exception.class)
@@ -75,7 +127,7 @@ public class SpaceService {
 		spaceUserVO.setSpaceId(spaceVO.getSpaceId());
 		spaceUsersDAO.save(spaceUserVO);
 		return spaceVO.getSpaceId();
-	};
+	}
 
 	// 스페이스 삭제
 	public void remove(Long spaceId){
@@ -84,7 +136,7 @@ public class SpaceService {
 		}catch(Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	// 스페이스 수정
 	public void modify(SpaceDTO spaceDTO){
@@ -93,16 +145,12 @@ public class SpaceService {
 		}catch(Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
-
-	// 게시글 필터 조회
-	public void filter(){
-	};
+	}
 
 	// 스페이스 태그 조회
 	public  List<TagVO> tagList(Long spaceId){
 		return tagsDAO.findAll(spaceId);
-	};
+	}
 
 	// 스페이스 태그 추가
 	public void addTag(TagVO tagVO){
@@ -111,7 +159,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	// 스페이스 태그 삭제
 	public void removeTag(Long tagId){
@@ -120,7 +168,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	@Transactional(rollbackFor = Exception.class)
 	// 스페이스 회원 입장 (초대코드 입력)
@@ -143,7 +191,7 @@ public class SpaceService {
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 		return spaceId;
-	};
+	}
 
 	// 스페이스 회원 탈퇴
 	public void withdrawSpace(Long spaceId, Long userId){
@@ -152,7 +200,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 	// 스페이스 회원 상태 변경
 	@Transactional(rollbackFor = Exception.class)
@@ -163,7 +211,7 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 
 
 	// 스페이스 내 유저 정보 변경
@@ -173,5 +221,5 @@ public class SpaceService {
 		} catch (Exception e){
 			throw new CustomException(StatusCode.BAD_REQUEST);
 		}
-	};
+	}
 }
