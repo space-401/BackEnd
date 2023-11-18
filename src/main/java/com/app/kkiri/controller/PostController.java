@@ -1,6 +1,5 @@
 package com.app.kkiri.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,7 +38,6 @@ import com.app.kkiri.security.Response;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
-import com.google.gson.Gson;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -110,7 +108,7 @@ public class PostController {
             uploadFullPathAndFileName.append("/");
             uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
 
-            fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
+            fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
 
             postImgVO.setPostImgName(originalFileName); // post.jpg
             postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
@@ -173,7 +171,7 @@ public class PostController {
             uploadFullPathAndFileName.append("/");
             uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
 
-            fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
+            fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
 
             postImgVO.setPostImgName(originalFileName); // post.jpg
             postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg

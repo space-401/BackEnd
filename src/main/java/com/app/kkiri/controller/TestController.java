@@ -22,9 +22,9 @@ public class TestController {
 		return "test";
 	}
 
-	@GetMapping("/file/test")
-	public String fileTest(String objectKey) throws Exception {
-		return fileService.displayFile(objectKey);
+	@GetMapping("/test/file")
+	public String testFile(String keyName) throws Exception {
+		return fileService.getS3ObjectURL(keyName);
 	}
 
 	@ExceptionHandler(Exception.class)
