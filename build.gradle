@@ -80,6 +80,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.586'
 
+    // https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11
+    implementation 'com.oracle.database.jdbc:ojdbc11:23.3.0.23.09'
 }
 
 tasks.named('test') {
