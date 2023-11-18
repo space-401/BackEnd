@@ -1,34 +1,16 @@
 package com.app.kkiri;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
 public class S3Config {
 
-	@Value("${aws.credentials.access-key}")
-	private String accessKey;
-
-	@Value("${aws.credentials.secret-key}")
-	private String secretKey;
-
-	@Value("${aws.credentials.region}")
-	private String region;
-
 	@Bean
-	public AmazonS3Client amazonS3Client() {
-		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-
-		return (AmazonS3Client) AmazonS3ClientBuilder
-			.standard()
-			.withRegion(region)
-			.withCredentials(new AWSStaticCredentialsProvider(credentials))
-			.build();
+	public S3Client defaultS3Client() {
+		return S3Client.builder().region(Region.AP_NORTHEAST_2).build();
 	}
 }

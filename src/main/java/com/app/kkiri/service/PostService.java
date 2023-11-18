@@ -1,12 +1,9 @@
 package com.app.kkiri.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,7 +132,7 @@ public class PostService {
 
         List<String> fileKeys = postImgsDAO.findById(postId);
         List<String> fileURIs = new ArrayList<>();
-        fileKeys.forEach(fileKey -> fileURIs.add(fileService.displayFile(fileKey)));
+        fileKeys.forEach(fileKey -> fileURIs.add(fileService.getS3ObjectURL(fileKey)));
         postDetailResponseDTO.setImgsUrl(fileURIs);
 
         List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId, spaceId);
@@ -144,7 +141,7 @@ public class PostService {
             SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
             spaceUserRespnseDTO.setUserId(user.getUserId());
             spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+            spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
             selectedUserList.add(spaceUserRespnseDTO);
         }
@@ -157,7 +154,7 @@ public class PostService {
             SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
             spaceUserRespnseDTO.setUserId(user.getUserId());
             spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+            spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
             userList.add(spaceUserRespnseDTO);
         }
@@ -217,7 +214,7 @@ public class PostService {
 
                 List<String> fileKeys = postImgsDAO.findById(postId);
                 List<String> fileURIs = new ArrayList<>();
-                fileKeys.forEach(fileKey -> fileURIs.add(fileService.displayFile(fileKey)));
+                fileKeys.forEach(fileKey -> fileURIs.add(fileService.getS3ObjectURL(fileKey)));
                 postFilterDTO.setImgUrl(fileURIs);
 
                 List<TagVO> tagVOList = postTagsDAO.findById(postId);
@@ -239,7 +236,7 @@ public class PostService {
                     SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
                     spaceUserRespnseDTO.setUserId(user.getUserId());
                     spaceUserRespnseDTO.setUserName(user.getUserNickname());
-                    spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+                    spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
                     userList.add(spaceUserRespnseDTO);
                 }

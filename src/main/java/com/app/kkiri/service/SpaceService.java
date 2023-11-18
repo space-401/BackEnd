@@ -45,7 +45,7 @@ public class SpaceService {
 			SpaceResponseDTO spaceResponseDTO = new SpaceResponseDTO();
 			spaceResponseDTO.setSpaceId(space.getSpaceId());
 			spaceResponseDTO.setSpaceTitle(space.getSpaceName());
-			spaceResponseDTO.setImgUrl(fileService.displayFile(space.getSpaceIconPath()));
+			spaceResponseDTO.setImgUrl(fileService.getS3ObjectURL(space.getSpaceIconPath()));
 
 			List<SpaceUserVO> users = spaceUsersDAO.findAll(space.getSpaceId(), userId);
 			List<SpaceUserRespnseDTO> userList = new ArrayList<>();
@@ -54,7 +54,7 @@ public class SpaceService {
 				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
 				spaceUserRespnseDTO.setUserId(user.getUserId());
 				spaceUserRespnseDTO.setUserName(user.getUserNickname());
-				spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+				spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
 				userList.add(spaceUserRespnseDTO);
 			}
@@ -75,7 +75,7 @@ public class SpaceService {
 
 		spaceDetailDTO.setSpaceTitle(spaceVO.getSpaceName());
 		spaceDetailDTO.setSpaceDescription(spaceVO.getSpaceDescription());
-		spaceDetailDTO.setImgUrl(fileService.displayFile(spaceVO.getSpaceIconPath()));
+		spaceDetailDTO.setImgUrl(fileService.getS3ObjectURL(spaceVO.getSpaceIconPath()));
 		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
 		spaceDetailDTO.setIsAdmin(spaceUsersDAO.findByUserAdminYn(spaceId, userId));
 		spaceDetailDTO.setIsFirst(spaceUsersDAO.findByFirst(spaceId, userId) == 0 ? 1 : 0);
@@ -86,7 +86,7 @@ public class SpaceService {
 			SpaceListDTO spaceListDTO = new SpaceListDTO();
 			spaceListDTO.setSpaceId(space.getSpaceId());
 			spaceListDTO.setSpaceTitle(space.getSpaceName());
-			spaceListDTO.setImgUrl(fileService.displayFile(space.getSpaceIconPath()));
+			spaceListDTO.setImgUrl(fileService.getS3ObjectURL(space.getSpaceIconPath()));
 
 			List<SpaceUserVO> userList = spaceUsersDAO.findAll(space.getSpaceId(), userId);
 			List<SpaceUserRespnseDTO> spaceUserRespnseDTOList = new ArrayList<>();
@@ -95,7 +95,7 @@ public class SpaceService {
 				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
 				spaceUserRespnseDTO.setUserId(user.getUserId());
 				spaceUserRespnseDTO.setUserName(user.getUserNickname());
-				spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+				spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
 				spaceUserRespnseDTOList.add(spaceUserRespnseDTO);
 			}

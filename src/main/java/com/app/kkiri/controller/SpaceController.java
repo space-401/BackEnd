@@ -1,6 +1,5 @@
 package com.app.kkiri.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -49,7 +48,6 @@ import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
 import com.app.kkiri.service.SpaceService;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.Gson;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -152,7 +150,7 @@ public class SpaceController {
 			uploadFullPathAndFileName.append("/");
 			uploadFullPathAndFileName.append(uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
 
-			fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
+			fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
 
 			spaceVO.setSpaceIconName(originalFileName); // space.jpg
 			spaceVO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
@@ -226,7 +224,7 @@ public class SpaceController {
 			uploadFullPathAndFileName.append("/");
 			uploadFullPathAndFileName.append(uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
 
-			fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
+			fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
 
 			spaceDTO.setSpaceIconName(originalFileName); // space.jpg
 			spaceDTO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
@@ -344,7 +342,7 @@ public class SpaceController {
 				uploadFullPathAndFileName.append("/");
 				uploadFullPathAndFileName.append(uploadFileName); // upload/profile/2023/11/10/uuid_profile.jpg
 
-				fileService.uploadFile(multipartFile, uploadFullPathAndFileName.toString());
+				fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
 
 				spaceUserVO.setProfileImgName(originalFileName); // profile.jpg
 				spaceUserVO.setProfileImgPath(uploadFullPathAndFileName.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
