@@ -87,8 +87,22 @@ public class JwtTokenProvider {
 	public boolean validateToken(String token) {
 
 		try {
+
+			Date date = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
+			LOGGER.info("[validateToken()] date.getTime() : {}", date.getTime());
+
+			Date now = new Date();
+			LOGGER.info("[validateToken()] now : {}", now);
+
+			LOGGER.info("[validateToken(] result : {}", Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date()));
+
 			return !Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+
 		} catch (JwtException ex){
+			LOGGER.info("[validateToken()] ex.getMessage() : {}", ex.getMessage());
+			LOGGER.info("[validateToken()] ex.getCause() : {}", ex.getCause());
+			LOGGER.info("[validateToken()] ex.getClass() : {}", ex.getClass());
+
 			return false;
 		}
 	}
