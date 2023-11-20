@@ -130,7 +130,6 @@ public class SpaceController {
 		spaceVO.setSpaceUserTally(1);
 
 		if(!multipartFile.isEmpty()){ // 사용자가 이미지를 지정한 경우
-
 			StringBuffer uploadPath = new StringBuffer();
 			StringBuffer uploadFileName = new StringBuffer();
 			StringBuffer uploadFullPathAndFileName = new StringBuffer();
@@ -156,20 +155,16 @@ public class SpaceController {
 			spaceVO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
 			spaceVO.setSpaceIconUuid(uuid); // uuid
 			spaceVO.setSpaceIconSize(multipartFile.getSize()); // ...bytes
-
 		} else { // 기본이미지를 사용한 경우
-
 			Long defaultImg = spaceDTO.getDefaultImg();
-
 			if(defaultImg != null){
-
-				// ?? 디폴트 이미지 번호는 랜덤으로 생성되서 넘어오는가 ??
 				spaceVO.setSpaceIconName(defaultImg + ".jpg"); // 1.jpg
+				// 디폴트 이미지 번호는 프론트에서 넘어온다. (0 ~ 4)
+
 				spaceVO.setSpaceIconUuid("default"); // default
 				spaceVO.setSpaceIconPath(defaultRootPath + "/" + defaultImg + ".jpg"); // upload/default/1.jpg
 				spaceVO.setSpaceIconSize(0L); // 0L
 			} else {
-
 				throw new CustomException(StatusCode.MISSING_IMAGE);
 			}
 		}
@@ -178,14 +173,15 @@ public class SpaceController {
 		spaceUserVO.setUserId(userId);
 		spaceUserVO.setUserAdminYn(true);
 		spaceUserVO.setUserNickname("default");
-		spaceUserVO.setProfileImgName("default");
-		spaceUserVO.setProfileImgPath("default");
+		spaceUserVO.setProfileImgName("defaultProfile.png");
+		spaceUserVO.setProfileImgPath("upload/default/defaultProfile.png");
 		spaceUserVO.setProfileImgUuid("default");
+		// "" 빈문자열로 작성하면 DBMS 에서 null 로 인식하여 에러가 발생한다.
+		// 따라서 임의의 문자열인 "default" 를 기본값으로 저장한다.
+
 		spaceUserVO.setProfileImgSize(0L);
 
-		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
-
-		return ResponseEntity.ok().body(spaceId);
+		return ResponseEntity.ok().body(spaceService.register(spaceVO, spaceUserVO));
 	}
 
 	// 스페이스 삭제
@@ -305,7 +301,7 @@ public class SpaceController {
 		HttpServletRequest request) throws IOException {
 
 		Long userId = getUserId(request);
-		log.info("userId: " + userId);
+		LOGGER.info("[]");
 
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		spaceUserVO.setUserId(userId);
