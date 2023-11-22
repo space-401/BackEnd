@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.UserDTO;
-import com.app.kkiri.domain.dto.UserResponseDTO;
+import com.app.kkiri.domain.dto.response.UserResponse;
 import com.app.kkiri.repository.UsersDAO;
 import com.app.kkiri.security.enums.UserStatus;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
@@ -29,7 +29,7 @@ public class UserService {
 
 	// userId 를 사용하여 회원 조회
 	@Transactional(rollbackFor = Exception.class)
-	public UserResponseDTO search(Long userId) {
+	public UserResponse search(Long userId) {
 		return usersDAO.findById(userId);
 	}
 
@@ -44,7 +44,7 @@ public class UserService {
 			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), "토큰에 이메일 주소가 포함되어 있지 않습니다");
 		}
 
-		UserResponseDTO selectedUser = usersDAO.findByUserEmail(userEmail);
+		UserResponse selectedUser = usersDAO.findByUserEmail(userEmail);
 		String socialType = customOAuth2User.getRegistrationId();
 
 		// 동일한 이메일 주소로 다른 소셜 로그인을 시도하는 경우
@@ -56,7 +56,7 @@ public class UserService {
 		String accessToken = jwtTokenProvider.createAccessToken(nextUserId);
 		String refreshToken = jwtTokenProvider.createRefreshToken(nextUserId);
 
-		UserResponseDTO userResponseDTO = null;
+		UserResponse userResponseDTO = null;
 
 		// 신규 회원인 경우 회원 가입을 한다
 		if(selectedUser == null) {
@@ -102,19 +102,12 @@ public class UserService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public String reissueAccessToken(String refreshToken) throws AuthenticationException {
+	public void updateAccessToken(String reissuedAccessToken) throws AuthenticationException {
+		LOGGER.info("[updateAccessToken()] param reissuedAccessToken : {}", reissuedAccessToken);
 
-		Long userId = jwtTokenProvider.getUserId(refreshToken);
-		if(userId == null) {
-			OAuth2Error oAuth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT);
-			throw new OAuth2AuthenticationException(oAuth2Error, "존재하지 않는 사용자 입니다");
-		}
+		Long userId = jwtTokenProvider.getUserIdByToken(reissuedAccessToken);
 
-	 	String newAccessToken = jwtTokenProvider.createAccessToken(userId);
-
-		usersDAO.setAccessToken(userId, newAccessToken);
-
-		return newAccessToken;
+		usersDAO.setAccessToken(userId, reissuedAccessToken);
 	}
 }
 

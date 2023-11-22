@@ -1,9 +1,11 @@
-package com.app.kkiri.domain.dto;
+package com.app.kkiri.domain.dto.response;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.app.kkiri.domain.dto.PostDateDTO;
+import com.app.kkiri.domain.dto.PostPositionDTO;
 import com.app.kkiri.domain.vo.TagVO;
 
 import lombok.Data;
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PostDetailResponseDTO {
+
     private Long spaceId;
     private Boolean isMine;
     private String postTitle;

@@ -1,26 +1,29 @@
 package com.app.kkiri.service;
 
+import static com.app.kkiri.global.exception.ExceptionCode.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.PostDateDTO;
-import com.app.kkiri.domain.dto.PostDetailResponseDTO;
+import com.app.kkiri.domain.dto.response.PostDetailResponseDTO;
 import com.app.kkiri.domain.dto.PostFilterDTO;
-import com.app.kkiri.domain.dto.PostFilterResponseDTO;
+import com.app.kkiri.domain.dto.response.PostFilterResponseDTO;
 import com.app.kkiri.domain.dto.PostPositionDTO;
-import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.domain.vo.PostVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.TagVO;
-import com.app.kkiri.exceptions.CustomException;
-import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.global.exception.BadRequestException;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.MentionDAO;
 import com.app.kkiri.repository.PostBookmarksDAO;
@@ -44,16 +47,18 @@ public class PostService {
     private final SpaceUsersDAO  spaceUsersDAO;
     private final CommentsDAO commentsDAO;
     private final FileService fileService;
+    private final Logger LOGGER = LoggerFactory.getLogger(PostService.class);
 
     @Transactional(rollbackFor = Exception.class)
     // 게시글 작성
     public Long register(PostDTO postDTO, List<PostImgVO> imgs){
+
         postsDAO.save(postDTO);
         Long postId = postDTO.getPostId();
+        LOGGER.info("[register()] postId : {}", postId);
+
         List<Long> tags = postDTO.getTags();
         List<Long> people = postDTO.getPeople();
-
-        log.info("postId: " + postId);
 
         for (PostImgVO img : imgs) {
             img.setPostId(postId);
@@ -76,13 +81,14 @@ public class PostService {
         try {
             postsDAO.delete(postId);
         } catch (Exception e){
-            throw new CustomException(StatusCode.BAD_REQUEST);
+            // throw new CustomException(StatusCode.BAD_REQUEST);
         }
     }
 
     // 게시글 수정
     @Transactional(rollbackFor = Exception.class)
     public void modify(PostDTO postDTO, List<PostImgVO> imgs){
+
         Long postId = postDTO.getPostId();
         List<Long> tags = postDTO.getTags();
         List<Long> people = postDTO.getPeople();
@@ -104,7 +110,6 @@ public class PostService {
         for (Long person: people) {
             mentionDAO.insert(postId, person);
         }
-
     }
 
     // 게시글 상세조회
@@ -173,8 +178,7 @@ public class PostService {
 //        postDetailResponseDTO.setSelectedTags(tagList);
         postDetailResponseDTO.setSelectedTags(postTagsDAO.findById(postId));
         postDetailResponseDTO.setCommentConut(commentsDAO.getTotal(postId));
-
-        log.info("postDetailResponseDTO: " + postDetailResponseDTO);
+        LOGGER.info("[postDetail()] postDetailResponseDTO : {}", postDetailResponseDTO);
 
         return postDetailResponseDTO;
     }
@@ -188,7 +192,7 @@ public class PostService {
                 postBookmarksDAO.delete(postId, userId);
             }
         } catch (Exception e){
-            throw new CustomException(StatusCode.BAD_REQUEST);
+            // throw new CustomException(StatusCode.BAD_REQUEST);
         }
     }
 
@@ -248,10 +252,11 @@ public class PostService {
             postFilterResponseDTO.setPostList(postList);
             postFilterResponseDTO.setItemLength((Integer)param.get("amount"));
             postFilterResponseDTO.setTotal(postsDAO.getTotal(param));
+            LOGGER.info("[filter()] postFilterResponseDTO : {}", postFilterResponseDTO);
 
             return postFilterResponseDTO;
         } catch (Exception e) {
-            throw new CustomException(StatusCode.BAD_REQUEST);
+            throw new BadRequestException(INVALID_REQUEST);
         }
     }
 }

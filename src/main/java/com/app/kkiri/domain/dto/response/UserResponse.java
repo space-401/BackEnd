@@ -1,4 +1,4 @@
-package com.app.kkiri.domain.dto;
+package com.app.kkiri.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponseDTO {
+public class UserResponse {
 
 	private Long userId;
 	private String socialType;

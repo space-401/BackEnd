@@ -3,7 +3,7 @@ package com.app.kkiri.repository;
 import org.springframework.stereotype.Repository;
 
 import com.app.kkiri.domain.dto.UserDTO;
-import com.app.kkiri.domain.dto.UserResponseDTO;
+import com.app.kkiri.domain.dto.response.UserResponse;
 import com.app.kkiri.domain.vo.UserVO;
 import com.app.kkiri.mapper.UsersMapper;
 
@@ -21,10 +21,10 @@ public class UsersDAO {
 	}
 
 	// userId 를 사용하여 회원 조회
-	public UserResponseDTO findById(Long userId) {
+	public UserResponse findById(Long userId) {
 		UserVO selectedUserVO = usersMapper.selectUser(userId);
 
-		UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+		UserResponse userResponseDTO = UserResponse.builder()
 			.userId(selectedUserVO.getUserId())
 			.socialType(selectedUserVO.getSocialType())
 			.userStatus(selectedUserVO.getUserStatus())
@@ -51,10 +51,10 @@ public class UsersDAO {
 	}
 
 	// 가장 최근에 가입한 회원의 회원 고유 번호 조회
-	public UserResponseDTO findRecentUser() {
+	public UserResponse findRecentUser() {
 		UserVO selectedRecentUser = usersMapper.selectRecentUser();
 
-		UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+		UserResponse userResponseDTO = UserResponse.builder()
 			.userId(selectedRecentUser.getUserId())
 			.socialType(selectedRecentUser.getSocialType())
 			.userStatus(selectedRecentUser.getUserStatus())
@@ -67,14 +67,14 @@ public class UsersDAO {
 	}
 
 	// userEmail 을 사용하여 회원 조회
-	public UserResponseDTO findByUserEmail(String userEmail) {
+	public UserResponse findByUserEmail(String userEmail) {
 		UserVO selectedUserVO = usersMapper.selectUserByUserEmail(userEmail);
 
 		if(selectedUserVO == null) {
 			return null;
 		}
 
-		UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+		UserResponse userResponseDTO = UserResponse.builder()
 			.userId(selectedUserVO.getUserId())
 			.socialType(selectedUserVO.getSocialType())
 			.userStatus(selectedUserVO.getUserStatus())
