@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

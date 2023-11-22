@@ -1,13 +1,13 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.dto.CommentResponseDTO;
+import com.app.kkiri.domain.dto.response.CommentResponseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
-import com.app.kkiri.exceptions.CustomException;
-import com.app.kkiri.exceptions.StatusCode;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.http.HttpStatusCode;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,13 +29,13 @@ public class CommentController {
         String token = jwtTokenProvider.resolveToken(request);
 
         if(token == null) { // 헤더 이상
-            throw new CustomException(StatusCode.INSUFFICIENT_HEADER);
+            // throw new CustomException(StatusCode.INSUFFICIENT_HEADER);
         }
 
-        Long userId = jwtTokenProvider.getUserId(token);
+        Long userId = jwtTokenProvider.getUserIdByToken(token);
 
         if(userId == null) { // 만료되거나 이상이 있는 토큰
-            throw new CustomException(StatusCode.INVALID_TOKEN);
+            // throw new CustomException(StatusCode.INVALID_TOKEN);
         }
 
         return userId;
@@ -47,14 +47,14 @@ public class CommentController {
         Long userId = getUserId(request);
         commentVO.setUserId(userId);
         commentService.register(commentVO);
-        return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatusCode.OK, HttpStatus.OK);
     }
 
     @DeleteMapping("")
     // 댓글 삭제
     public ResponseEntity<?> delete(@RequestParam Long commentId){
         commentService.remove(commentId);
-        return new ResponseEntity<>(StatusCode.OK, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatusCode.OK, HttpStatus.OK);
     }
 
     @GetMapping("")

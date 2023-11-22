@@ -1,4 +1,4 @@
-package com.app.kkiri;
+package com.app.kkiri.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

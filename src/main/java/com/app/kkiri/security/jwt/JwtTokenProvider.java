@@ -1,5 +1,7 @@
 package com.app.kkiri.security.jwt;
 
+import static com.app.kkiri.global.exception.ExceptionCode.*;
+
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
@@ -21,8 +23,10 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
+import com.app.kkiri.global.exception.AuthException;
+import com.app.kkiri.service.UserService;
+
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -52,93 +56,117 @@ public class JwtTokenProvider {
 	public String createAccessToken(Long nextUserId) {
 		Date now = new Date();
 
-		return Jwts.builder()
+		String createAccessToken = Jwts.builder()
 			.subject(Long.toString(nextUserId))
 			.issuedAt(now)
 			.expiration(new Date(now.getTime() + accessTokenValidMilliSecond))
 			.signWith(secretKey)
 			.compact();
+		LOGGER.info("[createAccessToken()] createAccessToken : {}", createAccessToken);
+
+		return createAccessToken;
 	}
 
 	public String createRefreshToken(Long nextUserId) {
 		Date now = new Date();
 
-		return Jwts.builder()
+		String createRefreshToken = Jwts.builder()
 			.subject(Long.toString(nextUserId))
 			.issuedAt(now)
 			.expiration(new Date(now.getTime() + refreshTokenValidMilliSecond))
 			.signWith(secretKey)
 			.compact();
+		LOGGER.info("[createRefreshToken()] createRefreshToken : {}", createRefreshToken);
+
+		return createRefreshToken;
 	}
 
-	// 엑세스 토큰으로 회원 고유 번호 추출
-	public Long getUserId(String token) {
+	// 토큰으로 회원 고유 번호 추출
+	public Long getUserIdByToken(String token) {
 
-		try {
-			String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
-			return Long.valueOf(sub);
+		String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
+		LOGGER.info("[getUserId()] sub : {}", sub);
 
-		} catch (JwtException ex){
-			return null;
-		}
+		return Long.valueOf(sub);
+	}
+
+	// 헤더에서 회원 고유 번호 추출
+	public Long getUserIdByHeader(HttpServletRequest httpServletRequest) {
+
+		String token = resolveToken(httpServletRequest);
+		String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
+		LOGGER.info("[getUserId()] sub : {}", sub);
+
+		return Long.valueOf(sub);
 	}
 
 	// 토큰의 유효성과 만료일 체크
 	public boolean validateToken(String token) {
 
 		try {
-
-			Date date = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
-			LOGGER.info("[validateToken()] date.getTime() : {}", date.getTime());
-
+			Date expirationDate = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
 			Date now = new Date();
-			LOGGER.info("[validateToken()] now : {}", now);
 
-			LOGGER.info("[validateToken(] result : {}", Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date()));
+			boolean result = expirationDate.after(now);
+			LOGGER.info("[validateToken()] result : {}", result);
 
-			return !Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
-
+			return result;
+		} catch (ExpiredJwtException ex) {
+			throw new AuthException(EXPIRED_TOKEN);
 		} catch (JwtException ex){
-			LOGGER.info("[validateToken()] ex.getMessage() : {}", ex.getMessage());
-			LOGGER.info("[validateToken()] ex.getCause() : {}", ex.getCause());
-			LOGGER.info("[validateToken()] ex.getClass() : {}", ex.getClass());
-
-			return false;
+			throw new AuthException(INVALID_TOKEN);
 		}
 	}
 
 	// 헤더에서 토큰 추출
-	public String resolveToken(HttpServletRequest request) throws AuthenticationException {
+	public String resolveToken(HttpServletRequest request) {
 
 		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 		if (header == null) {
-			return null;
+			throw new AuthException(TOKEN_NOT_FOUND);
 		}
 
 		header = header.trim();
 		if (!StringUtils.startsWithIgnoreCase(header, AUTHENTICATION_SCHEME_BEARER)) {
-			return null;
+			throw new AuthException(TOKEN_NOT_FOUND);
 		}
 
 		if (header.equalsIgnoreCase(AUTHENTICATION_SCHEME_BEARER)) {
-			return null;
+			throw new AuthException(TOKEN_NOT_FOUND);
 		}
 
-		return header.substring(7);
+		String resolvedToken = header.substring(7);
+		LOGGER.info("[resolveToken()] resolvedToken : {}", resolvedToken);
+
+		return resolvedToken;
 	}
 
 	// 토큰으로 인증 정보 조회
 	public Authentication getAuthentication(String token) throws AuthenticationException {
 
-		Long userId = this.getUserId(token);
+		Long userId = this.getUserIdByToken(token);
 		if(userId == null) {
 			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT), "존재하지 않는 사용자입니다");
 		}
 
-		String userIdStr = String.valueOf(this.getUserId(token));
+		String userIdStr = String.valueOf(this.getUserIdByToken(token));
 		UserDetails userDetails = userDetailsService.loadUserByUsername(userIdStr);
 
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
 
+	// 리프레시 토큰을 사용하여 액세스 토큰을 재발급한다.
+	public String reissueAccessToken(final HttpServletRequest httpServletRequest) {
+
+		final String refreshToken = resolveToken(httpServletRequest);
+
+		if(validateToken(refreshToken)) {
+			final Long userId = getUserIdByToken(refreshToken);
+			final String reissuedAccessToken = createAccessToken(userId);
+
+			return reissuedAccessToken;
+		}
+
+		throw new AuthException(FAIL_TO_VALIDATE_TOKEN);
+	}
 }

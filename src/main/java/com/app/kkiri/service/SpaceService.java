@@ -4,20 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.dto.SpaceDetailDTO;
 import com.app.kkiri.domain.dto.SpaceListDTO;
-import com.app.kkiri.domain.dto.SpaceResponseDTO;
-import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.response.SpaceResponseDTO;
+import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
+import com.app.kkiri.domain.dto.response.TagResponse;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
-import com.app.kkiri.exceptions.CustomException;
-import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.global.exception.BadRequestException;
+import com.app.kkiri.global.exception.ExceptionCode;
 import com.app.kkiri.repository.SpaceUsersDAO;
 import com.app.kkiri.repository.SpacesDAO;
 import com.app.kkiri.repository.TagsDAO;
@@ -29,10 +32,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class SpaceService {
+
 	private final SpacesDAO spacesDAO;
 	private final SpaceUsersDAO spaceUsersDAO;
 	private final TagsDAO tagsDAO;
 	private final FileService fileService;
+	private final Logger LOGGER = LoggerFactory.getLogger(SpaceService.class);
+
 	// 목록 조회
 	public List<SpaceResponseDTO> list(Long userId){
 		// 스페이스 정보, 상단 바에 뜨는 스페이스 정보 및 스페이스 유저 목록을 담는 객체
@@ -123,10 +129,19 @@ public class SpaceService {
 	// 스페이스 생성
 	@Transactional(rollbackFor = Exception.class)
 	public Long register(SpaceVO spaceVO, SpaceUserVO spaceUserVO){
+		LOGGER.info("[register()] parmas spaceVO : {} spaceUserVO : {}", spaceVO, spaceUserVO);
+
 		spacesDAO.save(spaceVO);
-		spaceUserVO.setSpaceId(spaceVO.getSpaceId());
+
+		Long spaceId = spaceVO.getSpaceId();
+		LOGGER.info("[register()] spaceId : {}", spaceId);
+
+		spaceUserVO.setSpaceId(spaceId);
+		LOGGER.info("[register()] spaceUserVO : {}", spaceUserVO);
+
 		spaceUsersDAO.save(spaceUserVO);
-		return spaceVO.getSpaceId();
+
+		return spaceId;
 	}
 
 	// 스페이스 삭제
@@ -134,7 +149,7 @@ public class SpaceService {
 		try {
 			spacesDAO.delete(spaceId);
 		}catch(Exception e){
-			throw new CustomException(StatusCode.BAD_REQUEST);
+			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 	}
 
@@ -143,42 +158,45 @@ public class SpaceService {
 		try {
 			spacesDAO.set(spaceDTO);
 		}catch(Exception e){
-			throw new CustomException(StatusCode.BAD_REQUEST);
+			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 	}
 
 	// 스페이스 태그 조회
 	public  List<TagVO> tagList(Long spaceId){
-		return tagsDAO.findAll(spaceId);
+
+		List<TagVO> tags = tagsDAO.findAll(spaceId);
+		LOGGER.info("[tagList()] tags : {}", tags);
+
+		return tags;
 	}
 
 	// 스페이스 태그 추가
-	public void addTag(TagVO tagVO){
-		try {
-			tagsDAO.save(tagVO);
-		} catch (Exception e){
-			throw new CustomException(StatusCode.BAD_REQUEST);
-		}
+	@Transactional
+	public TagResponse addTag(TagVO tagVO){
+
+		tagsDAO.save(tagVO);
+
+		TagResponse tagResponseDTO = tagsDAO.findRecentTag();
+		LOGGER.info("[addTag()] tagResponseDTO : {}", tagResponseDTO);
+
+		return tagResponseDTO;
 	}
 
 	// 스페이스 태그 삭제
 	public void removeTag(Long tagId){
-		try {
-			tagsDAO.delete(tagId);
-		} catch (Exception e){
-			throw new CustomException(StatusCode.BAD_REQUEST);
-		}
+
+		tagsDAO.delete(tagId);
 	}
 
-	@Transactional(rollbackFor = Exception.class)
 	// 스페이스 회원 입장 (초대코드 입력)
+	@Transactional(rollbackFor = Exception.class)
 	public Long enter(Long userId, SpaceVO spaceVO){
 		Long spaceId = spacesDAO.findByCodeAndPw(spaceVO);
 
 		if(spaceId != null){
 			if(spaceUsersDAO.findById(spaceId, userId) != null){
-				log.info("유저가 가입되어있는 경우");
-				throw new CustomException(StatusCode.ALREADY_SAVED_SPACE);
+				// throw new BadRequestException(ExceptionCode.ALREADY_SAVED_SPACE);
 			} else {
 				SpaceUserVO spaceUserVO = new SpaceUserVO();
 				spaceUserVO.createNormal(userId);
@@ -188,7 +206,7 @@ public class SpaceService {
 			}
 		} else {
 			log.info("비밀번호가 틀린 경우");
-			throw new CustomException(StatusCode.BAD_REQUEST);
+			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 		return spaceId;
 	}
@@ -198,7 +216,7 @@ public class SpaceService {
 		try {
 			spaceUsersDAO.delete(spaceId, userId);
 		} catch (Exception e){
-			throw new CustomException(StatusCode.BAD_REQUEST);
+			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 	}
 
@@ -209,17 +227,16 @@ public class SpaceService {
 			spaceUsersDAO.setByAdminYn(spaceId);
 			spaceUsersDAO.setByUserId(spaceId, userId);
 		} catch (Exception e){
-			throw new CustomException(StatusCode.BAD_REQUEST);
+			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 	}
-
 
 	// 스페이스 내 유저 정보 변경
 	public void modifyInfo(SpaceUserVO spaceUserVO){
 		try{
 			spaceUsersDAO.set(spaceUserVO);
 		} catch (Exception e){
-			throw new CustomException(StatusCode.BAD_REQUEST);
+			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
 	}
 }

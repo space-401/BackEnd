@@ -1,4 +1,4 @@
-package com.app.kkiri.domain.dto;
+package com.app.kkiri.domain.dto.response;
 
 import org.springframework.stereotype.Component;
 

@@ -25,4 +25,14 @@
         WHERE TAG_ID=#{tagId}
     </delete>
 
+    <select id="selectRecentTag" resultType="tagVO">
+        SELECT tag_id, tag_name, space_id
+        FROM (
+                 SELECT tag_id, tag_name, space_id
+                 FROM tags
+                 ORDER BY tag_id DESC
+             )
+        WHERE ROWNUM = 1
+    </select>
+
 </mapper>

@@ -1,7 +1,6 @@
 package com.app.kkiri.service;
 
-import com.app.kkiri.domain.dto.CommentDTO;
-import com.app.kkiri.domain.dto.CommentResponseDTO;
+import com.app.kkiri.domain.dto.response.CommentResponseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -10,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Slf4j
