@@ -103,7 +103,10 @@ public class PostController {
             uploadFullPathAndFileName.delete(0, uploadFullPathAndFileName.length());
         }
 
-        return ResponseEntity.created(URI.create("/post/" + postService.register(postDTO, imgList))).build();
+        Map<String, Object> map = new HashMap<>();
+        map.put("postId", postService.register(postDTO, imgList));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(map);
     }
 
     // 게시글 삭제
@@ -162,7 +165,10 @@ public class PostController {
 
         postService.modify(postDTO, imgList);
 
-        return ResponseEntity.noContent().build();
+        Map<String, Object> map = new HashMap<>();
+        map.put("postId", postDTO.getPostId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(map);
     }
 
     // 게시글 상세 조회
