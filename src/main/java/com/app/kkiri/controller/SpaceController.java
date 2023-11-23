@@ -168,8 +168,10 @@ public class SpaceController {
 		spaceUserVO.setProfileImgSize(0L);
 
 		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
+		Map<String, Object> map = new HashMap<>();
+		map.put("spaceId", spaceId);
 
-		return ResponseEntity.created(URI.create("/space/" + spaceId)).build();
+		return ResponseEntity.status(HttpStatus.CREATED).body(map);
 	}
 
 	// 스페이스 삭제
@@ -183,7 +185,7 @@ public class SpaceController {
 
 	// 스페이스 수정
 	@PatchMapping("")
-	public ResponseEntity<Response> modify(
+	public ResponseEntity modify(
 		@RequestPart SpaceDTO spaceDTO,
 		@RequestPart(required = false, value = "imgUrl") MultipartFile multipartFile) throws IOException {
 		LOGGER.info("[modify()] params spaceDTO : {}, multipartFile : {}", spaceDTO, multipartFile);
@@ -229,7 +231,10 @@ public class SpaceController {
 
 		spaceService.modify(spaceDTO);
 
-		return ResponseEntity.created(URI.create("/space/" + spaceDTO.getSpaceId())).build();
+		Map<String, Object> map = new HashMap<>();
+		map.put("spaceId", spaceDTO.getSpaceId());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(map);
 	}
 
 	// 스페이스 태그 조회
