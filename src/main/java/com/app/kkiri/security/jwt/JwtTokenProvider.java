@@ -84,20 +84,29 @@ public class JwtTokenProvider {
 	// 토큰으로 회원 고유 번호 추출
 	public Long getUserIdByToken(String token) {
 
-		String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
-		LOGGER.info("[getUserId()] sub : {}", sub);
+		try {
+			String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
+			LOGGER.info("[getUserId()] sub : {}", sub);
 
-		return Long.valueOf(sub);
+			return Long.valueOf(sub);
+		} catch(JwtException ex) {
+			throw new AuthException(INVALID_TOKEN);
+		}
 	}
 
 	// 헤더에서 회원 고유 번호 추출
 	public Long getUserIdByHeader(HttpServletRequest httpServletRequest) {
 
 		String token = resolveToken(httpServletRequest);
-		String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
-		LOGGER.info("[getUserId()] sub : {}", sub);
 
-		return Long.valueOf(sub);
+		try{
+			String sub = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
+			LOGGER.info("[getUserId()] sub : {}", sub);
+
+			return Long.valueOf(sub);
+		} catch (JwtException ex) {
+			throw new AuthException(INVALID_TOKEN);
+		}
 	}
 
 	// 토큰의 유효성과 만료일 체크
