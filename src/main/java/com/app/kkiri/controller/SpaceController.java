@@ -169,6 +169,15 @@ public class SpaceController {
 		spaceUserVO.setProfileImgSize(0L);
 
 		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
+
+		List<TagVO> defaultTags = new ArrayList<>();
+		defaultTags.add(TagVO.builder().tagName("즐거운").spaceId(spaceId).build());
+		defaultTags.add(TagVO.builder().tagName("기억에 남는").spaceId(spaceId).build());
+		defaultTags.add(TagVO.builder().tagName("생일").spaceId(spaceId).build());
+		defaultTags.add(TagVO.builder().tagName("여행").spaceId(spaceId).build());
+
+		spaceService.addDefaultTags(defaultTags);
+
 		Map<String, Object> map = new HashMap<>();
 		map.put("spaceId", spaceId);
 
