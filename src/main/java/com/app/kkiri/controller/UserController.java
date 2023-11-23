@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class UserController {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserService userService;
 
-	@PatchMapping("/refreshToken")
+	@GetMapping("/refreshToken")
 	public ResponseEntity<Map<String, Object>> refreshToken(HttpServletRequest httpServletRequest) {
 
 		String reissuedAccessToken = jwtTokenProvider.reissueAccessToken(httpServletRequest);
@@ -37,6 +38,6 @@ public class UserController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("newAccessToken", reissuedAccessToken);
 
-		return ResponseEntity.status(CREATED).body(map);
+		return ResponseEntity.ok().body(map);
 	}
 }
