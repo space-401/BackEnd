@@ -1,6 +1,7 @@
 package com.app.kkiri.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -181,6 +182,17 @@ public class SpaceService {
 		LOGGER.info("[addTag()] tagResponseDTO : {}", tagResponseDTO);
 
 		return tagResponseDTO;
+	}
+
+	// 디폴트 스페이스 태그 추가
+	@Transactional
+	public void addDefaultTags(List<TagVO> defaultTags){
+
+		for(TagVO tagVO : defaultTags) {
+			LOGGER.info("[addDefaultTags()] param tagVO : {}", tagVO);
+
+			tagsDAO.save(tagVO);
+		}
 	}
 
 	// 스페이스 태그 삭제
