@@ -82,6 +82,7 @@ public class SpaceController {
 	public ResponseEntity<Map<String, Object>> list(HttpServletRequest request){
 
 		Long userId = jwtTokenProvider.getUserIdByHeader(request);
+
 		Map<String, Object> map = new HashMap<>();
 		map.put("spaceList", spaceService.list(userId));
 
