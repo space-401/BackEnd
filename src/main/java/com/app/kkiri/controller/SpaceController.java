@@ -360,7 +360,10 @@ public class SpaceController {
 					   @RequestParam(required = false) List<Long> tagId,
 					   @RequestParam(required = false) String keyword,
 					   @RequestParam(required = false) String startDate,
-					   @RequestParam(required = false) String endDate, HttpServletRequest request){
+					   @RequestParam(required = false) String endDate,
+						HttpServletRequest request)
+	{
+		// ?? id 를 1L 로 설정하는게 맞나 ??
 		Long id = 1L;
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
