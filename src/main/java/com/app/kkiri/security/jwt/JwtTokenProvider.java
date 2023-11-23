@@ -104,6 +104,8 @@ public class JwtTokenProvider {
 			LOGGER.info("[getUserId()] sub : {}", sub);
 
 			return Long.valueOf(sub);
+		} catch (ExpiredJwtException ex) {
+			throw new AuthException(EXPIRED_TOKEN);
 		} catch (JwtException ex) {
 			throw new AuthException(INVALID_TOKEN);
 		}
