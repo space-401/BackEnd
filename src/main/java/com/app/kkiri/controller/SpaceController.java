@@ -363,13 +363,13 @@ public class SpaceController {
 	}
 
 	// 게시글 필터 조회
-	@GetMapping("/search")
-	public ResponseEntity<PostFilterResponseDTO> filter(@RequestParam Long spaceId, @RequestParam Long page,
-					   @RequestParam(required = false) List<Long> userId,
-					   @RequestParam(required = false) List<Long> tagId,
-					   @RequestParam(required = false) String keyword,
-					   @RequestParam(required = false) String startDate,
-					   @RequestParam(required = false) String endDate,
+	@GetMapping(value = "/search", consumes = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<PostFilterResponseDTO> filter(@RequestBody Long spaceId, @RequestBody Long page,
+					   @RequestBody(required = false) List<Long> userId,
+					   @RequestBody(required = false) List<Long> tagId,
+					   @RequestBody(required = false) String keyword,
+					   @RequestBody(required = false) String startDate,
+					   @RequestBody(required = false) String endDate,
 						HttpServletRequest request)
 	{
 		Long id = jwtTokenProvider.getUserIdByHeader(request);
