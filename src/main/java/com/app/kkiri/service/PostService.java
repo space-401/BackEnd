@@ -252,8 +252,8 @@ public class PostService {
             postFilterResponseDTO.setPostList(postList);
             postFilterResponseDTO.setItemLength((Integer)param.get("amount"));
             postFilterResponseDTO.setTotal(postsDAO.getTotal(param));
-            LOGGER.info("[filter()] Page : {}", (Integer)param.get("page"));
-            postFilterResponseDTO.setPage((Integer)param.get("page"));
+            LOGGER.info("[filter()] Page : {}", param.get("page"));
+//            postFilterResponseDTO.setPage((Integer)param.get("page"));
             LOGGER.info("[filter()] postFilterResponseDTO : {}", postFilterResponseDTO);
 
             return postFilterResponseDTO;
