@@ -1,20 +1,26 @@
 package com.app.kkiri.controller;
 
-import com.app.kkiri.domain.dto.response.CommentResponseDTO;
-import com.app.kkiri.domain.vo.CommentVO;
-import com.app.kkiri.security.jwt.JwtTokenProvider;
-import com.app.kkiri.service.CommentService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import software.amazon.awssdk.http.HttpStatusCode;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import com.app.kkiri.domain.dto.response.CommentResponseDTO;
+import com.app.kkiri.domain.vo.CommentVO;
+import com.app.kkiri.security.jwt.JwtTokenProvider;
+import com.app.kkiri.service.CommentService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor
@@ -47,14 +53,14 @@ public class CommentController {
         Long userId = getUserId(request);
         commentVO.setUserId(userId);
         commentService.register(commentVO);
-        return new ResponseEntity<>(HttpStatusCode.OK, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("")
     // 댓글 삭제
     public ResponseEntity<?> delete(@RequestParam Long commentId){
         commentService.remove(commentId);
-        return new ResponseEntity<>(HttpStatusCode.OK, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("")

@@ -15,6 +15,9 @@ public enum ExceptionCode {
 
 	OVERSIZED_IMAGE(5001, "업로드 가능한 이미지 용량을 초과했습니다."),
 	MISSING_IMAGE(5002, "기본 이미지가 없습니다."),
+	FAIL_TO_UPLOAD_IMAGE(5003, "이미지 업로드에 실패하였습니다."),
+	FAIL_TO_GET_IMAGE_URL(5004, "이미지 불러오기에 실패하였습니다."),
+	FAIL_TO_DELETE_IMAGE(5005, "이미지 삭제에 실패하였습니다."),
 
 	INVALID_TOKEN(9101, "올바르지 않은 형식의 토큰입니다."),
 	EXPIRED_TOKEN(9102, "기한이 만료된 토큰입니다."),

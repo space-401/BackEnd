@@ -1,113 +1,66 @@
 package com.app.kkiri.service;
 
-import java.io.File;
+import static com.app.kkiri.global.exception.ExceptionCode.*;
+
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.app.kkiri.global.exception.ImageException;
+
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.core.sync.ResponseTransformer;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.Delete;
-import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @RequiredArgsConstructor
 public class FileService {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(FileService.class);
-	private final String bucketName = "kkiri-bucket";
-	private final S3Client s3Client;
+	private final AmazonS3Client amazonS3Client;
 
-	public void uploadFileToS3(String fileName, MultipartFile multipartFile) throws IOException {
-		// fileName 은 파일의 전체 경로이다. 예) upload/post/2023/11/10/uuid_post.jpg
+	@Value("${cloud.aws.s3.bucket}")
+	private String bucket;
+
+	public void uploadFileToS3(String fileName, MultipartFile multipartFile) {
+		LOGGER.info("[uploadFileToS3()] param fileName : {}", fileName);
+		LOGGER.info("[uploadFileToS3()] param multipartFile.getName() : {}", multipartFile.getName());
+		LOGGER.info("[uploadFileToS3()] param multipartFile.getSize() : {}", (double)multipartFile.getSize()/1024/1024 + "MB");
 
 		try {
-			PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-				.bucket(bucketName)
-				.key(fileName)
-				.acl(ObjectCannedACL.BUCKET_OWNER_FULL_CONTROL)
-				.build();
-
-			byte[] bytes = multipartFile.getBytes();
-
-			s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalStateException e) {
-			throw new RuntimeException(e);
-		} catch (AwsServiceException e) {
-			throw new RuntimeException(e);
-		} catch (SdkClientException e) {
-			throw new RuntimeException(e);
+			ObjectMetadata objectMetadata = new ObjectMetadata();
+			objectMetadata.setContentType(multipartFile.getContentType());
+			objectMetadata.setContentLength(multipartFile.getSize());
+			amazonS3Client.putObject(bucket, fileName, multipartFile.getInputStream(), objectMetadata);
+		} catch (IOException ex) {
+			throw new ImageException(FAIL_TO_UPLOAD_IMAGE);
 		}
 	}
 
 	public String getS3ObjectURL(String keyName) {
-
-		String result = null;
+		LOGGER.info("[getS3ObjectURL()] param keyName : {}", keyName);
 
 		try {
-			GetUrlRequest request = GetUrlRequest.builder()
-				.bucket(bucketName)
-				.key(keyName)
-				.build();
+			String imgUrl = amazonS3Client.getUrl(bucket, keyName).toString();
+			LOGGER.info("[getS3ObjectURL()] imgUrl : {}", imgUrl);
 
-			URL url = s3Client.utilities().getUrl(request);
-
-			result = url.toString();
-
-		} catch (S3Exception e) {
-			System.err.println(e.awsErrorDetails().errorMessage());
-			System.exit(1);
+			return imgUrl;
+		} catch (Exception e) {
+			throw new ImageException(FAIL_TO_GET_IMAGE_URL);
 		}
-
-		return result;
 	}
 
 	public void deleteS3Object(String keyName) {
-
-		ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
-		toDelete.add(ObjectIdentifier.builder()
-			.key(keyName)
-			.build());
+		LOGGER.info("[deleteS3Object()] param keyName : {}", keyName);
 
 		try {
-			DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-				.bucket(bucketName)
-				.delete(Delete
-					.builder()
-					.objects(toDelete)
-					.build()
-				)
-				.build();
-
-			s3Client.deleteObjects(deleteObjectsRequest);
-			LOGGER.info("[deleteS3Object()] deleted object key name : {}", keyName);
-
-		} catch (S3Exception e) {
-			System.err.println(e.awsErrorDetails().errorMessage());
-			System.exit(1);
+			amazonS3Client.deleteObject(bucket, keyName);
+		} catch (Exception e) {
+			throw new ImageException(FAIL_TO_GET_IMAGE_URL);
 		}
-
 	}
 }
