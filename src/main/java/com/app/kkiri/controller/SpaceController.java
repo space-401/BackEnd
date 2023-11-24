@@ -19,6 +19,7 @@ import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.app.kkiri.domain.dto.PostFilterValueDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -364,40 +365,35 @@ public class SpaceController {
 
 	// 게시글 필터 조회
 	@GetMapping(value = "/search", consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<PostFilterResponseDTO> filter(@RequestBody Long spaceId, @RequestBody Long page,
-					   @RequestBody(required = false) List<Long> userId,
-					   @RequestBody(required = false) List<Long> tagId,
-					   @RequestBody(required = false) String keyword,
-					   @RequestBody(required = false) String startDate,
-					   @RequestBody(required = false) String endDate,
-						HttpServletRequest request)
-	{
+	public ResponseEntity<PostFilterResponseDTO> filter(
+			@RequestBody(required = false) PostFilterValueDTO searchValue,
+			HttpServletRequest request){
 		Long id = jwtTokenProvider.getUserIdByHeader(request);
 
-		LOGGER.info("[getTagIdList()] tagIdList : {}", tagId);
+		LOGGER.info("[getTagIdList()] tagIdList : {}", searchValue.getTagId());
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;
-		param.put("spaceId", spaceId);
-		param.put("page", page);
-		param.put("writers", userId);
-		param.put("tags", tagId);
-		param.put("keyword", keyword);
+		param.put("spaceId", searchValue.getSpaceId());
+		param.put("page", searchValue.getPage());
+		param.put("writers", searchValue.getUserId());
+		param.put("tags", searchValue.getTagId());
+		param.put("keyword", searchValue.getKeyword());
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/d");
-		if(startDate != null && endDate !=null){
-			LocalDate start = LocalDate.parse(startDate, formatter);
-			LocalDate end = LocalDate.parse(endDate, formatter);
+		if(searchValue.getStartDate() != null && searchValue.getEndDate() !=null){
+			LocalDate start = LocalDate.parse(searchValue.getStartDate(), formatter);
+			LocalDate end = LocalDate.parse(searchValue.getEndDate(), formatter);
 
 			Long numOfDaysBetween = ChronoUnit.DAYS.between(start, end);
 			dateList = IntStream.iterate(0, i -> i + 1)
 			.limit(numOfDaysBetween)
 			.mapToObj(i -> start.plusDays(i))
 			.collect(Collectors.toList());
-		} else if (startDate != null) {
-			dateList.add(LocalDate.parse(startDate, formatter));
-		} else if(endDate != null){
-			dateList.add(LocalDate.parse(endDate, formatter));
+		} else if (searchValue.getStartDate() != null) {
+			dateList.add(LocalDate.parse(searchValue.getStartDate(), formatter));
+		} else if(searchValue.getEndDate() != null){
+			dateList.add(LocalDate.parse(searchValue.getEndDate(), formatter));
 		}
 
 		param.put("dateList", dateList);
