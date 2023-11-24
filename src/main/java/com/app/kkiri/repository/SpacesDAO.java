@@ -1,6 +1,7 @@
 package com.app.kkiri.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +24,7 @@ public class SpacesDAO {
 	public SpaceVO findById(Long spaceId){ return spacesMapper.selectById(spaceId); }
 
 	// 스페이스 입장
-	public Long findByCodeAndPw(SpaceVO spaceVO){ return spacesMapper.selectByCodeAndPw(spaceVO); }
+	public Optional<Long> findByCodeAndPw(SpaceVO spaceVO){ return spacesMapper.selectByCodeAndPw(spaceVO); }
 
 	// 스페이스 생성
 	public void save(SpaceVO spaceVO){ spacesMapper.insert(spaceVO); }

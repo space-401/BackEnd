@@ -372,8 +372,7 @@ public class SpaceController {
 					   @RequestParam(required = false) String endDate,
 						HttpServletRequest request)
 	{
-		// ?? id 를 1L 로 설정하는게 맞나 ??
-		Long id = 1L;
+		Long id = jwtTokenProvider.getUserIdByHeader(request);
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;
