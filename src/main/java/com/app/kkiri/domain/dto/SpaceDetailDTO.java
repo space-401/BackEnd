@@ -2,6 +2,7 @@ package com.app.kkiri.domain.dto;
 
 import java.util.List;
 
+import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
@@ -17,6 +18,6 @@ public class SpaceDetailDTO {
     private String spacePw;
     private int isAdmin;
     private int isFirst;
-    private List<SpaceListDTO> userList;
+    private List<SpaceUserRespnseDTO> userList;
     private List<TagDTO> tagList;
 }

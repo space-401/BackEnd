@@ -88,13 +88,7 @@ public class SpaceService {
 		spaceDetailDTO.setIsFirst(spaceUsersDAO.findByFirst(spaceId, userId) == 0 ? 1 : 0);
 
 		List<SpaceVO> spaces = spacesDAO.findAll(userId);
-		List<SpaceListDTO> spaceListDTOList = new ArrayList<>();
 		for (SpaceVO space:spaces) {
-			SpaceListDTO spaceListDTO = new SpaceListDTO();
-			spaceListDTO.setSpaceId(space.getSpaceId());
-			spaceListDTO.setSpaceTitle(space.getSpaceName());
-			spaceListDTO.setImgUrl(fileService.getS3ObjectURL(space.getSpaceIconPath()));
-
 			List<SpaceUserVO> userList = spaceUsersDAO.findAll(space.getSpaceId(), userId);
 			List<SpaceUserRespnseDTO> spaceUserRespnseDTOList = new ArrayList<>();
 
@@ -107,11 +101,8 @@ public class SpaceService {
 				spaceUserRespnseDTOList.add(spaceUserRespnseDTO);
 			}
 
-			spaceListDTO.setUserList(spaceUserRespnseDTOList);
-
-			spaceListDTOList.add(spaceListDTO);
+			spaceDetailDTO.setUserList(spaceUserRespnseDTOList);
 		}
-		spaceDetailDTO.setUserList(spaceListDTOList);
 
 		List<TagVO> tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
 		List<TagDTO> tagList = new ArrayList<>();
