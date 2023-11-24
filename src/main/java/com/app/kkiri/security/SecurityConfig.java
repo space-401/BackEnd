@@ -64,12 +64,11 @@ public class SecurityConfig {
 		// 주어진 요청의 실제 출처, HTTP 메소드 및 헤더를 확인하는 메소드와 함께 CORS 구성을 위한 컨테이너입니다.
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.addAllowedOrigin("http://localhost:3000");
-		corsConfiguration.addAllowedOrigin("http://localhost:8085");
+		corsConfiguration.addAllowedOrigin("https://localhost:3000");
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.addAllowedHeader("*");
 
-		// setAllowCredentials(true) 로 작성할 경우
-		// addAllowOrigin() 에 "*" 를 작성할 수 없다.
+		// setAllowCredentials(true) 로 작성할 경우 addAllowOrigin() 에 "*" 를 작성할 수 없다.
 		corsConfiguration.setAllowCredentials(true);
 
 		// URL 경로 패턴을 사용하여 요청에 대한 CorsConfiguration 을 선택하는 CorsConfigurationSource 입니다.
