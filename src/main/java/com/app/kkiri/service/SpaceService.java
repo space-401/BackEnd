@@ -1,9 +1,12 @@
 package com.app.kkiri.service;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import com.app.kkiri.global.exception.ExceptionCode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.dto.SpaceDetailDTO;
-import com.app.kkiri.domain.dto.SpaceListDTO;
 import com.app.kkiri.domain.dto.response.SpaceResponseDTO;
 import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
@@ -21,7 +23,6 @@ import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.global.exception.BadRequestException;
-import com.app.kkiri.global.exception.ExceptionCode;
 import com.app.kkiri.repository.SpaceUsersDAO;
 import com.app.kkiri.repository.SpacesDAO;
 import com.app.kkiri.repository.TagsDAO;
@@ -195,22 +196,18 @@ public class SpaceService {
 	// 스페이스 회원 입장 (초대코드 입력)
 	@Transactional(rollbackFor = Exception.class)
 	public Long enter(Long userId, SpaceVO spaceVO){
-		Long spaceId = spacesDAO.findByCodeAndPw(spaceVO);
+		Long spaceId = spacesDAO.findByCodeAndPw(spaceVO).orElseThrow(()->new BadRequestException(ExceptionCode.INVALID_SPACE_CODE_OR_PASSWORD));
 
-		if(spaceId != null){
-			if(spaceUsersDAO.findById(spaceId, userId) != null){
-				// throw new BadRequestException(ExceptionCode.ALREADY_SAVED_SPACE);
-			} else {
-				SpaceUserVO spaceUserVO = new SpaceUserVO();
-				spaceUserVO.createNormal(userId);
-				spaceUserVO.setSpaceId(spaceId);
-				spaceUsersDAO.save(spaceUserVO);
-				spacesDAO.setTally(spaceId,spacesDAO.getTally(spaceId) + 1);
-			}
+		if(spaceUsersDAO.findById(spaceId, userId) != null){
+			 throw new BadRequestException(ExceptionCode.ALREADY_SAVED_SPACE);
 		} else {
-			log.info("비밀번호가 틀린 경우");
-			// throw new CustomException(StatusCode.BAD_REQUEST);
+			SpaceUserVO spaceUserVO = new SpaceUserVO();
+			spaceUserVO.createNormal(userId);
+			spaceUserVO.setSpaceId(spaceId);
+			spaceUsersDAO.save(spaceUserVO);
+			spacesDAO.setTally(spaceId,spacesDAO.getTally(spaceId) + 1);
 		}
+
 		return spaceId;
 	}
 

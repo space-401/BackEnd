@@ -1,6 +1,7 @@
 package com.app.kkiri.mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,7 +17,7 @@ public interface SpacesMapper {
 	public SpaceVO selectById(Long spaceId);
 
 	// 스페이스 입장
-	public Long selectByCodeAndPw(SpaceVO spaceVO);
+	public Optional<Long> selectByCodeAndPw(SpaceVO spaceVO);
 
 	// 스페이스 생성
 	public void insert(SpaceVO spaceVO);
