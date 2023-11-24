@@ -249,7 +249,6 @@ public class PostService {
                 postList.add(postFilterDTO);
             }
 
-            postFilterResponseDTO.setPage((Integer)param.get("page"));
             postFilterResponseDTO.setPostList(postList);
             postFilterResponseDTO.setItemLength((Integer)param.get("amount"));
             postFilterResponseDTO.setTotal(postsDAO.getTotal(param));
