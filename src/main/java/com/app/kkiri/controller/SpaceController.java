@@ -370,7 +370,7 @@ public class SpaceController {
 			HttpServletRequest request){
 		Long id = jwtTokenProvider.getUserIdByHeader(request);
 
-		LOGGER.info("[getTagIdList()] tagIdList : {}", searchValue.getTagId());
+		LOGGER.info("[filter()] searchValue : {}", searchValue);
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;
