@@ -76,8 +76,10 @@ dependencies {
     // AOP
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+    // DB
     // https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11
-    implementation 'com.oracle.database.jdbc:ojdbc11:23.3.0.23.09'
+//    implementation 'com.oracle.database.jdbc:ojdbc11:23.3.0.23.09'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
@@ -88,6 +90,6 @@ tasks.named('test') {
 }
 
 // 테스트 코드를 제외한 빌드 수행
-tasks.withType(Test) {
-    enabled = false
-}
+//tasks.withType(Test) {
+//    enabled = false
+//}
