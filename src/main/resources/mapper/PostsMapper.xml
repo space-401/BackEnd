@@ -3,11 +3,11 @@
 
 <mapper namespace="com.app.kkiri.mapper.PostsMapper">
     <insert id="insert">
-        <selectKey keyProperty="postId" order="BEFORE" resultType="long">
-            SELECT SEQ_POSTS.NEXTVAL FROM DUAL
+        INSERT INTO POSTS (POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, SPACE_ID, USER_ID)
+        VALUES (#{postTitle}, #{postLocationKeyword}, #{postLocationLat}, #{postLocationLng}, STR_TO_DATE(#{postBeginDate}, '%Y-%m-%d %H:%i:%s'), STR_TO_DATE(#{postEndDate}, '%Y-%m-%d %H:%i:%s'), #{postContent}, #{spaceId}, #{userId})
+        <selectKey keyProperty="postId" order="AFTER" resultType="long">
+            SELECT MAX(POST_ID) FROM POSTS
         </selectKey>
-        INSERT INTO POSTS (POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, SPACE_ID, USER_ID)
-        VALUES (#{postId}, #{postTitle}, #{postLocationKeyword}, #{postLocationLat}, #{postLocationLng}, TO_DATE(#{postBeginDate}, 'YYYY-MM-DD HH24:MI:SS'), TO_DATE(#{postEndDate}, 'YYYY-MM-DD HH24:MI:SS'), #{postContent}, #{spaceId}, #{userId})
     </insert>
 
     <delete id="delete">
@@ -19,8 +19,8 @@
         UPDATE POSTS
         SET POST_TITLE=#{postTitle}, POST_LOCATION_KEYWORD=#{postLocationKeyword},
             POST_LOCATION_LAT=#{postLocationLat}, POST_LOCATION_LNG=#{postLocationLng},
-            POST_BEGIN_DATE=TO_DATE(#{postBeginDate}, 'YYYY-MM-DD HH24:MI:SS'), POST_END_DATE=TO_DATE(#{postEndDate}, 'YYYY-MM-DD HH24:MI:SS'),
-            POST_CONTENT=#{postContent}, POST_UPDATE_DATE=SYSDATE
+            POST_BEGIN_DATE=STR_TO_DATE(#{postBeginDate}, '%Y-%m-%d %H:%i:%s'), POST_END_DATE=STR_TO_DATE(#{postEndDate}, '%Y-%m-%d %H:%i:%s'),
+            POST_CONTENT=#{postContent}, POST_UPDATE_DATE=NOW()
         WHERE POST_ID=#{postId}
     </update>
 
@@ -34,7 +34,7 @@
         POST_LOCATION_LAT, POST_LOCATION_LNG
         FROM
             (
-            SELECT ROWNUM R, POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
+            SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
             POST_LOCATION_LAT, POST_LOCATION_LNG
             FROM
                 (SELECT DISTINCT(p.POST_ID) POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
@@ -43,7 +43,7 @@
                 ON p.POST_ID=t.POST_ID
                 WHERE p.SPACE_ID=#{spaceId}
                 <if test="keyword != null">
-                    AND POST_TITLE LIKE '%'||#{keyword}||'%' OR POST_CONTENT LIKE '%'||#{keyword}||'%'
+                    AND POST_TITLE LIKE CONCAT('%',#{keyword},'%') OR POST_CONTENT LIKE CONCAT('%',#{keyword},'%')
                 </if>
                 <if test="dateList != null and dateList.size != 0">
                     <foreach collection="dateList" item="date" index="index">
@@ -73,8 +73,8 @@
                 POST_REGISTER_DATE DESC
                 ) D2
             <![CDATA[
-            WHERE ROWNUM <= #{page} * #{amount}
-        ) WHERE R > (#{page} - 1) * #{amount}
+            WHERE @ROWNUM:=0 <= #{page} * #{amount}
+        ) D3 WHERE ROWNUM > (#{page} - 1) * #{amount}
         ]]>
     </select>
 
@@ -82,14 +82,14 @@
         SELECT COUNT(POST_ID)
         FROM
         (
-        SELECT ROWNUM R, POST_ID
+        SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, POST_ID
         FROM
         (SELECT DISTINCT(p.POST_ID) POST_ID
         FROM POSTS p LEFT JOIN POST_TAGS t
         ON p.POST_ID=t.POST_ID
         WHERE p.SPACE_ID=#{spaceId}
         <if test="keyword != null">
-            AND POST_TITLE LIKE '%'||#{keyword}||'%' OR POST_CONTENT LIKE '%'||#{keyword}||'%'
+            AND POST_TITLE LIKE CONCAT('%',#{keyword},'%') OR POST_CONTENT LIKE CONCAT('%',#{keyword},'%')
         </if>
         <if test="dateList != null and dateList.size != 0">
             <foreach collection="dateList" item="date" index="index">
@@ -116,8 +116,8 @@
             </foreach>
         </if>) D2
         <![CDATA[
-            WHERE ROWNUM <= #{page} * #{amount}
-        ) WHERE R > (#{page} - 1) * #{amount}
+            WHERE @ROWNUM:=0 <= #{page} * #{amount}
+        )D3 WHERE ROWNUM > (#{page} - 1) * #{amount}
         ]]>
     </select>
 </mapper>

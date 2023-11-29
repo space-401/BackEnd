@@ -3,19 +3,19 @@
 
 <mapper namespace="com.app.kkiri.mapper.CommentsMapper">
     <insert id="insert">
-        <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
-            SELECT SEQ_COMMENTS.nextval FROM DUAL
+        INSERT INTO COMMENTS (COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
+        VALUES (#{commentContent}, #{commentRefYn}, #{commentId}, #{postId}, #{userId})
+        <selectKey keyProperty="commentId" order="AFTER" resultType="long">
+            SELECT MAX(COMMENT_ID) FROM COMMENTS
         </selectKey>
-        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
-        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentId}, #{postId}, #{userId})
     </insert>
 
     <insert id="insertReply">
-        <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
-            SELECT SEQ_COMMENTS.nextval FROM DUAL
+        INSERT INTO COMMENTS (COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
+        VALUES (#{commentContent}, #{commentRefYn}, #{commentGroup}, #{postId}, #{userId})
+        <selectKey keyProperty="commentId" order="AFTER" resultType="long">
+            SELECT MAX(COMMENT_ID) FROM COMMENTS
         </selectKey>
-        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
-        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentGroup}, #{postId}, #{userId})
     </insert>
 
     <delete id="delete">

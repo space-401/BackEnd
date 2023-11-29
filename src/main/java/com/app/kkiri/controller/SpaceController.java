@@ -380,7 +380,7 @@ public class SpaceController {
 		param.put("tags", searchValue.getTagId());
 		param.put("keyword", searchValue.getKeyword());
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/d");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
 		if(searchValue.getStartDate() != null && searchValue.getEndDate() !=null){
 			LocalDate start = LocalDate.parse(searchValue.getStartDate(), formatter);
 			LocalDate end = LocalDate.parse(searchValue.getEndDate(), formatter);

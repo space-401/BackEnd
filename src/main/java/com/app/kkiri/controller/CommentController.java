@@ -30,27 +30,10 @@ public class CommentController {
     private final CommentService commentService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    private Long getUserId(HttpServletRequest request) {
-
-        String token = jwtTokenProvider.resolveToken(request);
-
-        if(token == null) { // 헤더 이상
-            // throw new CustomException(StatusCode.INSUFFICIENT_HEADER);
-        }
-
-        Long userId = jwtTokenProvider.getUserIdByToken(token);
-
-        if(userId == null) { // 만료되거나 이상이 있는 토큰
-            // throw new CustomException(StatusCode.INVALID_TOKEN);
-        }
-
-        return userId;
-    }
-
     @PostMapping("")
     // 댓글 추가
     public ResponseEntity<?> insert(@RequestBody CommentVO commentVO, HttpServletRequest request) {
-        Long userId = getUserId(request);
+        Long userId = jwtTokenProvider.getUserIdByHeader(request);
         commentVO.setUserId(userId);
         commentService.register(commentVO);
         return new ResponseEntity<>(HttpStatus.OK);
