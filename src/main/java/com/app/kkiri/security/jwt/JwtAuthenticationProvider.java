@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.stereotype.Component;
 
-import com.app.kkiri.domain.dto.response.UserResponse;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.repository.UsersDAO;
 
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 		}
 
 		Long userId = jwtTokenProvider.getUserIdByToken(accessToken);
-		UserResponse userResponseDTO = usersDAO.findById(userId);
+		UserResponseDTO userResponseDTO = usersDAO.findById(userId);
 		if(userResponseDTO == null) {
 			OAuth2Error oauth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT);
 			throw new OAuth2AuthenticationException(oauth2Error, "존재하지 않는 사용자입니다");

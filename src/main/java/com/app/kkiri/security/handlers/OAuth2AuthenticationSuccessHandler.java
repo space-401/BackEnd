@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.app.kkiri.domain.dto.response.UserResponse;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.security.oAuth2Login.AuthenticatedOAuth2User;
 import com.google.gson.Gson;
 
@@ -23,7 +23,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
 		Gson gson = new Gson();
 		AuthenticatedOAuth2User authenticatedUser = (AuthenticatedOAuth2User)authentication.getPrincipal();
-		UserResponse userResponseDTO = UserResponse.builder()
+		UserResponseDTO userResponseDTO = UserResponseDTO.builder()
 			.userId(authenticatedUser.getUserId())
 			.socialType(authenticatedUser.getSocialType())
 			.userStatus(authenticatedUser.getUserStatus())

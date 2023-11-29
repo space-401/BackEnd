@@ -2,7 +2,6 @@ package com.app.kkiri.service;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,7 @@ import com.app.kkiri.domain.dto.SpaceDetailDTO;
 import com.app.kkiri.domain.dto.response.SpaceResponseDTO;
 import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
-import com.app.kkiri.domain.dto.response.TagResponse;
+import com.app.kkiri.domain.dto.response.TagResponseDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
@@ -166,11 +165,11 @@ public class SpaceService {
 
 	// 스페이스 태그 추가
 	@Transactional
-	public TagResponse addTag(TagVO tagVO){
+	public TagResponseDTO addTag(TagVO tagVO){
 
 		tagsDAO.save(tagVO);
 
-		TagResponse tagResponseDTO = tagsDAO.findRecentTag();
+		TagResponseDTO tagResponseDTO = tagsDAO.findRecentTag();
 		LOGGER.info("[addTag()] tagResponseDTO : {}", tagResponseDTO);
 
 		return tagResponseDTO;

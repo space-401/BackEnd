@@ -3,7 +3,6 @@ package com.app.kkiri.controller;
 import static com.app.kkiri.global.exception.ExceptionCode.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -40,14 +39,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.dto.SpaceDetailDTO;
 import com.app.kkiri.domain.dto.response.PostFilterResponseDTO;
-import com.app.kkiri.domain.dto.response.SpaceResponseDTO;
 import com.app.kkiri.domain.dto.SpaceUserDTO;
-import com.app.kkiri.domain.dto.response.TagResponse;
+import com.app.kkiri.domain.dto.response.TagResponseDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.global.exception.ImageException;
-import com.app.kkiri.security.Response;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
@@ -265,7 +262,7 @@ public class SpaceController {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public ResponseEntity addTag(@RequestBody TagVO tagVO){
 
-		TagResponse tagResponseDTO = spaceService.addTag(tagVO);
+		TagResponseDTO tagResponseDTO = spaceService.addTag(tagVO);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(tagResponseDTO);
 	}
