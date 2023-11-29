@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.app.kkiri.domain.dto.response.TagResponse;
+import com.app.kkiri.domain.dto.response.TagResponseDTO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.mapper.TagsMapper;
 
@@ -27,10 +27,10 @@ public class TagsDAO {
 	public void delete(Long tagId){ tagsMapper.delete(tagId); }
 
 	// 가장 최근에 생성된 태그 조회
-	public TagResponse findRecentTag() {
+	public TagResponseDTO findRecentTag() {
 		TagVO selectedRecentTag = tagsMapper.selectRecentTag();
 
-		TagResponse tagResponseDTO = TagResponse.builder()
+		TagResponseDTO tagResponseDTO = TagResponseDTO.builder()
 			.tagId(selectedRecentTag.getTagId())
 			.tagName(selectedRecentTag.getTagName())
 			.build();

@@ -3,49 +3,44 @@
 
 <mapper namespace="com.app.kkiri.mapper.UsersMapper">
     <select id="selectNextUserId" resultType="long">
-        SELECT seq_users.NEXTVAL
-        FROM DUAL
+        select `auto_increment`
+        from information_schema.tables
+        where table_schema = 'kkiri' and table_name = 'users'
     </select>
 
     <select id="selectUser" resultType="userVO">
-        SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
-        FROM users
-        WHERE user_id = #{userId}
+        select user_id, social_type, user_status, access_token, refresh_token, user_email
+        from users
+        where user_id = #{userId}
     </select>
 
     <insert id="insertUser">
-        INSERT INTO users
-        (user_id, social_type, user_status, access_token, refresh_token, user_email)
-        VALUES (#{userId}, #{socialType}, #{userStatus}, #{accessToken}, #{refreshToken}, #{userEmail})
+        insert into users (social_type, user_status, access_token, refresh_token, user_email)
+        values (#{socialType}, #{userStatus}, #{accessToken}, #{refreshToken}, #{userEmail})
     </insert>
 
     <select id="selectRecentUser" resultType="userVO">
-        SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
-        FROM (
-            SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
-            FROM users
-            ORDER BY user_id DESC
-        )
-        WHERE ROWNUM = 1
+        select user_id, social_type, user_status, access_token, refresh_token, user_email
+        from users
+        order by user_id desc
+        limit 1
     </select>
 
     <select id="selectUserByUserEmail" resultType="userVO">
-        SELECT user_id, social_type, user_status, access_token, refresh_token, user_email
-        FROM users
-        WHERE user_email = #{userEmail}
+        select user_id, social_type, user_status, access_token, refresh_token, user_email
+        from users
+        where user_email = #{userEmail}
     </select>
 
     <update id="updateAccessToken">
-        UPDATE users
-        SET access_token = #{accessToken}
-        WHERE user_id = #{userId}
+        update users
+        set access_token = #{accessToken}
+        where user_id = #{userId}
     </update>
 
     <update id="updateAccessTokenAndRefreshToken">
-        UPDATE users
-        SET access_token = #{accessToken}, refresh_token = #{refreshToken}
-        WHERE user_id = #{userId}
+        update users
+        set access_token = #{accessToken}, refresh_token = #{refreshToken}
+        where user_id = #{userId}
     </update>
-
-
 </mapper>

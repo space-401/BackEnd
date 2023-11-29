@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.UserDTO;
-import com.app.kkiri.domain.dto.response.UserResponse;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.repository.UsersDAO;
 import com.app.kkiri.security.enums.UserStatus;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
@@ -29,14 +29,15 @@ public class UserService {
 
 	// userId 를 사용하여 회원 조회
 	@Transactional(rollbackFor = Exception.class)
-	public UserResponse search(Long userId) {
+	public UserResponseDTO search(Long userId) {
 		return usersDAO.findById(userId);
 	}
 
 	// 회원 가입 및 로그인
 	@Transactional(rollbackFor = Exception.class)
 	public AuthenticatedOAuth2User register(CustomOAuth2User customOAuth2User) throws OAuth2AuthenticationException {
-		LOGGER.info("register() param customOAuth2User : {}", customOAuth2User);
+		LOGGER.info("register() [param] customOAuth2User.getName() : {}", customOAuth2User.getName());
+		LOGGER.info("register() [param] customOAuth2User.getEmail() : {}", customOAuth2User.getEmail());
 
 		// 토큰에 이메일 데이터가 없는 경우
 		String userEmail = customOAuth2User.getEmail();
@@ -44,7 +45,7 @@ public class UserService {
 			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), "토큰에 이메일 주소가 포함되어 있지 않습니다");
 		}
 
-		UserResponse selectedUser = usersDAO.findByUserEmail(userEmail);
+		UserResponseDTO selectedUser = usersDAO.findByUserEmail(userEmail);
 		String socialType = customOAuth2User.getRegistrationId();
 
 		// 동일한 이메일 주소로 다른 소셜 로그인을 시도하는 경우
@@ -52,14 +53,13 @@ public class UserService {
 			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT), "이미 가입된 이메일 주소입니다");
 		}
 
-		Long nextUserId = usersDAO.findNextUserId();
-		String accessToken = jwtTokenProvider.createAccessToken(nextUserId);
-		String refreshToken = jwtTokenProvider.createRefreshToken(nextUserId);
+		UserResponseDTO userResponseDTO = null;
 
-		UserResponse userResponseDTO = null;
+		if(selectedUser == null) { // 신규 회원인 경우 회원 가입을 한다
+			Long nextUserId = usersDAO.findNextUserId();
+			String accessToken = jwtTokenProvider.createAccessToken(nextUserId);
+			String refreshToken = jwtTokenProvider.createRefreshToken(nextUserId);
 
-		// 신규 회원인 경우 회원 가입을 한다
-		if(selectedUser == null) {
 			UserDTO userDTO = UserDTO.builder()
 				.userId(nextUserId)
 				.socialType(customOAuth2User.getRegistrationId())
@@ -72,20 +72,22 @@ public class UserService {
 			usersDAO.save(userDTO);
 
 			userResponseDTO = usersDAO.findRecentUser();
-		}
+			LOGGER.info("register() [if 신규 회원인 경우 result] userResponseDTO : {}", userResponseDTO);
+		} else { // 기존 회원인 경우
+			userResponseDTO = usersDAO.findByUserEmail(userEmail);
+			LOGGER.info("register() [if 기존 회원인 경우 start] userResponseDTO : {}", userResponseDTO);
 
-		// 기존 회원인 경우
-		userResponseDTO = usersDAO.findByUserEmail(userEmail);
+			// 리프레쉬 토큰이 만료되어 다시 소셜 로그인을 하는 경우
+			if(!jwtTokenProvider.validateToken(userResponseDTO.getRefreshToken())) {
+				Long selectedUserId = userResponseDTO.getUserId();
 
-		// 리프레쉬 토큰이 만료되어 다시 소셜 로그인을 하는 경우
-		if(!jwtTokenProvider.validateToken(userResponseDTO.getRefreshToken())) {
+				String newAccessToken = jwtTokenProvider.createAccessToken(selectedUserId);
+				String newRefreshToken = jwtTokenProvider.createRefreshToken(selectedUserId);
+				usersDAO.setTokens(selectedUserId, newAccessToken, newRefreshToken);
 
-			Long selectedUserId = userResponseDTO.getUserId();
-			String newAccessToken = jwtTokenProvider.createAccessToken(selectedUserId);
-			String newRefreshToken = jwtTokenProvider.createRefreshToken(selectedUserId);
-			usersDAO.setTokens(selectedUserId, newAccessToken, newRefreshToken);
-
-			userResponseDTO = usersDAO.findById(selectedUserId);
+				userResponseDTO = usersDAO.findById(selectedUserId);
+				LOGGER.info("register() [if 기존 회원인 경우 end] userResponseDTO : {}", userResponseDTO);
+			}
 		}
 
 		AuthenticatedOAuth2User authenticatedOAuth2User = AuthenticatedOAuth2User.builder()
@@ -103,7 +105,7 @@ public class UserService {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void updateAccessToken(String reissuedAccessToken) throws AuthenticationException {
-		LOGGER.info("[updateAccessToken()] param reissuedAccessToken : {}", reissuedAccessToken);
+		LOGGER.info("updateAccessToken() [param] reissuedAccessToken : {}", reissuedAccessToken);
 
 		Long userId = jwtTokenProvider.getUserIdByToken(reissuedAccessToken);
 
