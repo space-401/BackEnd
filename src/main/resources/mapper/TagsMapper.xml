@@ -8,11 +8,11 @@
     </select>
 
     <insert id="insert">
-        <selectKey keyProperty="tagId" order="BEFORE" resultType="long">
-            SELECT SEQ_TAGS.NEXTVAL FROM DUAL
+        INSERT INTO TAGS(TAG_NAME, SPACE_ID)
+        VALUES (#{tagName}, #{spaceId})
+        <selectKey keyProperty="tagId" order="AFTER" resultType="long">
+            SELECT MAX(TAG_ID) FROM TAGS
         </selectKey>
-        INSERT INTO TAGS(TAG_ID, TAG_NAME, SPACE_ID)
-        VALUES (#{tagId}, #{tagName}, #{spaceId})
     </insert>
 
     <select id="getTagCnt" resultType="int">
@@ -31,7 +31,7 @@
                  SELECT tag_id, tag_name, space_id
                  FROM tags
                  ORDER BY tag_id DESC
-             )
+             ) D1
         WHERE ROWNUM = 1
     </select>
 </mapper>

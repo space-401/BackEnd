@@ -4,11 +4,11 @@
 <mapper namespace="com.app.kkiri.mapper.PostImgsMapper">
 
     <insert id="insert">
-        <selectKey keyProperty="postImgId" order="BEFORE" resultType="long">
-            SELECT SEQ_IMGS.NEXTVAL FROM DUAL
+        INSERT INTO POST_IMGS(POST_IMG_NAME, POST_IMG_PATH, POST_IMG_UUID, POST_IMG_SIZE, POST_ID)
+        VALUES (#{postImgName}, #{postImgPath}, #{postImgUuid}, #{postImgSize}, #{postId})
+        <selectKey keyProperty="postImgId" order="AFTER" resultType="long">
+            SELECT MAX(POST_IMG_ID) FROM POST_IMGS
         </selectKey>
-        INSERT INTO POST_IMGS(POST_IMG_ID, POST_IMG_NAME, POST_IMG_PATH, POST_IMG_UUID, POST_IMG_SIZE, POST_ID)
-        VALUES (#{postImgId}, #{postImgName}, #{postImgPath}, #{postImgUuid}, #{postImgSize}, #{postId})
     </insert>
 
     <select id="selectById" resultType="string">
