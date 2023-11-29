@@ -3,12 +3,9 @@
 
 <mapper namespace="com.app.kkiri.mapper.PostBookmarksMapper">
     <update id="updateBookmark">
-        MERGE INTO POST_BOOKMARKS
-        USING DUAL
-        ON (POST_ID=#{postId} AND USER_ID=#{userId})
-        WHEN NOT MATCHED THEN
-        INSERT(POST_ID, USER_ID)
-        VALUES(#{postId},#{userId})
+        INSERT INTO POST_BOOKMARKS(POST_ID, USER_ID, BOOKMARK_YN) values (#{postId}, #{userId}, 1)
+        ON DUPLICATE KEY
+        UPDATE BOOKMARK_YN=IF(BOOKMARK_YN, 0, 1)
     </update>
 
     <delete id="delete">
