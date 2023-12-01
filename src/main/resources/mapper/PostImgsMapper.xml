@@ -4,20 +4,20 @@
 <mapper namespace="com.app.kkiri.mapper.PostImgsMapper">
 
     <insert id="insert">
-        INSERT INTO POST_IMGS(POST_IMG_NAME, POST_IMG_PATH, POST_IMG_UUID, POST_IMG_SIZE, POST_ID)
+        INSERT INTO post_imgs(post_img_name, post_img_path, post_img_uuid, post_img_size, post_id)
         VALUES (#{postImgName}, #{postImgPath}, #{postImgUuid}, #{postImgSize}, #{postId})
         <selectKey keyProperty="postImgId" order="AFTER" resultType="long">
-            SELECT MAX(POST_IMG_ID) FROM POST_IMGS
+            SELECT MAX(POST_IMG_ID) FROM post_imgs
         </selectKey>
     </insert>
 
     <select id="selectById" resultType="string">
-        SELECT POST_IMG_PATH  FROM POST_IMGS
-        WHERE POST_ID=#{postId}
+        SELECT post_img_path FROM post_imgs
+        WHERE post_id=#{postId}
     </select>
 
     <delete id="delete">
-        DELETE FROM POST_IMGS
-        WHERE POST_ID=#{postId}
+        DELETE FROM post_imgs
+        WHERE post_id=#{postId}
     </delete>
 </mapper>

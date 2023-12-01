@@ -3,26 +3,26 @@
 
 <mapper namespace="com.app.kkiri.mapper.TagsMapper">
     <select id="selectAll" resultType="tagVO">
-        SELECT TAG_ID, TAG_NAME FROM TAGS
-        WHERE SPACE_ID=#{spaceId}
+        SELECT tag_id, tag_name FROM tags
+        WHERE space_id=#{spaceId}
     </select>
 
     <insert id="insert">
-        INSERT INTO TAGS(TAG_NAME, SPACE_ID)
+        INSERT INTO tags(tag_name, space_id)
         VALUES (#{tagName}, #{spaceId})
         <selectKey keyProperty="tagId" order="AFTER" resultType="long">
-            SELECT MAX(TAG_ID) FROM TAGS
+            SELECT MAX(TAG_ID) FROM tags
         </selectKey>
     </insert>
 
     <select id="getTagCnt" resultType="int">
-        SELECT COUNT(TAG_ID) FROM TAGS
-        WHERE SPACE_ID=#{spaceId}
+        SELECT COUNT(tag_id) FROM tags
+        WHERE space_id=#{spaceId}
     </select>
 
     <delete id="delete">
-        DELETE FROM TAGS
-        WHERE TAG_ID=#{tagId}
+        DELETE FROM tags
+        WHERE tag_id=#{tagId}
     </delete>
 
     <select id="selectRecentTag" resultType="tagVO">

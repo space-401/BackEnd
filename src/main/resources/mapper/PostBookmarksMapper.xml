@@ -3,18 +3,19 @@
 
 <mapper namespace="com.app.kkiri.mapper.PostBookmarksMapper">
     <update id="updateBookmark">
-        INSERT INTO POST_BOOKMARKS(POST_ID, USER_ID, BOOKMARK_YN) values (#{postId}, #{userId}, 1)
+        INSERT INTO post_bookmarks (post_id, user_id, bookmark_yn)
+        values (#{postId}, #{userId}, 1)
         ON DUPLICATE KEY
-        UPDATE BOOKMARK_YN=IF(BOOKMARK_YN, 0, 1)
+        UPDATE bookmark_yn=IF(bookmark_yn, 0, 1)
     </update>
 
     <delete id="delete">
-        DELETE POST_BOOKMARKS
-        WHERE USER_ID=#{userId} AND POST_ID=#{postId}
+        DELETE post_bookmarks
+        WHERE user_id=#{userId} AND post_id=#{postId}
     </delete>
 
     <select id="select" resultType="int">
-        SELECT COUNT(POST_ID) FROM POST_BOOKMARKS
-        WHERE POST_ID=#{postId} AND USER_ID=#{userId}
+        SELECT COUNT(post_id) FROM post_bookmarks
+        WHERE post_id=#{postId} AND user_id=#{userId}
     </select>
 </mapper>

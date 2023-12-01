@@ -3,74 +3,72 @@
 
 <mapper namespace="com.app.kkiri.mapper.PostsMapper">
     <insert id="insert">
-        INSERT INTO POSTS (POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, SPACE_ID, USER_ID)
+        INSERT INTO posts (post_title, post_location_keyword, post_location_lat, post_location_lng, post_begin_date, post_end_date, post_content, space_id, user_id)
         VALUES (#{postTitle}, #{postLocationKeyword}, #{postLocationLat}, #{postLocationLng}, STR_TO_DATE(#{postBeginDate}, '%Y-%m-%d %H:%i:%s'), STR_TO_DATE(#{postEndDate}, '%Y-%m-%d %H:%i:%s'), #{postContent}, #{spaceId}, #{userId})
         <selectKey keyProperty="postId" order="AFTER" resultType="long">
-            SELECT MAX(POST_ID) FROM POSTS
+            SELECT MAX(POST_ID) FROM posts
         </selectKey>
     </insert>
 
     <delete id="delete">
-        DELETE FROM POSTS
-        WHERE POST_ID=#{postId}
+        DELETE FROM posts
+        WHERE post_id=#{postId}
     </delete>
 
     <update id="update">
-        UPDATE POSTS
-        SET POST_TITLE=#{postTitle}, POST_LOCATION_KEYWORD=#{postLocationKeyword},
-            POST_LOCATION_LAT=#{postLocationLat}, POST_LOCATION_LNG=#{postLocationLng},
-            POST_BEGIN_DATE=STR_TO_DATE(#{postBeginDate}, '%Y-%m-%d %H:%i:%s'), POST_END_DATE=STR_TO_DATE(#{postEndDate}, '%Y-%m-%d %H:%i:%s'),
-            POST_CONTENT=#{postContent}, POST_UPDATE_DATE=NOW()
-        WHERE POST_ID=#{postId}
+        UPDATE posts
+        SET post_title=#{postTitle}, post_location_keyword=#{postLocationKeyword},
+            post_location_lat=#{postLocationLat}, post_location_lng=#{postLocationLng},
+            post_begin_date=STR_TO_DATE(#{postBeginDate}, '%Y-%m-%d %H:%i:%s'), post_end_date=STR_TO_DATE(#{postEndDate}, '%Y-%m-%d %H:%i:%s'),
+            post_content=#{postContent}, post_update_date=NOW()
+        WHERE post_id=#{postId}
     </update>
 
     <select id="selectById" resultType="postVO">
-        SELECT POST_TITLE, POST_LOCATION_KEYWORD, POST_LOCATION_LAT, POST_LOCATION_LNG, POST_BEGIN_DATE, POST_END_DATE, POST_CONTENT, POST_REGISTER_DATE, POST_UPDATE_DATE, SPACE_ID, USER_ID FROM POSTS
-        WHERE POST_ID=#{postId}
+        SELECT post_title, post_location_keyword, post_location_lat, post_location_lng, post_begin_date, post_end_date, post_content, post_register_date, post_update_date, space_id, user_iduser_id
+        FROM posts
+        WHERE post_id=#{postId}
     </select>
 
     <select id="selectByfilter" parameterType="hashmap" resultType="postVO">
-        SELECT POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
-        POST_LOCATION_LAT, POST_LOCATION_LNG
+        SELECT post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng
         FROM
             (
-            SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
-            POST_LOCATION_LAT, POST_LOCATION_LNG
+            SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng
             FROM
-                (SELECT DISTINCT(p.POST_ID) POST_ID, POST_TITLE, POST_LOCATION_KEYWORD, POST_REGISTER_DATE, POST_UPDATE_DATE,
-                POST_LOCATION_LAT, POST_LOCATION_LNG
-                FROM POSTS p LEFT JOIN POST_TAGS t
-                ON p.POST_ID=t.POST_ID
-                WHERE p.SPACE_ID=#{spaceId}
+                (SELECT DISTINCT(p.post_id) post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng
+                FROM posts p LEFT JOIN post_tags t
+                ON p.post_id=t.post_id
+                WHERE p.space_id=#{spaceId}
                 <if test="keyword != null">
-                    AND POST_TITLE LIKE CONCAT('%',#{keyword},'%') OR POST_CONTENT LIKE CONCAT('%',#{keyword},'%')
+                    AND post_title LIKE CONCAT('%',#{keyword},'%') OR post_content LIKE CONCAT('%',#{keyword},'%')
                 </if>
                 <if test="dateList != null and dateList.size != 0">
                     <foreach collection="dateList" item="date" index="index">
                         <choose>
                             <when test="index == 0">
-                                AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                                AND #{date} BETWEEN post_begin_date AND post_end_date
                             </when>
                             <when test="index != 0">
-                                OR #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                                OR #{date} BETWEEN post_begin_date AND post_end_date
                             </when>
                         </choose>
                     </foreach>
                 </if>
                 <if test="tags != null and tags.size != 0">
-                    AND t.TAG_ID IN
+                    AND t.tag_id IN
                     <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
                         #{tag}
                     </foreach>
                 </if>
                 <if test="writers != null and writers.size != 0">
-                    AND USER_ID IN
+                    AND user_id IN
                     <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
                         #{writer}
                     </foreach>
                 </if>
                 ORDER BY
-                POST_REGISTER_DATE DESC
+                post_register_date DESC
                 ) D2
             <![CDATA[
             WHERE @ROWNUM:=0 <= #{page} * #{amount}
@@ -79,38 +77,38 @@
     </select>
 
     <select id="getTotal" resultType="_int">
-        SELECT COUNT(POST_ID)
+        SELECT COUNT(post_id)
         FROM
         (
-        SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, POST_ID
+        SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id
         FROM
-        (SELECT DISTINCT(p.POST_ID) POST_ID
-        FROM POSTS p LEFT JOIN POST_TAGS t
-        ON p.POST_ID=t.POST_ID
-        WHERE p.SPACE_ID=#{spaceId}
+        (SELECT DISTINCT(p.post_id) post_id
+        FROM posts p LEFT JOIN post_tags t
+        ON p.post_id=t.post_id
+        WHERE p.space_id=#{spaceId}
         <if test="keyword != null">
-            AND POST_TITLE LIKE CONCAT('%',#{keyword},'%') OR POST_CONTENT LIKE CONCAT('%',#{keyword},'%')
+            AND post_title LIKE CONCAT('%',#{keyword},'%') OR post_content LIKE CONCAT('%',#{keyword},'%')
         </if>
         <if test="dateList != null and dateList.size != 0">
             <foreach collection="dateList" item="date" index="index">
                 <choose>
                     <when test="index == 0">
-                        AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                        AND #{date} BETWEEN post_begin_date AND post_end_date
                     </when>
                     <when test="index != 0">
-                        OR #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
+                        OR #{date} BETWEEN post_begin_date AND post_end_date
                     </when>
                 </choose>
             </foreach>
         </if>
         <if test="tags != null and tags.size != 0">
-            AND t.TAG_ID IN
+            AND t.tag_id IN
             <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
                 #{tag}
             </foreach>
         </if>
         <if test="writers != null and writers.size != 0">
-            AND USER_ID IN
+            AND user_id IN
             <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
                 #{writer}
             </foreach>
