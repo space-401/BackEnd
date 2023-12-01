@@ -63,7 +63,7 @@ public class SecurityConfig {
 
 		// 주어진 요청의 실제 출처, HTTP 메소드 및 헤더를 확인하는 메소드와 함께 CORS 구성을 위한 컨테이너입니다.
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.addAllowedOrigin("http://localhost:3000");
+		corsConfiguration.addAllowedOrigin("https://www.kkiri.net");
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.addAllowedHeader("*");
 
