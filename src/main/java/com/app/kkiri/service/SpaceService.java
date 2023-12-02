@@ -156,6 +156,7 @@ public class SpaceService {
 
 	// 스페이스 태그 조회
 	public  List<TagVO> tagList(Long spaceId){
+		LOGGER.info("[tagList()] param spaceId : {}", spaceId);
 
 		List<TagVO> tags = tagsDAO.findAll(spaceId);
 		LOGGER.info("[tagList()] tags : {}", tags);
@@ -164,7 +165,6 @@ public class SpaceService {
 	}
 
 	// 스페이스 태그 추가
-	@Transactional
 	public TagResponseDTO addTag(TagVO tagVO){
 
 		tagsDAO.save(tagVO);
@@ -173,17 +173,6 @@ public class SpaceService {
 		LOGGER.info("[addTag()] tagResponseDTO : {}", tagResponseDTO);
 
 		return tagResponseDTO;
-	}
-
-	// 디폴트 스페이스 태그 추가
-	@Transactional
-	public void addDefaultTags(List<TagVO> defaultTags){
-
-		for(TagVO tagVO : defaultTags) {
-			LOGGER.info("[addDefaultTags()] param tagVO : {}", tagVO);
-
-			tagsDAO.save(tagVO);
-		}
 	}
 
 	// 스페이스 태그 삭제
