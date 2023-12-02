@@ -102,8 +102,10 @@ public class SpaceController {
 	@PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<?> register(
 		@RequestPart SpaceDTO spaceDTO,
+		@RequestPart(value = "tags") List<String> tagNames,
 		@RequestPart(required = false, value = "imgUrl") MultipartFile multipartFile,
 		HttpServletRequest request) throws IOException {
+		LOGGER.info("[register()] param spaceDTO : {}, multipartFile : {}, tagNames : {}", spaceDTO, multipartFile, tagNames);
 
 		Long userId = jwtTokenProvider.getUserIdByHeader(request);
 
@@ -168,13 +170,15 @@ public class SpaceController {
 
 		Long spaceId = spaceService.register(spaceVO, spaceUserVO);
 
-		List<TagVO> defaultTags = new ArrayList<>();
-		defaultTags.add(TagVO.builder().tagName("즐거운").spaceId(spaceId).build());
-		defaultTags.add(TagVO.builder().tagName("기억에 남는").spaceId(spaceId).build());
-		defaultTags.add(TagVO.builder().tagName("생일").spaceId(spaceId).build());
-		defaultTags.add(TagVO.builder().tagName("여행").spaceId(spaceId).build());
+		for (String tagName : tagNames) {
+			TagVO tagVO = TagVO.builder()
+				.tagName(tagName)
+				.spaceId(spaceId)
+				.build();
 
-		spaceService.addDefaultTags(defaultTags);
+			TagResponseDTO tagResponseDTO = spaceService.addTag(tagVO);
+			LOGGER.info("[register()] tagResponseDTO : {}", tagResponseDTO);
+		}
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("spaceId", spaceId);

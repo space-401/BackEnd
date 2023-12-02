@@ -27,11 +27,8 @@
 
     <select id="selectRecentTag" resultType="tagVO">
         SELECT tag_id, tag_name, space_id
-        FROM (
-                 SELECT tag_id, tag_name, space_id
-                 FROM tags
-                 ORDER BY tag_id DESC
-             ) D1
-        WHERE ROWNUM = 1
+        FROM tags
+        ORDER BY tag_id DESC
+        LIMIT 1
     </select>
 </mapper>
