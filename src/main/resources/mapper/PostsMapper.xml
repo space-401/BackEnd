@@ -34,14 +34,14 @@
         SELECT post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng
         FROM
             (
-            SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng
+            SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng, space_id
             FROM
-                (SELECT DISTINCT(p.post_id) post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng
+                (SELECT DISTINCT(p.post_id) post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng, space_id
                 FROM posts p LEFT JOIN post_tags t
                 ON p.post_id=t.post_id
                 WHERE p.space_id=#{spaceId}
                 <if test="keyword != null">
-                    AND post_title LIKE CONCAT('%',#{keyword},'%') OR post_content LIKE CONCAT('%',#{keyword},'%')
+                    AND post_title LIKE CONCAT('%',#{keyword},'%')
                 </if>
                 <if test="dateList != null and dateList.size != 0">
                     <foreach collection="dateList" item="date" index="index">
@@ -71,7 +71,7 @@
                 post_register_date DESC
                 ) D2
             <![CDATA[
-            WHERE @ROWNUM:=0 <= #{page} * #{amount}
+            WHERE @ROWNUM:=0 <= #{page} * #{amount} AND space_id=#{spaceId}
         ) D3 WHERE ROWNUM > (#{page} - 1) * #{amount}
         ]]>
     </select>
@@ -80,14 +80,14 @@
         SELECT COUNT(post_id)
         FROM
         (
-        SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id
+        SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id, space_id
         FROM
-        (SELECT DISTINCT(p.post_id) post_id
+        (SELECT DISTINCT(p.post_id) post_id, space_id
         FROM posts p LEFT JOIN post_tags t
         ON p.post_id=t.post_id
         WHERE p.space_id=#{spaceId}
         <if test="keyword != null">
-            AND post_title LIKE CONCAT('%',#{keyword},'%') OR post_content LIKE CONCAT('%',#{keyword},'%')
+            AND post_title LIKE CONCAT('%',#{keyword},'%')
         </if>
         <if test="dateList != null and dateList.size != 0">
             <foreach collection="dateList" item="date" index="index">
@@ -114,7 +114,7 @@
             </foreach>
         </if>) D2
         <![CDATA[
-            WHERE @ROWNUM:=0 <= #{page} * #{amount}
+            WHERE @ROWNUM:=0 <= #{page} * #{amount} AND space_id=#{spaceId}
         )D3 WHERE ROWNUM > (#{page} - 1) * #{amount}
         ]]>
     </select>

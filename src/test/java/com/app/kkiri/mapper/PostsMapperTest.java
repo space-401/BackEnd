@@ -27,8 +27,8 @@ class PostsMapperTest {
     @Test
     void insert() {
         PostDTO postDTO = new PostDTO();
-        postDTO.create(4L,"test", "test", null, null,  "카페",231.2, 232.3, "2023-11-10", "2023-11-12");
-        postDTO.setUserId(1L);
+        postDTO.create(3L,"test", "test", null, null,  "카페",231.2, 232.3, "2023-11-12", "2023-11-15");
+        postDTO.setUserId(2L);
         postsMapper.insert(postDTO);
     }
 
