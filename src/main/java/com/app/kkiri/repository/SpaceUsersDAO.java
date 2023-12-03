@@ -51,4 +51,9 @@ public class SpaceUsersDAO {
 		return spaceUsersMapper.selectSpaceId(userId);
 	}
 
+	// postId 를 사용하여 해당 게시글을 작성한 사용자의 userNickname 을 조회
+	public String findUserNicknameByPostId(Long postId) {
+		return spaceUsersMapper.selectUserNicknameByPostId(postId);
+	}
+
 }

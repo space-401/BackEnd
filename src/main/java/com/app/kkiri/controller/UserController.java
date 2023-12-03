@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.app.kkiri.domain.dto.response.PostBookmarkResponseDTO;
 import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.kkiri.security.jwt.JwtTokenProvider;
@@ -67,5 +69,13 @@ public class UserController {
 		userService.deleteUser(httpServletRequest);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/bookmark")
+	public ResponseEntity<PostBookmarkResponseDTO> bookmark(@RequestParam int page, HttpServletRequest httpServletRequest) {
+
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+
+		return ResponseEntity.ok().body(postService.findBookmarkedPostsByUserIdAndPage(userId, page));
 	}
 }

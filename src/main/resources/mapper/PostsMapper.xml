@@ -124,4 +124,24 @@
         DELETE FROM posts
         WHERE user_Id = #{userId}
     </delete>
+
+    <!-- 사용자가 북마크한 게시글 정보를 조회 -->
+    <select id="selectBookmarkedPosts" resultType="postVO">
+        SELECT p.post_id, p.post_title, p.post_register_date
+        FROM post_bookmarks pb
+        INNER JOIN posts p
+        ON pb.post_id = p.post_id
+        WHERE pb.user_id = #{userId}
+        AND pb.bookmark_yn = TRUE
+        ORDER BY p.post_register_date DESC
+        LIMIT #{startIndex}, 10;
+    </select>
+    
+    <!-- 사용자가 북마크한 게시글의 수를 조회 -->
+    <select id="getTotalBookmarkedPosts" resultType="long">
+        SELECT COUNT(post_id)
+        FROM post_bookmarks
+        WHERE user_id = #{userId}
+        AND bookmark_yn = TRUE
+    </select>
 </mapper>
