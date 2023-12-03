@@ -395,20 +395,22 @@ public class SpaceController {
 		param.put("keyword", data.getKeyword());
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		if(data.getStartDate() != null && data.getEndDate() !=null){
-			LocalDate start = LocalDate.parse(data.getStartDate(), formatter);
-			LocalDate end = LocalDate.parse(data.getEndDate(), formatter);
+		LocalDate start = data.getStartDate() != null ? LocalDate.parse(data.getStartDate(), formatter): null;
+		LocalDate end = data.getEndDate() != null ? LocalDate.parse(data.getEndDate(), formatter): null;
 
+		if(end == null){
+			dateList.add(start);
+		} else {
+			LOGGER.info("[filter()] Start : {}", start);
+			LOGGER.info("[filter()] End : {}", end);
 			Long numOfDaysBetween = ChronoUnit.DAYS.between(start, end);
 			dateList = IntStream.iterate(0, i -> i + 1)
-			.limit(numOfDaysBetween)
+			.limit(numOfDaysBetween + 1L)
 			.mapToObj(i -> start.plusDays(i))
 			.collect(Collectors.toList());
-		} else if (data.getStartDate() != null) {
-			dateList.add(LocalDate.parse(data.getStartDate(), formatter));
-		} else if(data.getEndDate() != null){
-			dateList.add(LocalDate.parse(data.getEndDate(), formatter));
 		}
+
+		LOGGER.info("[filter()] DateList : {}", dateList);
 
 		param.put("dateList", dateList);
 		param.put("amount", amount);
