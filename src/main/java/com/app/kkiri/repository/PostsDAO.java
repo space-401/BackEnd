@@ -37,4 +37,14 @@ public class PostsDAO {
     public void deleteByUserId(Long userId) {
         postsMapper.deleteByUserId(userId);
     }
+
+    // 사용자가 북마크한 게시글 정보를 조회
+    public List<PostVO> findBookmarkedPostsByUserIdAndPage(Long userId, Long startIndex) {
+        return postsMapper.selectBookmarkedPosts(userId, startIndex);
+    }
+
+    // 사용자가 북마크한 게시글의 수를 조회
+    public Long countBookmarkedPostsByUserId (Long userId) {
+        return postsMapper.getTotalBookmarkedPosts(userId);
+    }
 }

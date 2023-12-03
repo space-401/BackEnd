@@ -17,7 +17,7 @@ import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.dto.SpaceDetailDTO;
 import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.dto.response.SpaceResponseDTO;
-import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
 import com.app.kkiri.domain.dto.response.TagResponseDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.SpaceVO;
@@ -59,15 +59,15 @@ public class SpaceService {
 			spaceResponseDTO.setImgUrl(fileService.getS3ObjectURL(space.getSpaceIconPath()));
 
 			List<SpaceUserVO> users = spaceUsersDAO.findAll(space.getSpaceId(), userId);
-			List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+			List<SpaceUserResponseDTO> userList = new ArrayList<>();
 
 			for (SpaceUserVO user:users) {
-				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-				spaceUserRespnseDTO.setUserId(user.getUserId());
-				spaceUserRespnseDTO.setUserName(user.getUserNickname());
-				spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+				SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+				spaceUserResponseDTO.setUserId(user.getUserId());
+				spaceUserResponseDTO.setUserName(user.getUserNickname());
+				spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
-				userList.add(spaceUserRespnseDTO);
+				userList.add(spaceUserResponseDTO);
 			}
 			spaceResponseDTO.setUserList(userList);
 			spaceList.add(spaceResponseDTO);
@@ -95,18 +95,18 @@ public class SpaceService {
 		List<SpaceVO> spaces = spacesDAO.findAll(userId);
 		for (SpaceVO space:spaces) {
 			List<SpaceUserVO> userList = spaceUsersDAO.findAll(space.getSpaceId(), userId);
-			List<SpaceUserRespnseDTO> spaceUserRespnseDTOList = new ArrayList<>();
+			List<SpaceUserResponseDTO> spaceUserResponseDTOList = new ArrayList<>();
 
 			for (SpaceUserVO user:userList) {
-				SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-				spaceUserRespnseDTO.setUserId(user.getUserId());
-				spaceUserRespnseDTO.setUserName(user.getUserNickname());
-				spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+				SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+				spaceUserResponseDTO.setUserId(user.getUserId());
+				spaceUserResponseDTO.setUserName(user.getUserNickname());
+				spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
-				spaceUserRespnseDTOList.add(spaceUserRespnseDTO);
+				spaceUserResponseDTOList.add(spaceUserResponseDTO);
 			}
 
-			spaceDetailDTO.setUserList(spaceUserRespnseDTOList);
+			spaceDetailDTO.setUserList(spaceUserResponseDTOList);
 		}
 
 		List<TagVO> tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());

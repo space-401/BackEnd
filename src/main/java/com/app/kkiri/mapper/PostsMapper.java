@@ -30,4 +30,10 @@ public interface PostsMapper {
 
     // userId 를 사용하여 post 를 삭제
     public void deleteByUserId(Long userId);
+
+    // 사용자가 북마크한 게시글 정보를 조회
+    public List<PostVO> selectBookmarkedPosts(Long userId, Long startIndex);
+
+    // 사용자가 북마크한 게시글의 수를 조회
+    public Long getTotalBookmarkedPosts(Long userId);
 }
