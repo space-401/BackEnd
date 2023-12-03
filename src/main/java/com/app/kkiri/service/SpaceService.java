@@ -88,6 +88,7 @@ public class SpaceService {
 		spaceDetailDTO.setSpaceDescription(spaceVO.getSpaceDescription());
 		spaceDetailDTO.setImgUrl(fileService.getS3ObjectURL(spaceVO.getSpaceIconPath()));
 		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
+		spaceDetailDTO.setSpaceCode(spaceVO.getSpaceCode());
 		spaceDetailDTO.setIsAdmin(spaceUsersDAO.findByUserAdminYn(spaceId, userId));
 		spaceDetailDTO.setIsFirst(spaceUsersDAO.findByFirst(spaceId, userId) == 0 ? 1 : 0);
 
