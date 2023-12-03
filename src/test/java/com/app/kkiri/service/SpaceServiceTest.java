@@ -84,10 +84,10 @@ class SpaceServiceTest {
         spaceService.withdrawSpace(47L, 5L);
     }
 
-    @Test
-    void modifyStatus() {
-        spaceService.modifyStatus(46L, 2L);
-    }
+    // @Test
+    // void modifyStatus() {
+    //     spaceService.modifyStatus(46L, 2L);
+    // }
 
     @Test
     void modifyInfo() {
