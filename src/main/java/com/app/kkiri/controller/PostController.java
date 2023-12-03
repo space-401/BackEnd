@@ -1,7 +1,6 @@
 package com.app.kkiri.controller;
 
 import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,7 +32,6 @@ import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.response.PostDetailResponseDTO;
 import com.app.kkiri.domain.vo.PostBookmarkVO;
 import com.app.kkiri.domain.vo.PostImgVO;
-import com.app.kkiri.security.Response;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
 import com.app.kkiri.service.FileService;
 import com.app.kkiri.service.PostService;
@@ -63,7 +61,7 @@ public class PostController {
         HttpServletRequest request) throws IOException{
         LOGGER.info("[register()] param postDTO : {}, multipartFiles : {}, request : {}", postDTO, multipartFiles, request);
 
-        Long userId = jwtTokenProvider.getUserIdByHeader(request);
+        Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
         postDTO.setUserId(userId);
 
         StringBuffer uploadPath = new StringBuffer();
@@ -176,7 +174,7 @@ public class PostController {
     public ResponseEntity<PostDetailResponseDTO> postDetail(@RequestParam Long postId, HttpServletRequest request){
         LOGGER.info("[postDetail()] param postId : {}, request : {}", postId, request);
 
-        Long userId = jwtTokenProvider.getUserIdByHeader(request);
+        Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 
         return ResponseEntity.ok().body(postService.postDetail(postId, userId));
     }
@@ -186,7 +184,7 @@ public class PostController {
     public ResponseEntity bookmark(@RequestBody PostBookmarkVO postId, HttpServletRequest request){
         LOGGER.info("[bookmark()] postId : {}, request : {}", postId, request);
 
-        Long userId = jwtTokenProvider.getUserIdByHeader(request);
+        Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
         postService.bookmark(postId.getPostId(), userId);
 
         return ResponseEntity.noContent().build();

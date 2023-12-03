@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import com.app.kkiri.repository.PostImgsDAO;
 import com.app.kkiri.repository.PostTagsDAO;
 import com.app.kkiri.repository.PostsDAO;
 import com.app.kkiri.repository.SpaceUsersDAO;
+import com.app.kkiri.security.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +50,7 @@ public class PostService {
     private final SpaceUsersDAO  spaceUsersDAO;
     private final CommentsDAO commentsDAO;
     private final FileService fileService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final Logger LOGGER = LoggerFactory.getLogger(PostService.class);
 
     @Transactional(rollbackFor = Exception.class)
@@ -260,5 +264,13 @@ public class PostService {
         } catch (Exception e) {
             throw new BadRequestException(INVALID_REQUEST);
         }
+    }
+
+    // userId 를 사용하여 post 를 삭제
+    public void deleteByUserId(HttpServletRequest httpServletRequest) {
+
+        Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+
+        postsDAO.deleteByUserId(userId);
     }
 }

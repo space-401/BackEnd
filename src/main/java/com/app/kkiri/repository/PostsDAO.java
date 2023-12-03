@@ -32,4 +32,9 @@ public class PostsDAO {
 
     // 필터된 게시글 총 개수
     public int getTotal(Map<String, Object> param){ return postsMapper.getTotal(param); }
+
+    // userId 를 사용하여 post 를 삭제
+    public void deleteByUserId(Long userId) {
+        postsMapper.deleteByUserId(userId);
+    }
 }

@@ -1,11 +1,12 @@
 package com.app.kkiri.service;
 
+import static com.app.kkiri.global.exception.ExceptionCode.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.app.kkiri.global.exception.ExceptionCode;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,17 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.SpaceDTO;
 import com.app.kkiri.domain.dto.SpaceDetailDTO;
+import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.dto.response.SpaceResponseDTO;
 import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
-import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.dto.response.TagResponseDTO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.domain.vo.TagVO;
 import com.app.kkiri.global.exception.BadRequestException;
+import com.app.kkiri.global.exception.ExceptionCode;
 import com.app.kkiri.repository.SpaceUsersDAO;
 import com.app.kkiri.repository.SpacesDAO;
 import com.app.kkiri.repository.TagsDAO;
+import com.app.kkiri.security.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,7 @@ public class SpaceService {
 	private final SpaceUsersDAO spaceUsersDAO;
 	private final TagsDAO tagsDAO;
 	private final FileService fileService;
+	private final JwtTokenProvider jwtTokenProvider;
 	private final Logger LOGGER = LoggerFactory.getLogger(SpaceService.class);
 
 	// 목록 조회
@@ -210,10 +214,11 @@ public class SpaceService {
 
 	// 스페이스 회원 상태 변경
 	@Transactional(rollbackFor = Exception.class)
-	public void modifyStatus(Long spaceId, Long userId){
+	public void modifyStatus(Long originalAdminUserId, Long newAdminUserId, Long spaceId){
+
 		try{
-			spaceUsersDAO.setByAdminYn(spaceId);
-			spaceUsersDAO.setByUserId(spaceId, userId);
+			spaceUsersDAO.setByAdminYn(originalAdminUserId, spaceId);
+			spaceUsersDAO.setByUserId(spaceId, newAdminUserId);
 		} catch (Exception e){
 			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
@@ -221,10 +226,27 @@ public class SpaceService {
 
 	// 스페이스 내 유저 정보 변경
 	public void modifyInfo(SpaceUserVO spaceUserVO){
+		LOGGER.info("[modifyInfo() param spaceUserVO : {}]", spaceUserVO);
+
 		try{
 			spaceUsersDAO.set(spaceUserVO);
 		} catch (Exception e){
 			// throw new CustomException(StatusCode.BAD_REQUEST);
 		}
+	}
+
+	// userId 를 사용한 스페이스 회원 삭제
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteSpaceUser(HttpServletRequest httpServletRequest) {
+
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+
+		List<Long> spaceIds = spaceUsersDAO.findBySpaceIdAndUserAdminYnTrue(userId);
+
+		if(spaceIds.size() != 0) {
+			throw new BadRequestException(FAIL_TO_DELETE_USER);
+		}
+
+		spaceUsersDAO.deleteByUserId(userId);
 	}
 }

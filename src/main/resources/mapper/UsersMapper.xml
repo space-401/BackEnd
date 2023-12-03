@@ -43,4 +43,10 @@
         set access_token = #{accessToken}, refresh_token = #{refreshToken}
         where user_id = #{userId}
     </update>
+    
+    <update id="updateUserStatus">
+        UPDATE users
+        SET user_status = 'leaver'
+        WHERE user_id = #{userId}
+    </update>
 </mapper>
