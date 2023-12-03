@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,13 +31,19 @@ import lombok.extern.slf4j.Slf4j;
 public class CommentController {
     private final CommentService commentService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final Logger LOGGER = LoggerFactory.getLogger(CommentController.class);
 
     @PostMapping("")
     // 댓글 추가
     public ResponseEntity<?> insert(@RequestBody CommentVO commentVO, HttpServletRequest request) {
+        LOGGER.info("[insert()] param commentVO : {}", commentVO);
+
         Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
+
         commentVO.setUserId(userId);
+
         commentService.register(commentVO);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

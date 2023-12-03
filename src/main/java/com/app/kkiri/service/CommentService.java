@@ -1,5 +1,8 @@
 package com.app.kkiri.service;
 
+import com.app.kkiri.global.exception.ExceptionCode;
+import com.app.kkiri.global.exception.ExceptionCode.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +13,7 @@ import com.app.kkiri.domain.dto.response.CommentResponseDTO;
 import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.global.exception.BadRequestException;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.SpaceUsersDAO;
 
@@ -34,7 +38,7 @@ public class CommentService {
                 commentsDAO.save(commentVO);
             }
         } catch (Exception e){
-            // throw new CustomException(StatusCode.BAD_REQUEST);
+            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
     }
 

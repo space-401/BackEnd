@@ -5,16 +5,20 @@
     <insert id="insert">
         INSERT INTO comments (comment_content, comment_ref_yn, comment_group, post_id, user_id)
         VALUES (#{commentContent}, #{commentRefYn}, #{commentId}, #{postId}, #{userId})
-        <selectKey keyProperty="commentId" order="AFTER" resultType="long">
-            SELECT MAX(comment_id) FROM comments
+        <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
+            SELECT `auto_increment`
+            FROM information_schema.tables
+            WHERE table_schema = 'kkiri' AND table_name = 'comments'
         </selectKey>
     </insert>
 
     <insert id="insertReply">
         INSERT INTO comments (comment_content, comment_ref_yn, comment_group, post_id, user_id)
         VALUES (#{commentContent}, #{commentRefYn}, #{commentGroup}, #{postId}, #{userId})
-        <selectKey keyProperty="commentId" order="AFTER" resultType="long">
-            SELECT MAX(comment_id) FROM comments
+        <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
+            SELECT `auto_increment`
+            FROM information_schema.tables
+            WHERE table_schema = 'kkiri' AND table_name = 'comments'
         </selectKey>
     </insert>
 
