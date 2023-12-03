@@ -57,8 +57,8 @@ public class SecurityConfig {
 			.successHandler(oAuth2AuthenticationSuccessHandler)
 		);
 
-		// http.logout(logout -> logout
-		// 	.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
+		http.logout(logout -> logout
+			.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
 
 		return http.build();
 	}
