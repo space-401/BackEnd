@@ -368,13 +368,14 @@ public class SpaceController {
 	}
 
 	// 게시글 필터 조회
-	@GetMapping(value = "/search", consumes = {MediaType.APPLICATION_JSON_VALUE})
+	@PostMapping(value = "/search", consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<PostFilterResponseDTO> filter(
 			@RequestBody(required = false) PostFilterValueDTO searchValue,
 			HttpServletRequest request){
 		Long id = jwtTokenProvider.getUserIdByHeader(request);
 
 		LOGGER.info("[filter()] searchValue : {}", searchValue);
+
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;
