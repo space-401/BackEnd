@@ -1,7 +1,5 @@
 package com.app.kkiri.repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -48,7 +46,7 @@ public class SpaceUsersDAO {
 	}
 
 	// userId 를 사용하여 해당 유저가 방장으로 있는 스페이스의 고유 번호를 조회
-	public List<Long> findBySpaceIdAndUserAdminYnTrue(Long userId) {
+	public List<Long> findSpaceIdByUserIdAndUserAdminYnTrue(Long userId) {
 
 		return spaceUsersMapper.selectSpaceId(userId);
 	}
