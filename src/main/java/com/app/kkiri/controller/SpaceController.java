@@ -376,36 +376,36 @@ public class SpaceController {
 	// 게시글 필터 조회
 	@PostMapping(value = "/search")
 	public ResponseEntity<PostFilterResponseDTO> filter(
-			@RequestBody(required = false) PostFilterValueDTO searchValue,
+			@RequestBody(required = false) PostFilterValueDTO data,
 			HttpServletRequest request){
 		Long id = jwtTokenProvider.getUserIdByHttpRequest(request);
 
-		LOGGER.info("[filter()] searchValue : {}", searchValue);
+		LOGGER.info("[filter()] searchValue : {}", data);
 
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;
 
-		param.put("spaceId", searchValue.getSpaceId());
-		param.put("page", searchValue.getPage());
-		param.put("writers", searchValue.getUserId());
-		param.put("tags", searchValue.getTagId());
-		param.put("keyword", searchValue.getKeyword());
+		param.put("spaceId", data.getSpaceId());
+		param.put("page", data.getPage());
+		param.put("writers", data.getUserId());
+		param.put("tags", data.getTagId());
+		param.put("keyword", data.getKeyword());
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		if(searchValue.getStartDate() != null && searchValue.getEndDate() !=null){
-			LocalDate start = LocalDate.parse(searchValue.getStartDate(), formatter);
-			LocalDate end = LocalDate.parse(searchValue.getEndDate(), formatter);
+		if(data.getStartDate() != null && data.getEndDate() !=null){
+			LocalDate start = LocalDate.parse(data.getStartDate(), formatter);
+			LocalDate end = LocalDate.parse(data.getEndDate(), formatter);
 
 			Long numOfDaysBetween = ChronoUnit.DAYS.between(start, end);
 			dateList = IntStream.iterate(0, i -> i + 1)
 			.limit(numOfDaysBetween)
 			.mapToObj(i -> start.plusDays(i))
 			.collect(Collectors.toList());
-		} else if (searchValue.getStartDate() != null) {
-			dateList.add(LocalDate.parse(searchValue.getStartDate(), formatter));
-		} else if(searchValue.getEndDate() != null){
-			dateList.add(LocalDate.parse(searchValue.getEndDate(), formatter));
+		} else if (data.getStartDate() != null) {
+			dateList.add(LocalDate.parse(data.getStartDate(), formatter));
+		} else if(data.getEndDate() != null){
+			dateList.add(LocalDate.parse(data.getEndDate(), formatter));
 		}
 
 		param.put("dateList", dateList);
