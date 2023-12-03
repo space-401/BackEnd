@@ -155,7 +155,7 @@ public class SpaceService {
 		try {
 			spacesDAO.set(spaceDTO);
 		}catch(Exception e){
-			// throw new CustomException(StatusCode.BAD_REQUEST);
+			throw new BadRequestException(INVALID_REQUEST);
 		}
 	}
 
@@ -264,5 +264,10 @@ public class SpaceService {
 
 	private Long getUserId(HttpServletRequest httpServletRequest) {
 		return jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+	}
+
+	// spaceId 를 사용하여 spaces 의 모든 컬럼을 조회
+	public SpaceVO findBySpaceId(Long spaceId) {
+		return spacesDAO.findBySpaceId(spaceId);
 	}
 }
