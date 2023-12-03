@@ -210,8 +210,7 @@ public class SpaceController {
 		@RequestPart(required = false, value = "imgUrl") MultipartFile multipartFile) throws IOException {
 		LOGGER.info("[modify()] params spaceDTO : {}, multipartFile : {}", spaceDTO, multipartFile);
 
-		// 이미지 저장
-		if(!multipartFile.isEmpty()){ // 사용자가 이미지를 지정한 경우
+		if(!multipartFile.isEmpty()) { // 사용자가 이미지를 지정한 경우
 			StringBuffer uploadPath = new StringBuffer();
 			StringBuffer uploadFileName = new StringBuffer();
 			StringBuffer uploadFullPathAndFileName = new StringBuffer();
@@ -237,16 +236,18 @@ public class SpaceController {
 			spaceDTO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
 			spaceDTO.setSpaceIconUuid(uuid); // uuid
 			spaceDTO.setSpaceIconSize(multipartFile.getSize()); // ...bytes
-		} else { // 기본이미지를 사용한 경우
-			if(spaceDTO.getDefaultImg() != null) {
-				Long defaultImg = spaceDTO.getDefaultImg();
-				spaceDTO.setSpaceIconName(defaultImg + ".jpg"); // 1.jpg
-				spaceDTO.setSpaceIconUuid("default"); // default
-				spaceDTO.setSpaceIconPath(defaultRootPath + "/" + defaultImg + ".jpg"); // upload/default/1.jpg
-				spaceDTO.setSpaceIconSize(0L); // 0L
-			} else {
-				throw new ImageException(MISSING_IMAGE);
-			}
+		} else if(spaceDTO.getDefaultImg() != null) { // 사용자가 디폴트 이미지를 선택한 경우
+			Long defaultImg = spaceDTO.getDefaultImg();
+			spaceDTO.setSpaceIconName(defaultImg + ".jpg"); // 1.jpg
+			spaceDTO.setSpaceIconUuid("default"); // default
+			spaceDTO.setSpaceIconPath(defaultRootPath + "/" + defaultImg + ".jpg"); // upload/default/1.jpg
+			spaceDTO.setSpaceIconSize(0L); // 0L
+		} else { // 사용자가 이미지 변경을 원하지 않는 경우
+			SpaceVO selectedSpace = spaceService.findBySpaceId(spaceDTO.getSpaceId());
+			spaceDTO.setSpaceIconName(selectedSpace.getSpaceIconName());
+			spaceDTO.setSpaceIconUuid(selectedSpace.getSpaceIconUuid());
+			spaceDTO.setSpaceIconPath(selectedSpace.getSpaceIconPath());
+			spaceDTO.setSpaceIconSize(selectedSpace.getSpaceIconSize());
 		}
 
 		spaceService.modify(spaceDTO);
@@ -330,45 +331,46 @@ public class SpaceController {
 
 		if(spaceUserDTO.getIsAdmin()) { // 방장 변경
 			spaceService.modifyStatus(originalAdminUserId, newAdminUserId, spaceId);
-		} else { // 스페이스 유저 정보 수정
-			if(!multipartFile.isEmpty()){ // 유저 프로필 이미지 변경 시
-				StringBuffer uploadPath = new StringBuffer();
-				StringBuffer uploadFileName = new StringBuffer();
-				StringBuffer uploadFullPathAndFileName = new StringBuffer();
-
-				uploadPath.append(profileRootPath); // upload/profile
-				uploadPath.append("/");
-				uploadPath.append(getUploadPath()); // 2023/11/10
-
-				String uuid = UUID.randomUUID().toString();
-				String originalFileName = multipartFile.getOriginalFilename();
-
-				uploadFileName.append(uuid);
-				uploadFileName.append("_");
-				uploadFileName.append(originalFileName); // uuid_profile.jpg
-
-				uploadFullPathAndFileName.append(uploadPath);
-				uploadFullPathAndFileName.append("/");
-				uploadFullPathAndFileName.append(uploadFileName); // upload/profile/2023/11/10/uuid_profile.jpg
-
-				fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
-
-				spaceUserVO.setProfileImgName(originalFileName); // profile.jpg
-				spaceUserVO.setProfileImgPath(uploadFullPathAndFileName.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
-				spaceUserVO.setProfileImgUuid(uuid); // uuid
-				spaceUserVO.setProfileImgSize(multipartFile.getSize()); // ...bytes
-			} else { // 기본이미지로 저장
-				spaceUserVO.setProfileImgName("defaultProfile.png"); // defaultProfile.png
-				spaceUserVO.setProfileImgPath(defaultRootPath + "/defaultProfile.png"); // upload/default/defaultProfile.png
-				spaceUserVO.setProfileImgUuid("default"); // default
-				spaceUserVO.setProfileImgSize(0L); // 0L
-			}
-
-			spaceUserVO.setSpaceId(spaceId);
-			spaceUserVO.setUserNickname(spaceUserDTO.getUserNickname());
-
-			spaceService.modifyInfo(spaceUserVO);
+			return ResponseEntity.noContent().build();
 		}
+
+		if(!multipartFile.isEmpty()) { // 사용자가 이미지를 지정한 경우
+			StringBuffer uploadPath = new StringBuffer();
+			StringBuffer uploadFileName = new StringBuffer();
+			StringBuffer uploadFullPathAndFileName = new StringBuffer();
+
+			uploadPath.append(profileRootPath); // upload/profile
+			uploadPath.append("/");
+			uploadPath.append(getUploadPath()); // 2023/11/10
+
+			String uuid = UUID.randomUUID().toString();
+			String originalFileName = multipartFile.getOriginalFilename();
+
+			uploadFileName.append(uuid);
+			uploadFileName.append("_");
+			uploadFileName.append(originalFileName); // uuid_profile.jpg
+
+			uploadFullPathAndFileName.append(uploadPath);
+			uploadFullPathAndFileName.append("/");
+			uploadFullPathAndFileName.append(uploadFileName); // upload/profile/2023/11/10/uuid_profile.jpg
+
+			fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
+
+			spaceUserVO.setProfileImgName(originalFileName); // profile.jpg
+			spaceUserVO.setProfileImgPath(uploadFullPathAndFileName.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
+			spaceUserVO.setProfileImgUuid(uuid); // uuid
+			spaceUserVO.setProfileImgSize(multipartFile.getSize()); // ...bytes
+		} else { // 사용자가 어떠한 이미지도 선택하지 않은 경우 기본 이미지를 저장한다.
+			spaceUserVO.setProfileImgName("defaultProfile.png"); // defaultProfile.png
+			spaceUserVO.setProfileImgPath(defaultRootPath + "/defaultProfile.png"); // upload/default/defaultProfile.png
+			spaceUserVO.setProfileImgUuid("default"); // default
+			spaceUserVO.setProfileImgSize(0L); // 0L
+		}
+
+		spaceUserVO.setSpaceId(spaceId);
+		spaceUserVO.setUserNickname(spaceUserDTO.getUserNickname());
+
+		spaceService.modifyInfo(spaceUserVO);
 
 		return ResponseEntity.noContent().build();
 	}
