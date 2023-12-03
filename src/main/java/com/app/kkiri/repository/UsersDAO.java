@@ -95,4 +95,9 @@ public class UsersDAO {
 	public void setTokens(Long userId, String accessToken, String refreshToken) {
 		usersMapper.updateAccessTokenAndRefreshToken(userId, accessToken, refreshToken);
 	}
+
+	// 회원 탈퇴
+	public void deleteUser(Long userId) {
+		usersMapper.updateUserStatus(userId);
+	}
 }

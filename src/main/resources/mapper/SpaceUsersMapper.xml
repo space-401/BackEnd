@@ -52,13 +52,13 @@
 
     <update id="updateByAdminYn">
         UPDATE space_users
-        SET user_admin_yn = '0'
-        WHERE user_admin_yn = '1' AND space_id=#{spaceId}
+        SET user_admin_yn = FALSE
+        WHERE user_id = #{userId} AND space_id = #{spaceId}
     </update>
 
     <update id="updateByUserId">
         UPDATE space_users
-        SET user_admin_yn = '1'
+        SET user_admin_yn = TRUE
         WHERE user_id=#{userId} AND space_id=#{spaceId}
     </update>
 
@@ -67,4 +67,15 @@
         WHERE space_id=#{spaceId} AND user_nickname=#{userNickname}
     </select>
 
+    <delete id="deleteByUserId">
+        DELETE FROM space_users
+        WHERE user_id = #{userId}
+    </delete>
+
+    <!-- userId 를 사용하여 해당 유저가 방장으로 있는 스페이스의 고유 번호를 조회한다. -->
+    <select id="selectSpaceId" resultType="long">
+        SELECT space_id
+        FROM space_users
+        WHERE user_id = #{userId} AND user_admin_yn = TRUE
+    </select>
 </mapper>

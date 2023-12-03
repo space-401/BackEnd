@@ -1,5 +1,7 @@
 package com.app.kkiri.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -110,6 +112,14 @@ public class UserService {
 		Long userId = jwtTokenProvider.getUserIdByToken(reissuedAccessToken);
 
 		usersDAO.setAccessToken(userId, reissuedAccessToken);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteUser(HttpServletRequest httpServletRequest) {
+
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+
+		usersDAO.deleteUser(userId);
 	}
 }
 

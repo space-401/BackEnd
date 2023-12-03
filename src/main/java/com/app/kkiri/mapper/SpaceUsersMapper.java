@@ -30,7 +30,7 @@ public interface SpaceUsersMapper {
 	public void update(SpaceUserVO spaceUserVO);
 
 	// 일반 회원으로 변경
-	public void updateByAdminYn(Long spaceId);
+	public void updateByAdminYn(Long userId, Long spaceId);
 
 	// 방장 권한 부여
 	public void updateByUserId(Long spaceId, Long userId);
@@ -38,5 +38,9 @@ public interface SpaceUsersMapper {
 	// 스페이스 닉네임 중복 체크
 	public int selectByNickname(Long spaceId, String userNickname);
 
+	// userId 를 사용한 스페이스 회원 삭제
+	public void deleteByUserId(Long userId);
 
+	// userId 를 사용하여 해당 유저가 방장으로 있는 스페이스의 고유 번호를 조회
+	public List<Long> selectSpaceId(Long userId);
 }

@@ -79,7 +79,7 @@ public class SpaceController {
 	@GetMapping("/list")
 	public ResponseEntity<Map<String, Object>> list(HttpServletRequest request){
 
-		Long userId = jwtTokenProvider.getUserIdByHeader(request);
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("spaceList", spaceService.list(userId));
@@ -91,7 +91,7 @@ public class SpaceController {
 	@GetMapping("")
 	public ResponseEntity<?> spaceDetail(@RequestParam Long spaceId, HttpServletRequest request){
 
-		Long userId = jwtTokenProvider.getUserIdByHeader(request);
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		SpaceDetailDTO spaceDetailDTO = spaceService.spaceDetail(spaceId, userId);
 
@@ -106,7 +106,7 @@ public class SpaceController {
 		HttpServletRequest request) throws IOException {
 		LOGGER.info("[register()] param spaceDTO : {}, multipartFile : {}", spaceDTO, multipartFile);
 
-		Long userId = jwtTokenProvider.getUserIdByHeader(request);
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		SpaceVO spaceVO = new SpaceVO();
 		spaceVO.setSpaceName(spaceDTO.getSpaceName());
@@ -289,7 +289,7 @@ public class SpaceController {
 	public ResponseEntity<Map<String, Object>> enterSpace(@RequestBody SpaceVO spaceVO, HttpServletRequest request){
 		LOGGER.info("[enterSpace] param spaceVO : {}, request : {}", spaceVO, request);
 
-		Long userId = jwtTokenProvider.getUserIdByHeader(request);
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 		Long spaceId = spaceService.enter(userId, spaceVO);
 
 		Map<String, Object> map = new HashMap<>();
@@ -316,13 +316,15 @@ public class SpaceController {
 		HttpServletRequest request) throws IOException {
 		LOGGER.info("[modifyInfo()] spaceUserDTO : {}, multipartFile : {}, request : {}", spaceUserDTO, multipartFile, request);
 
-		Long userId = jwtTokenProvider.getUserIdByHeader(request);
+		Long originalAdminUserId = jwtTokenProvider.getUserIdByHttpRequest(request);
+		Long newAdminUserId = spaceUserDTO.getUserId();
+		Long spaceId = spaceUserDTO.getSpaceId();
+
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
-		spaceUserVO.setUserId(userId);
-		spaceUserDTO.setUserId(userId);
+		spaceUserVO.setUserId(originalAdminUserId);
 
 		if(spaceUserDTO.getIsAdmin()) { // 방장 변경
-			spaceService.modifyStatus(spaceUserDTO.getSpaceId(), spaceUserDTO.getUserId());
+			spaceService.modifyStatus(originalAdminUserId, newAdminUserId, spaceId);
 		} else { // 스페이스 유저 정보 수정
 			if(!multipartFile.isEmpty()){ // 유저 프로필 이미지 변경 시
 				StringBuffer uploadPath = new StringBuffer();
@@ -357,9 +359,8 @@ public class SpaceController {
 				spaceUserVO.setProfileImgSize(0L); // 0L
 			}
 
-			spaceUserVO.setSpaceId(spaceUserDTO.getSpaceId());
+			spaceUserVO.setSpaceId(spaceId);
 			spaceUserVO.setUserNickname(spaceUserDTO.getUserNickname());
-			LOGGER.info("[modifyInfo()] spaceUserVO : {}", spaceUserVO);
 
 			spaceService.modifyInfo(spaceUserVO);
 		}
@@ -372,7 +373,7 @@ public class SpaceController {
 	public ResponseEntity<PostFilterResponseDTO> filter(
 			@RequestBody(required = false) PostFilterValueDTO searchValue,
 			HttpServletRequest request){
-		Long id = jwtTokenProvider.getUserIdByHeader(request);
+		Long id = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		LOGGER.info("[filter()] searchValue : {}", searchValue);
 
