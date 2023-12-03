@@ -12,7 +12,7 @@
     </select>
 
     <select id="selectById" resultType="spaceVO">
-        SELECT space_name, space_description, space_icon_path, space_pw
+        SELECT space_name, space_description, space_icon_path, space_pw, space_code
         FROM spaces
         WHERE space_id=#{spaceId}
     </select>

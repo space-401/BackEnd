@@ -16,6 +16,7 @@ public class SpaceDetailDTO {
     private String spaceDescription;
     private String imgUrl;
     private String spacePw;
+    private String spaceCode;
     private int isAdmin;
     private int isFirst;
     private List<SpaceUserRespnseDTO> userList;
