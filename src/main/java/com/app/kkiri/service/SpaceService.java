@@ -8,6 +8,9 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
+import com.app.kkiri.domain.vo.UserVO;
+import com.app.kkiri.repository.UsersDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,7 @@ public class SpaceService {
 	private final SpaceUsersDAO spaceUsersDAO;
 	private final TagsDAO tagsDAO;
 	private final FileService fileService;
+	private final UsersDAO usersDAO;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final Logger LOGGER = LoggerFactory.getLogger(SpaceService.class);
 
@@ -90,7 +94,16 @@ public class SpaceService {
 		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
 		spaceDetailDTO.setSpaceCode(spaceVO.getSpaceCode());
 		spaceDetailDTO.setIsAdmin(spaceUsersDAO.findByUserAdminYn(spaceId, userId));
-		spaceDetailDTO.setIsFirst(spaceUsersDAO.findByFirst(spaceId, userId) == 0 ? 1 : 0);
+
+		// isFirst인지 체크하는 로직
+		// 처음인 경우 1, 처음이 아닌 경우 0
+		SpaceUserVO spaceUserVO = spaceUsersDAO.findById(spaceId, userId);
+		UserResponseDTO userResponseDTO = usersDAO.findById(userId);
+
+		LOGGER.info("[spaceDetail()] spaceUserVO : {}", spaceUserVO);
+		LOGGER.info("[spaceDetail()] userResponseDTO : {}", userResponseDTO);
+
+		spaceDetailDTO.setIsFirst(spaceUserVO.getUserNickname().toString().equals(userResponseDTO.getUserEmail().toString()) ?  1 : 0);
 
 		List<SpaceVO> spaces = spacesDAO.findAll(userId);
 		for (SpaceVO space:spaces) {
@@ -197,6 +210,7 @@ public class SpaceService {
 			SpaceUserVO spaceUserVO = new SpaceUserVO();
 			spaceUserVO.createNormal(userId);
 			spaceUserVO.setSpaceId(spaceId);
+			spaceUserVO.setUserNickname(usersDAO.findById(userId).getUserEmail());
 			spaceUsersDAO.save(spaceUserVO);
 			spacesDAO.setTally(spaceId,spacesDAO.getTally(spaceId) + 1);
 		}
