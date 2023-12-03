@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.app.kkiri.global.exception.AuthException;
-import com.app.kkiri.service.UserService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -95,7 +94,7 @@ public class JwtTokenProvider {
 	}
 
 	// 헤더에서 회원 고유 번호 추출
-	public Long getUserIdByHeader(HttpServletRequest httpServletRequest) {
+	public Long getUserIdByHttpRequest(HttpServletRequest httpServletRequest) {
 
 		String token = resolveToken(httpServletRequest);
 

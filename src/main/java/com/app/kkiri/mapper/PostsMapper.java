@@ -27,4 +27,7 @@ public interface PostsMapper {
 
     // 필터된 게시글 총 개수
     public int getTotal(Map<String, Object> param);
+
+    // userId 를 사용하여 post 를 삭제
+    public void deleteByUserId(Long userId);
 }

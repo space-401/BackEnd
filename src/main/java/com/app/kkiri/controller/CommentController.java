@@ -33,7 +33,7 @@ public class CommentController {
     @PostMapping("")
     // 댓글 추가
     public ResponseEntity<?> insert(@RequestBody CommentVO commentVO, HttpServletRequest request) {
-        Long userId = jwtTokenProvider.getUserIdByHeader(request);
+        Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
         commentVO.setUserId(userId);
         commentService.register(commentVO);
         return new ResponseEntity<>(HttpStatus.OK);

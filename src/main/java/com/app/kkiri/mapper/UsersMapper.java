@@ -27,4 +27,7 @@ public interface UsersMapper {
 	// 엑세스 토큰과 리프레쉬 토큰 재발급 후 수정
 	void updateAccessTokenAndRefreshToken(Long userId, String accessToken, String refreshToken);
 
+	// 회원 탈퇴
+	void updateUserStatus(Long userId);
+
 }

@@ -15,8 +15,6 @@ public class IndexController {
 	@GetMapping("/")
 	public ResponseEntity<Map<String, Object>> index() {
 
-		Gson gson = new Gson();
-
 		Map<String, Object> map = new HashMap<>();
 		map.put("message", "랜딩 페이지를 요청합니다");
 
