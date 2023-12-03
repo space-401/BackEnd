@@ -51,8 +51,7 @@ public class UserController {
 	@GetMapping("/mypage")
 	public ResponseEntity<?> mypage(HttpServletRequest request) {
 
-//		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
-		Long userId = 1L;
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		UserMypageResponseDTO userMypageResponseDTO = userService.searchMypage(userId);
 
