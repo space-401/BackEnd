@@ -33,4 +33,7 @@ public interface SpacesMapper {
 
 	// 스페이스 인원 업데이트
 	public void updateTally(Long spaceId, int spaceUserTally);
+
+	// userId 로 스페이스 삭제
+	public void deleteByUserId(Long userId);
 }

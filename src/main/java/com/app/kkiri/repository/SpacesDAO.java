@@ -41,4 +41,9 @@ public class SpacesDAO {
 	// 스페이스 인원 업데이트
 	public void setTally(Long spaceId, int spaceUserTally){ spacesMapper.updateTally(spaceId, spaceUserTally); }
 
+	// userId 로 스페이스 삭제
+	public void deleteByUserId(Long userId) {
+		spacesMapper.deleteByUserId(userId);
+	}
+
 }

@@ -240,14 +240,29 @@ public class SpaceService {
 	@Transactional(rollbackFor = Exception.class)
 	public void deleteSpaceUser(HttpServletRequest httpServletRequest) {
 
-		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+		Long userId = getUserId(httpServletRequest);
 
-		List<Long> spaceIds = spaceUsersDAO.findBySpaceIdAndUserAdminYnTrue(userId);
+		List<Long> spaceIds = spaceUsersDAO.findSpaceIdByUserIdAndUserAdminYnTrue(userId);
 
-		if(spaceIds.size() != 0) {
-			throw new BadRequestException(FAIL_TO_DELETE_USER);
+		if(spaceIds.size() != 0) { // 방장인 경우
+			for (Long spaceId : spaceIds) { // 방장인 스페이스를 순회한다
+				if(spacesDAO.getTally(spaceId) != 1) { // 스페이스에 방장 혼자만 가입된 경우가 아니라면
+					throw new BadRequestException(FAIL_TO_DELETE_USER); // 방장은 탈퇴 할 수 없다.
+				}
+			}
 		}
 
 		spaceUsersDAO.deleteByUserId(userId);
+	}
+
+	// userId 를 사용한 스페이스 회원 삭제
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteSpace(HttpServletRequest httpServletRequest) {
+
+		spacesDAO.deleteByUserId(getUserId(httpServletRequest));
+	}
+
+	private Long getUserId(HttpServletRequest httpServletRequest) {
+		return jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
 	}
 }
