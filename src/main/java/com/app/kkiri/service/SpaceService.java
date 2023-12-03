@@ -104,23 +104,21 @@ public class SpaceService {
 		LOGGER.info("[spaceDetail()] userResponseDTO : {}", userResponseDTO);
 
 		spaceDetailDTO.setIsFirst(spaceUserVO.getUserNickname().toString().equals(userResponseDTO.getUserEmail().toString()) ?  1 : 0);
+		
+		List<SpaceUserVO> userList = spaceUsersDAO.findAll(spaceId, userId);
+		List<SpaceUserResponseDTO> spaceUserResponseDTOList = new ArrayList<>();
 
-		List<SpaceVO> spaces = spacesDAO.findAll(userId);
-		for (SpaceVO space:spaces) {
-			List<SpaceUserVO> userList = spaceUsersDAO.findAll(space.getSpaceId(), userId);
-			List<SpaceUserResponseDTO> spaceUserResponseDTOList = new ArrayList<>();
+		for (SpaceUserVO user:userList) {
+			SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+			spaceUserResponseDTO.setUserId(user.getUserId());
+			spaceUserResponseDTO.setUserName(user.getUserNickname());
+			spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
-			for (SpaceUserVO user:userList) {
-				SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
-				spaceUserResponseDTO.setUserId(user.getUserId());
-				spaceUserResponseDTO.setUserName(user.getUserNickname());
-				spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
-
-				spaceUserResponseDTOList.add(spaceUserResponseDTO);
-			}
-
-			spaceDetailDTO.setUserList(spaceUserResponseDTOList);
+			spaceUserResponseDTOList.add(spaceUserResponseDTO);
 		}
+
+		spaceDetailDTO.setUserList(spaceUserResponseDTOList);
+//		}
 
 		List<TagVO> tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
 		List<TagDTO> tagList = new ArrayList<>();
