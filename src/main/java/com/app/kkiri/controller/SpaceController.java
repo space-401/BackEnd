@@ -82,7 +82,6 @@ public class SpaceController {
 	// 목록 조회
 	@GetMapping("/list")
 	public ResponseEntity<Map<String, Object>> list(HttpServletRequest request){
-
 		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		Map<String, Object> map = new HashMap<>();
@@ -94,11 +93,8 @@ public class SpaceController {
 	// 스페이스 상세 조회
 	@GetMapping("")
 	public ResponseEntity<?> spaceDetail(@RequestParam Long spaceId, HttpServletRequest request){
-
 		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
-
 		SpaceDetailDTO spaceDetailDTO = spaceService.spaceDetail(spaceId, userId);
-
 		return ResponseEntity.ok().body(spaceDetailDTO);
 	}
 
@@ -109,7 +105,6 @@ public class SpaceController {
 		@RequestPart(required = false, value = "imgUrl") MultipartFile multipartFile,
 		HttpServletRequest request) throws IOException {
 		LOGGER.info("[register()] param spaceDTO : {}, multipartFile : {}", spaceDTO, multipartFile);
-		
 		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
 		UserResponseDTO userResponseDTO = userService.search(userId);
 
