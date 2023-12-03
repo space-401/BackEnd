@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.app.kkiri.domain.dto.PostFilterValueDTO;
 import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.service.UserService;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -373,32 +374,38 @@ public class SpaceController {
 	}
 
 	// 게시글 필터 조회
-	@GetMapping(value = "/search")
+	@PostMapping(value = "/search")
 	public ResponseEntity<PostFilterResponseDTO> filter(
-			@RequestParam(required = false) Map<String, Object> searchValue,
+			@RequestBody(required = false) PostFilterValueDTO searchValue,
 			HttpServletRequest request){
 		Long id = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		LOGGER.info("[filter()] searchValue : {}", searchValue);
 
-		Map<String, Object> param = searchValue;
+		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
-		if(searchValue.get("startDate") != null && searchValue.get("endDate") !=null){
-			LocalDate start = LocalDate.parse(searchValue.get("startDate").toString(), formatter);
-			LocalDate end = LocalDate.parse(searchValue.get("endDate").toString(), formatter);
+		param.put("spaceId", searchValue.getSpaceId());
+		param.put("page", searchValue.getPage());
+		param.put("writers", searchValue.getUserId());
+		param.put("tags", searchValue.getTagId());
+		param.put("keyword", searchValue.getKeyword());
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		if(searchValue.getStartDate() != null && searchValue.getEndDate() !=null){
+			LocalDate start = LocalDate.parse(searchValue.getStartDate(), formatter);
+			LocalDate end = LocalDate.parse(searchValue.getEndDate(), formatter);
 
 			Long numOfDaysBetween = ChronoUnit.DAYS.between(start, end);
 			dateList = IntStream.iterate(0, i -> i + 1)
 			.limit(numOfDaysBetween)
 			.mapToObj(i -> start.plusDays(i))
 			.collect(Collectors.toList());
-		} else if (searchValue.get("startDate") != null) {
-			dateList.add(LocalDate.parse(searchValue.get("startDate").toString(), formatter));
-		} else if(searchValue.get("endDate").toString() != null){
-			dateList.add(LocalDate.parse(searchValue.get("endDate").toString(), formatter));
+		} else if (searchValue.getStartDate() != null) {
+			dateList.add(LocalDate.parse(searchValue.getStartDate(), formatter));
+		} else if(searchValue.getEndDate() != null){
+			dateList.add(LocalDate.parse(searchValue.getEndDate(), formatter));
 		}
 
 		param.put("dateList", dateList);
