@@ -47,7 +47,7 @@ public class PostService {
     private final PostTagsDAO postTagsDAO;
     private final PostBookmarksDAO postBookmarksDAO;
     private final MentionDAO mentionDAO;
-    private final SpaceUsersDAO  spaceUsersDAO;
+    private final SpaceUsersDAO spaceUsersDAO;
     private final CommentsDAO commentsDAO;
     private final FileService fileService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -231,7 +231,7 @@ public class PostService {
                 for (TagVO tag:tagVOList) {
                     TagDTO tagDTO = new TagDTO();
                     tagDTO.setTagId(tag.getTagId());
-                    tagDTO.setTagTitle(tag.getTagName());
+                    tagDTO.setTagName(tag.getTagName());
 
                     tagList.add(tagDTO);
                 }
@@ -254,10 +254,11 @@ public class PostService {
             }
 
             postFilterResponseDTO.setPostList(postList);
+            LOGGER.info("[filter()] Amount : {}", param.get("amount"));
             postFilterResponseDTO.setItemLength((Integer)param.get("amount"));
             postFilterResponseDTO.setTotal(postsDAO.getTotal(param));
             LOGGER.info("[filter()] Page : {}", param.get("page"));
-//            postFilterResponseDTO.setPage((Integer)param.get("page"));
+            postFilterResponseDTO.setPage((Integer)param.get("page"));
             LOGGER.info("[filter()] postFilterResponseDTO : {}", postFilterResponseDTO);
 
             return postFilterResponseDTO;
