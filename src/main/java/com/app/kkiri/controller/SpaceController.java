@@ -19,6 +19,8 @@ import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.app.kkiri.domain.dto.PostFilterValueDTO;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
+import com.app.kkiri.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,6 +67,7 @@ public class SpaceController {
 	private final PostService postService;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final FileService fileService;
+	private final UserService userService;
 
 	@Value("${file.rootPath.space}")
 	private String spaceRootPath;
@@ -105,8 +108,9 @@ public class SpaceController {
 		@RequestPart(required = false, value = "imgUrl") MultipartFile multipartFile,
 		HttpServletRequest request) throws IOException {
 		LOGGER.info("[register()] param spaceDTO : {}, multipartFile : {}", spaceDTO, multipartFile);
-
+		
 		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
+		UserResponseDTO userResponseDTO = userService.search(userId);
 
 		SpaceVO spaceVO = new SpaceVO();
 		spaceVO.setSpaceName(spaceDTO.getSpaceName());
@@ -158,7 +162,7 @@ public class SpaceController {
 		SpaceUserVO spaceUserVO = new SpaceUserVO();
 		spaceUserVO.setUserId(userId);
 		spaceUserVO.setUserAdminYn(true);
-		spaceUserVO.setUserNickname("default");
+		spaceUserVO.setUserNickname(userResponseDTO.getUserEmail());
 		spaceUserVO.setProfileImgName("defaultProfile.png");
 		spaceUserVO.setProfileImgPath("upload/default/defaultProfile.png");
 		spaceUserVO.setProfileImgUuid("default");
@@ -369,37 +373,32 @@ public class SpaceController {
 	}
 
 	// 게시글 필터 조회
-	@PostMapping(value = "/search")
+	@GetMapping(value = "/search")
 	public ResponseEntity<PostFilterResponseDTO> filter(
-			@RequestBody(required = false) PostFilterValueDTO searchValue,
+			@RequestParam(required = false) Map<String, Object> searchValue,
 			HttpServletRequest request){
 		Long id = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		LOGGER.info("[filter()] searchValue : {}", searchValue);
 
-		Map<String, Object> param = new HashMap<>();
+		Map<String, Object> param = searchValue;
 		List<LocalDate> dateList = new ArrayList<>();
 		int amount = 10;
-		param.put("spaceId", searchValue.getSpaceId());
-		param.put("page", searchValue.getPage());
-		param.put("writers", searchValue.getUserId());
-		param.put("tags", searchValue.getTagId());
-		param.put("keyword", searchValue.getKeyword());
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
-		if(searchValue.getStartDate() != null && searchValue.getEndDate() !=null){
-			LocalDate start = LocalDate.parse(searchValue.getStartDate(), formatter);
-			LocalDate end = LocalDate.parse(searchValue.getEndDate(), formatter);
+		if(searchValue.get("startDate") != null && searchValue.get("endDate") !=null){
+			LocalDate start = LocalDate.parse(searchValue.get("startDate").toString(), formatter);
+			LocalDate end = LocalDate.parse(searchValue.get("endDate").toString(), formatter);
 
 			Long numOfDaysBetween = ChronoUnit.DAYS.between(start, end);
 			dateList = IntStream.iterate(0, i -> i + 1)
 			.limit(numOfDaysBetween)
 			.mapToObj(i -> start.plusDays(i))
 			.collect(Collectors.toList());
-		} else if (searchValue.getStartDate() != null) {
-			dateList.add(LocalDate.parse(searchValue.getStartDate(), formatter));
-		} else if(searchValue.getEndDate() != null){
-			dateList.add(LocalDate.parse(searchValue.getEndDate(), formatter));
+		} else if (searchValue.get("startDate") != null) {
+			dateList.add(LocalDate.parse(searchValue.get("startDate").toString(), formatter));
+		} else if(searchValue.get("startDate").toString() != null){
+			dateList.add(LocalDate.parse(searchValue.get("endDate").toString(), formatter));
 		}
 
 		param.put("dateList", dateList);
