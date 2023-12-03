@@ -368,7 +368,7 @@ public class SpaceController {
 	}
 
 	// 게시글 필터 조회
-	@PostMapping(value = "/search", consumes = {MediaType.APPLICATION_JSON_VALUE})
+	@PostMapping(value = "/search")
 	public ResponseEntity<PostFilterResponseDTO> filter(
 			@RequestBody(required = false) PostFilterValueDTO searchValue,
 			HttpServletRequest request){
