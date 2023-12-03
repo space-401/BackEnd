@@ -397,7 +397,7 @@ public class SpaceController {
 			.collect(Collectors.toList());
 		} else if (searchValue.get("startDate") != null) {
 			dateList.add(LocalDate.parse(searchValue.get("startDate").toString(), formatter));
-		} else if(searchValue.get("startDate").toString() != null){
+		} else if(searchValue.get("endDate").toString() != null){
 			dateList.add(LocalDate.parse(searchValue.get("endDate").toString(), formatter));
 		}
 
