@@ -50,9 +50,10 @@ public class UserController {
 	@DeleteMapping("")
 	public ResponseEntity<?> deleteUser(HttpServletRequest httpServletRequest) {
 
-		userService.deleteUser(httpServletRequest);
-		spaceService.deleteSpaceUser(httpServletRequest);
 		postService.deleteByUserId(httpServletRequest);
+		spaceService.deleteSpace(httpServletRequest);
+		spaceService.deleteSpaceUser(httpServletRequest);
+		userService.deleteUser(httpServletRequest);
 
 		return ResponseEntity.noContent().build();
 	}
