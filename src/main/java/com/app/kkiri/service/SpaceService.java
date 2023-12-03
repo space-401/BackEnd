@@ -113,7 +113,7 @@ public class SpaceService {
 		for (TagVO tag:tags) {
 			TagDTO tagDTO = new TagDTO();
 			tagDTO.setTagId(tag.getTagId());
-			tagDTO.setTagTitle(tag.getTagName());
+			tagDTO.setTagName(tag.getTagName());
 
 			tagList.add(tagDTO);
 		}

@@ -378,7 +378,8 @@ public class SpaceController {
 	public ResponseEntity<PostFilterResponseDTO> filter(
 			@RequestBody(required = false) PostFilterValueDTO data,
 			HttpServletRequest request){
-		Long id = jwtTokenProvider.getUserIdByHttpRequest(request);
+		Long id = 1L;
+//		Long id = jwtTokenProvider.getUserIdByHttpRequest(request);
 
 		LOGGER.info("[filter()] searchValue : {}", data);
 
@@ -387,7 +388,7 @@ public class SpaceController {
 		int amount = 10;
 
 		param.put("spaceId", data.getSpaceId());
-		param.put("page", data.getPage());
+		param.put("page", data.getPage().intValue());
 		param.put("writers", data.getUserId());
 		param.put("tags", data.getTagId());
 		param.put("keyword", data.getKeyword());
