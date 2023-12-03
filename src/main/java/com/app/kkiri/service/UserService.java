@@ -2,6 +2,8 @@ package com.app.kkiri.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
+import com.app.kkiri.domain.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -33,6 +35,19 @@ public class UserService {
 	@Transactional(rollbackFor = Exception.class)
 	public UserResponseDTO search(Long userId) {
 		return usersDAO.findById(userId);
+	}
+
+	// userId를 사용하여 마이페이지 내 정보 조회
+	@Transactional(rollbackFor = Exception.class)
+	public UserMypageResponseDTO searchMypage(Long userId) {
+		UserResponseDTO userResponseDTO = usersDAO.findById(userId);
+
+		UserMypageResponseDTO userMypageResponseDTO = UserMypageResponseDTO.builder()
+				.socialType(userResponseDTO.getSocialType())
+				.email(userResponseDTO.getUserEmail())
+				.build();
+
+		return userMypageResponseDTO;
 	}
 
 	// 회원 가입 및 로그인

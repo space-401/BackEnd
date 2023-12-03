@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,17 @@ public class UserController {
 		map.put("newAccessToken", reissuedAccessToken);
 
 		return ResponseEntity.ok().body(map);
+	}
+
+	@GetMapping("/mypage")
+	public ResponseEntity<?> mypage(HttpServletRequest request) {
+
+//		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
+		Long userId = 1L;
+
+		UserMypageResponseDTO userMypageResponseDTO = userService.searchMypage(userId);
+
+		return ResponseEntity.ok().body(userMypageResponseDTO);
 	}
 
 	@DeleteMapping("")
