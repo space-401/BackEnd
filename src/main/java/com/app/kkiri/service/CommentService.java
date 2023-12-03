@@ -1,7 +1,6 @@
 package com.app.kkiri.service;
 
 import com.app.kkiri.global.exception.ExceptionCode;
-import com.app.kkiri.global.exception.ExceptionCode.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.response.CommentResponseDTO;
-import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.global.exception.BadRequestException;
@@ -64,7 +63,7 @@ public class CommentService {
             commentResponseDTO.setRefId(comment.getCommentGroup());
 
             SpaceUserVO userVO = spaceUsersDAO.findById(spaceId, comment.getUserId());
-            SpaceUserRespnseDTO user = new SpaceUserRespnseDTO();
+            SpaceUserResponseDTO user = new SpaceUserResponseDTO();
             user.setUserId(userVO.getUserId());
             user.setUserName(userVO.getUserNickname());
             user.setImgUrl(userVO.getProfileImgPath());

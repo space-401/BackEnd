@@ -43,4 +43,7 @@ public interface SpaceUsersMapper {
 
 	// userId 를 사용하여 해당 유저가 방장으로 있는 스페이스의 고유 번호를 조회
 	public List<Long> selectSpaceId(Long userId);
+
+	// postId 를 사용하여 해당 게시글을 작성한 사용자의 userNickname 을 조회
+	public String selectUserNicknameByPostId(Long postId);
 }

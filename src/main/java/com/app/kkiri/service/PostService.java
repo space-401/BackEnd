@@ -15,11 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.PostDateDTO;
+import com.app.kkiri.domain.dto.response.PostBookmarkResponseDTO;
 import com.app.kkiri.domain.dto.response.PostDetailResponseDTO;
 import com.app.kkiri.domain.dto.PostFilterDTO;
 import com.app.kkiri.domain.dto.response.PostFilterResponseDTO;
 import com.app.kkiri.domain.dto.PostPositionDTO;
-import com.app.kkiri.domain.dto.response.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.response.PostResponseDTO;
+import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.domain.vo.PostVO;
@@ -145,27 +147,27 @@ public class PostService {
         postDetailResponseDTO.setImgsUrl(fileURIs);
 
         List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId, spaceId);
-        List<SpaceUserRespnseDTO> selectedUserList = new ArrayList<>();
+        List<SpaceUserResponseDTO> selectedUserList = new ArrayList<>();
         for (SpaceUserVO user:selectedUsers) {
-            SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-            spaceUserRespnseDTO.setUserId(user.getUserId());
-            spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+            SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+            spaceUserResponseDTO.setUserId(user.getUserId());
+            spaceUserResponseDTO.setUserName(user.getUserNickname());
+            spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
-            selectedUserList.add(spaceUserRespnseDTO);
+            selectedUserList.add(spaceUserResponseDTO);
         }
 
         postDetailResponseDTO.setSelectedUsers(selectedUserList);
 
         List<SpaceUserVO> users = spaceUsersDAO.findAll(spaceId, userId);
-        List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+        List<SpaceUserResponseDTO> userList = new ArrayList<>();
         for (SpaceUserVO user:users) {
-            SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-            spaceUserRespnseDTO.setUserId(user.getUserId());
-            spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+            SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+            spaceUserResponseDTO.setUserId(user.getUserId());
+            spaceUserResponseDTO.setUserName(user.getUserNickname());
+            spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
-            userList.add(spaceUserRespnseDTO);
+            userList.add(spaceUserResponseDTO);
         }
         postDetailResponseDTO.setUserList(userList);
 
@@ -181,7 +183,7 @@ public class PostService {
 //        }
 //        postDetailResponseDTO.setSelectedTags(tagList);
         postDetailResponseDTO.setSelectedTags(postTagsDAO.findById(postId));
-        postDetailResponseDTO.setCommentConut(commentsDAO.getTotal(postId));
+        postDetailResponseDTO.setCommentCount(commentsDAO.getTotal(postId));
         LOGGER.info("[postDetail()] postDetailResponseDTO : {}", postDetailResponseDTO);
 
         return postDetailResponseDTO;
@@ -239,14 +241,14 @@ public class PostService {
                 postFilterDTO.setSelectedTags(tagList);
 
                 List<SpaceUserVO> users = spaceUsersDAO.findAll((Long)param.get("spaceId"), userId);
-                List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+                List<SpaceUserResponseDTO> userList = new ArrayList<>();
                 for (SpaceUserVO user:users) {
-                    SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-                    spaceUserRespnseDTO.setUserId(user.getUserId());
-                    spaceUserRespnseDTO.setUserName(user.getUserNickname());
-                    spaceUserRespnseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+                    SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+                    spaceUserResponseDTO.setUserId(user.getUserId());
+                    spaceUserResponseDTO.setUserName(user.getUserNickname());
+                    spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
 
-                    userList.add(spaceUserRespnseDTO);
+                    userList.add(spaceUserResponseDTO);
                 }
                 postFilterDTO.setUsersList(userList);
 
@@ -273,5 +275,36 @@ public class PostService {
         Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
 
         postsDAO.deleteByUserId(userId);
+    }
+
+    // 사용자가 북마크한 게시글 정보를 조회
+    public PostBookmarkResponseDTO findBookmarkedPostsByUserIdAndPage(Long userId, int page) {
+        int itemLength = 10;
+        Long startIndex = Long.valueOf((page - 1) * itemLength);
+        List<PostVO> selectedPosts = postsDAO.findBookmarkedPostsByUserIdAndPage(userId, startIndex);
+        Long total = postsDAO.countBookmarkedPostsByUserId(userId);
+
+        List<PostResponseDTO> postResponseDTOS = new ArrayList<>();
+        for(PostVO postVO : selectedPosts) {
+            PostResponseDTO postResponseDTO = PostResponseDTO.builder()
+                .postId(postVO.getPostId())
+                .postTitle(postVO.getPostTitle())
+                .postCommentCount(commentsDAO.getTotal(postVO.getPostId()))
+                .postCreatedAt(postVO.getPostRegisterDate())
+                .postWriterName(spaceUsersDAO.findUserNicknameByPostId(postVO.getPostId()))
+                .build();
+
+            postResponseDTOS.add(postResponseDTO);
+        }
+
+        PostBookmarkResponseDTO postBookmarkResponseDTO = PostBookmarkResponseDTO.builder()
+            .bookMarkList(postResponseDTOS)
+            .page(page)
+            .total(total)
+            .itemLength(itemLength)
+            .build();
+        LOGGER.info("[findBookmarkedPostsByUserIdAndPage()] postBookmarkResponseDTO : {}", postBookmarkResponseDTO);
+
+        return postBookmarkResponseDTO;
     }
 }

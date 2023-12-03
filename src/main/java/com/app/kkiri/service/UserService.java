@@ -46,6 +46,7 @@ public class UserService {
 				.socialType(userResponseDTO.getSocialType())
 				.email(userResponseDTO.getUserEmail())
 				.build();
+		LOGGER.info("[searchMypage()] userMypageResponseDTO : {}", userMypageResponseDTO);
 
 		return userMypageResponseDTO;
 	}

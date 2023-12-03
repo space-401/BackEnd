@@ -25,10 +25,10 @@ public class PostDetailResponseDTO {
     private String postCreatedAt;
     private String postUpdatedAt;
     private PostDateDTO date;
-    private Long commentConut;
+    private Long commentCount;
     private Boolean isBookmark;
-    private List<SpaceUserRespnseDTO> userList;
-    private List<SpaceUserRespnseDTO> selectedUsers;
+    private List<SpaceUserResponseDTO> userList;
+    private List<SpaceUserResponseDTO> selectedUsers;
     private List<TagVO> selectedTags;
     private List<String> imgsUrl;
 }

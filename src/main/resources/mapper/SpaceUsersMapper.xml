@@ -78,4 +78,14 @@
         FROM space_users
         WHERE user_id = #{userId} AND user_admin_yn = TRUE
     </select>
+
+    <!-- postId 를 사용하여 해당 게시글을 작성한 사용자의 userNickname 을 조회 -->
+    <select id="selectUserNicknameByPostId" resultType="string">
+        SELECT su.user_nickname
+        FROM space_users su
+        INNER JOIN posts p
+        ON su.user_id = p.user_id
+        AND su.space_id = p.space_id
+        WHERE p.post_id = #{postId}
+    </select>
 </mapper>
