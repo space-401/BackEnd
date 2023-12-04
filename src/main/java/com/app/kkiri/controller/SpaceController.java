@@ -393,9 +393,7 @@ public class SpaceController {
 		LocalDate start = data.getStartDate() != null ? LocalDate.parse(data.getStartDate(), formatter): null;
 		LocalDate end = data.getEndDate() != null ? LocalDate.parse(data.getEndDate(), formatter): null;
 
-		if(end == null){
-			dateList.add(start);
-		} else {
+		if(start != null && end != null){
 			LOGGER.info("[filter()] Start : {}", start);
 			LOGGER.info("[filter()] End : {}", end);
 			Long numOfDaysBetween = ChronoUnit.DAYS.between(start, end);
@@ -403,6 +401,8 @@ public class SpaceController {
 			.limit(numOfDaysBetween + 1L)
 			.mapToObj(i -> start.plusDays(i))
 			.collect(Collectors.toList());
+		} else if(start != null){
+			dateList.add(start);
 		}
 
 		LOGGER.info("[filter()] DateList : {}", dateList);

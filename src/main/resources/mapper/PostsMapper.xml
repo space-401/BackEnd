@@ -47,10 +47,10 @@
                     <foreach collection="dateList" item="date" index="index">
                         <choose>
                             <when test="index == 0">
-                                AND #{date} BETWEEN post_begin_date AND post_end_date
+                                AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
                             </when>
                             <when test="index != 0">
-                                OR #{date} BETWEEN post_begin_date AND post_end_date
+                                OR #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
                             </when>
                         </choose>
                     </foreach>
