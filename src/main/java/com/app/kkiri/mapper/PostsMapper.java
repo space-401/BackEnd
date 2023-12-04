@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.vo.PostVO;
+import com.app.kkiri.domain.vo.SpaceVO;
 
 @Mapper
 public interface PostsMapper {
@@ -34,6 +35,9 @@ public interface PostsMapper {
     // 사용자가 북마크한 게시글 정보를 조회
     public List<PostVO> selectBookmarkedPosts(Long userId, Long startIndex);
 
-    // 사용자가 북마크한 게시글의 수를 조회
-    public Long getTotalBookmarkedPosts(Long userId);
+    // userId 를 사용하여 사용자가 작성한 게시글 조회
+    public List<PostVO> selectByUserId(Long userId, Long startIndex);
+
+    // userId 를 사용하여 사용자가 작성한 게시글 수를 조회
+    public Long getTotalByUserId(Long userId);
 }

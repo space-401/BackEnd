@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.vo.PostVO;
+import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.mapper.PostsMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,13 @@ public class PostsDAO {
         return postsMapper.selectBookmarkedPosts(userId, startIndex);
     }
 
-    // 사용자가 북마크한 게시글의 수를 조회
-    public Long countBookmarkedPostsByUserId (Long userId) {
-        return postsMapper.getTotalBookmarkedPosts(userId);
+    // userId 를 사용하여 사용자가 작성한 게시글 조회
+    public List<PostVO> findByUserId(Long userId, Long startIndex) {
+        return postsMapper.selectByUserId(userId, startIndex);
+    }
+
+    // userId 를 사용하여 사용자가 작성한 게시글 수를 조회
+    public Long countByUserId(Long userId) {
+        return postsMapper.getTotalByUserId(userId);
     }
 }

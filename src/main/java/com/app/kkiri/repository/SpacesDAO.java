@@ -50,5 +50,4 @@ public class SpacesDAO {
 	public SpaceVO findBySpaceId(Long spaceId) {
 		return spacesMapper.selectBySpaceId(spaceId);
 	}
-
 }

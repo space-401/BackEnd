@@ -56,4 +56,9 @@ public class SpaceUsersDAO {
 		return spaceUsersMapper.selectUserNicknameByPostId(postId);
 	}
 
+	// postId 와 spaceId 를 사용하여 게시글에 맨션된 회원 정보를 조회-
+	public List<SpaceUserVO> findByPostIdAndSpaceId(Long postId, Long spaceId) {
+		return spaceUsersMapper.selectByPostIdAndSpaceId(postId, spaceId);
+	}
+
 }

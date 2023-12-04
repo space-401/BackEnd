@@ -1,21 +1,18 @@
 package com.app.kkiri.controller;
 
-import static org.springframework.http.HttpStatus.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.app.kkiri.domain.dto.response.PostBookmarkResponseDTO;
+import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.MyPostListResponseDTO;
 import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,9 +50,7 @@ public class UserController {
 	@GetMapping("/mypage")
 	public ResponseEntity<?> mypage(HttpServletRequest request) {
 
-		Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
-
-		UserMypageResponseDTO userMypageResponseDTO = userService.searchMypage(userId);
+		UserMypageResponseDTO userMypageResponseDTO = userService.searchMypage(jwtTokenProvider.getUserIdByHttpRequest(request));
 
 		return ResponseEntity.ok().body(userMypageResponseDTO);
 	}
@@ -63,19 +58,25 @@ public class UserController {
 	@DeleteMapping("")
 	public ResponseEntity<?> deleteUser(HttpServletRequest httpServletRequest) {
 
-		postService.deleteByUserId(httpServletRequest);
-		spaceService.deleteSpace(httpServletRequest);
-		spaceService.deleteSpaceUser(httpServletRequest);
-		userService.deleteUser(httpServletRequest);
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+
+		postService.deleteByUserId(userId);
+		spaceService.deleteSpace(userId);
+		spaceService.deleteSpaceUser(userId);
+		userService.deleteUser(userId);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/bookmark")
-	public ResponseEntity<PostBookmarkResponseDTO> bookmark(@RequestParam int page, HttpServletRequest httpServletRequest) {
+	public ResponseEntity<BookmarkedPostListResponseDTO> bookmark(@RequestParam int page, HttpServletRequest httpServletRequest) {
 
-		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+		return ResponseEntity.ok().body(userService.bookmarkList(jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest), page));
+	}
 
-		return ResponseEntity.ok().body(postService.findBookmarkedPostsByUserIdAndPage(userId, page));
+	@GetMapping("/mypost")
+	public ResponseEntity<MyPostListResponseDTO> mypost(@RequestParam int page, HttpServletRequest httpServletRequest) {
+
+		return ResponseEntity.ok().body(userService.myPostList(jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest), page));
 	}
 }

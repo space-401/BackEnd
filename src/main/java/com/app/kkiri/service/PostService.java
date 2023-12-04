@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.PostDateDTO;
-import com.app.kkiri.domain.dto.response.PostBookmarkResponseDTO;
+import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
 import com.app.kkiri.domain.dto.response.PostDetailResponseDTO;
 import com.app.kkiri.domain.dto.PostFilterDTO;
 import com.app.kkiri.domain.dto.response.PostFilterResponseDTO;
 import com.app.kkiri.domain.dto.PostPositionDTO;
-import com.app.kkiri.domain.dto.response.PostResponseDTO;
+import com.app.kkiri.domain.dto.response.BookmarkedPostResponseDTO;
 import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.vo.PostImgVO;
@@ -270,41 +270,8 @@ public class PostService {
     }
 
     // userId 를 사용하여 post 를 삭제
-    public void deleteByUserId(HttpServletRequest httpServletRequest) {
-
-        Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+    public void deleteByUserId(Long userId) {
 
         postsDAO.deleteByUserId(userId);
-    }
-
-    // 사용자가 북마크한 게시글 정보를 조회
-    public PostBookmarkResponseDTO findBookmarkedPostsByUserIdAndPage(Long userId, int page) {
-        int itemLength = 10;
-        Long startIndex = Long.valueOf((page - 1) * itemLength);
-        List<PostVO> selectedPosts = postsDAO.findBookmarkedPostsByUserIdAndPage(userId, startIndex);
-        Long total = postsDAO.countBookmarkedPostsByUserId(userId);
-
-        List<PostResponseDTO> postResponseDTOS = new ArrayList<>();
-        for(PostVO postVO : selectedPosts) {
-            PostResponseDTO postResponseDTO = PostResponseDTO.builder()
-                .postId(postVO.getPostId())
-                .postTitle(postVO.getPostTitle())
-                .postCommentCount(commentsDAO.getTotal(postVO.getPostId()))
-                .postCreatedAt(postVO.getPostRegisterDate())
-                .postWriterName(spaceUsersDAO.findUserNicknameByPostId(postVO.getPostId()))
-                .build();
-
-            postResponseDTOS.add(postResponseDTO);
-        }
-
-        PostBookmarkResponseDTO postBookmarkResponseDTO = PostBookmarkResponseDTO.builder()
-            .bookMarkList(postResponseDTOS)
-            .page(page)
-            .total(total)
-            .itemLength(itemLength)
-            .build();
-        LOGGER.info("[findBookmarkedPostsByUserIdAndPage()] postBookmarkResponseDTO : {}", postBookmarkResponseDTO);
-
-        return postBookmarkResponseDTO;
     }
 }

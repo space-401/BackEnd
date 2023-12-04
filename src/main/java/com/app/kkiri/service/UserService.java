@@ -1,9 +1,19 @@
 package com.app.kkiri.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.BookmarkedPostResponseDTO;
+import com.app.kkiri.domain.dto.response.MyPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.MyPostResponseDTO;
 import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
-import com.app.kkiri.domain.vo.UserVO;
+import com.app.kkiri.domain.dto.response.UserProfileResponseDTO;
+import com.app.kkiri.domain.vo.PostVO;
+import com.app.kkiri.domain.vo.SpaceUserVO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -15,6 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.UserDTO;
 import com.app.kkiri.domain.dto.response.UserResponseDTO;
+import com.app.kkiri.repository.CommentsDAO;
+import com.app.kkiri.repository.PostBookmarksDAO;
+import com.app.kkiri.repository.PostsDAO;
+import com.app.kkiri.repository.SpaceUsersDAO;
 import com.app.kkiri.repository.UsersDAO;
 import com.app.kkiri.security.enums.UserStatus;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
@@ -29,6 +43,10 @@ public class UserService {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 	private final UsersDAO usersDAO;
+	private final PostsDAO postsDAO;
+	private final CommentsDAO commentsDAO;
+	private final SpaceUsersDAO spaceUsersDAO;
+	private final PostBookmarksDAO postBookmarksDAO;
 	private final JwtTokenProvider jwtTokenProvider;
 
 	// userId 를 사용하여 회원 조회
@@ -131,41 +149,92 @@ public class UserService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void deleteUser(HttpServletRequest httpServletRequest) {
-
-		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+	public void deleteUser(Long userId) {
 
 		usersDAO.deleteUser(userId);
 	}
+
+
+	// 사용자가 북마크한 게시글 정보를 조회
+	@Transactional
+	public BookmarkedPostListResponseDTO bookmarkList(Long userId, int page) {
+
+		int itemLength = 10;
+		Long startIndex = Long.valueOf((page - 1) * itemLength);
+		List<PostVO> selectedPosts = postsDAO.findBookmarkedPostsByUserIdAndPage(userId, startIndex);
+		Long total = postBookmarksDAO.countByUserId(userId);
+
+		List<BookmarkedPostResponseDTO> postResponseDTOS = new ArrayList<>();
+		for(PostVO postVO : selectedPosts) {
+			BookmarkedPostResponseDTO postResponseDTO = BookmarkedPostResponseDTO.builder()
+				.postId(postVO.getPostId())
+				.postTitle(postVO.getPostTitle())
+				.postCommentCount(commentsDAO.getTotal(postVO.getPostId()))
+				.postCreatedAt(postVO.getPostRegisterDate())
+				.postWriterName(spaceUsersDAO.findUserNicknameByPostId(postVO.getPostId()))
+				.build();
+
+			postResponseDTOS.add(postResponseDTO);
+		}
+
+		BookmarkedPostListResponseDTO bookmarkedPostListResponseDTO = BookmarkedPostListResponseDTO.builder()
+			.bookMarkList(postResponseDTOS)
+			.page(page)
+			.total(total)
+			.itemLength(itemLength)
+			.build();
+		LOGGER.info("[findBookmarkedPostsByUserIdAndPage()] postBookmarkResponseDTO : {}",
+			bookmarkedPostListResponseDTO);
+
+		return bookmarkedPostListResponseDTO;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public MyPostListResponseDTO myPostList(Long userId, int page) {
+
+		int itemLength = 10;
+		Long startIndex = Long.valueOf ((page - 1) * itemLength);
+		Long total = postsDAO.countByUserId(userId);
+
+		List<MyPostResponseDTO> myPostList = new ArrayList<>();
+
+		// 페이징 처리 된 사용자가 작성한 게시글 리스트
+		List<PostVO> selectedPostList = postsDAO.findByUserId(userId, startIndex);
+		for(PostVO postVO : selectedPostList) {
+
+			// 게시글에 맨션된 사용자 리스트
+			List<SpaceUserVO> selectedUserList = spaceUsersDAO.findByPostIdAndSpaceId(postVO.getPostId(), postVO.getSpaceId());
+			List<UserProfileResponseDTO> selectedUserProfileList = new ArrayList<>();
+			selectedUserList.stream().forEach(spaceUserVO -> {
+				UserProfileResponseDTO userProfileResponseDTO = UserProfileResponseDTO.builder()
+					.userId(spaceUserVO.getUserId())
+					.userName(spaceUserVO.getUserNickname())
+					.imgUrl(spaceUserVO.getProfileImgPath())
+					.build();
+
+				selectedUserProfileList.add(userProfileResponseDTO);
+			});
+
+			MyPostResponseDTO myPostResponseDTO = MyPostResponseDTO.builder()
+				.spaceId(postVO.getSpaceId())
+				.postId(postVO.getPostId())
+				.postTitle(postVO.getPostTitle())
+				.postCreatedAt(postVO.getPostRegisterDate())
+				.postCommentCount(commentsDAO.getTotal(postVO.getPostId()))
+				.selectedUsers(selectedUserProfileList)
+				.build();
+
+			myPostList.add(myPostResponseDTO);
+		}
+
+		MyPostListResponseDTO myPostListResponseDTO = MyPostListResponseDTO.builder()
+			.myPostList(myPostList)
+			.page(page)
+			.total(total)
+			.itemLength(itemLength)
+			.build();
+		LOGGER.info("[myPostList()] myPostListResponseDTO : {}", myPostListResponseDTO);
+
+		return myPostListResponseDTO;
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

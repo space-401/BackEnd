@@ -88,4 +88,14 @@
         AND su.space_id = p.space_id
         WHERE p.post_id = #{postId}
     </select>
+
+    <!-- postId 와 spaceId 를 사용하여 게시글에 맨션된 회원 정보를 조회 -->
+    <select id="selectByPostIdAndSpaceId" resultType="spaceUserVO">
+        SELECT su.user_id, su.user_nickname, su.profile_img_path
+        FROM space_users su
+        INNER JOIN mention m
+        ON su.user_id = m.user_id
+        WHERE m.post_id = #{postId}
+        AND su.space_id = #{spaceId}
+    </select>
 </mapper>
