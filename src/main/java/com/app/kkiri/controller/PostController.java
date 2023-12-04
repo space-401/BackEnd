@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,52 +54,73 @@ public class PostController {
     @Value("${file.rootPath.post}")
     private String postRootPath;
 
+    @Value("${file.rootPath.default}")
+    private String defaultRootPath;
+
     // 게시글 작성
     @PostMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity register(
-        @RequestPart PostDTO postDTO,
-        @RequestPart("imgs") List<MultipartFile> multipartFiles,
+    public ResponseEntity register(@RequestPart PostDTO postDTO, @RequestPart("imgs") List<MultipartFile> multipartFiles,
         HttpServletRequest request) throws IOException{
-        LOGGER.info("[register()] param postDTO : {}, multipartFiles : {}, request : {}", postDTO, multipartFiles, request);
+        LOGGER.info("[register()] param postDTO : {}, multipartFiles.size() : {}", postDTO, multipartFiles.size());
+
+        boolean isEmpty = false;
+
+        for(MultipartFile multipartFile : multipartFiles) {
+            if(multipartFile.isEmpty()) {
+                isEmpty = true;
+            }
+        }
 
         Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
         postDTO.setUserId(userId);
 
-        StringBuffer uploadPath = new StringBuffer();
-        StringBuffer uploadFileName = new StringBuffer();
-        StringBuffer uploadFullPathAndFileName = new StringBuffer();
-
-        uploadPath.append(postRootPath); // upload/post
-        uploadPath.append("/");
-        uploadPath.append(getUploadPath()); // 2023/11/10
-
         List<PostImgVO> imgList = new ArrayList<>();
 
-        for (MultipartFile multipartFile : multipartFiles) {
-            PostImgVO postImgVO = new PostImgVO();
-
-            String uuid = UUID.randomUUID().toString();
-            String originalFileName = multipartFile.getOriginalFilename();
-
-            uploadFileName.append(uuid);
-            uploadFileName.append("_");
-            uploadFileName.append(originalFileName); // uuid_post.jpg
-
-            uploadFullPathAndFileName.append(uploadPath);
-            uploadFullPathAndFileName.append("/");
-            uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
-
-            fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
-
-            postImgVO.setPostImgName(originalFileName); // post.jpg
-            postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
-            postImgVO.setPostImgUuid(uuid); // uuid
-            postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
+        if(isEmpty) { // 사용자가 이미지를 선택하지 않은 경우 기본 이미지를 저장한다.
+            int defaultImgNumber = new Random().nextInt(3) + 10;
+            PostImgVO postImgVO = PostImgVO.builder()
+                .postImgName(defaultImgNumber + ".png") // 10.png
+                .postImgUuid("default") // default
+                .postImgPath(defaultRootPath + "/" + defaultImgNumber + ".png") // upload/default/10.png
+                .postImgSize(0L) // 0L
+                .build();
 
             imgList.add(postImgVO);
+        } else { // 사용자가 이미지를 선택한 경우
+            StringBuffer uploadPath = new StringBuffer();
+            StringBuffer uploadFileName = new StringBuffer();
+            StringBuffer uploadFullPathAndFileName = new StringBuffer();
 
-            uploadFileName.delete(0, uploadFileName.length());
-            uploadFullPathAndFileName.delete(0, uploadFullPathAndFileName.length());
+            uploadPath.append(postRootPath); // upload/post
+            uploadPath.append("/");
+            uploadPath.append(getUploadPath()); // 2023/11/10
+
+            for (MultipartFile multipartFile : multipartFiles) {
+                PostImgVO postImgVO = new PostImgVO();
+
+                String uuid = UUID.randomUUID().toString();
+                String originalFileName = multipartFile.getOriginalFilename();
+
+                uploadFileName.append(uuid);
+                uploadFileName.append("_");
+                uploadFileName.append(originalFileName); // uuid_post.jpg
+
+                uploadFullPathAndFileName.append(uploadPath);
+                uploadFullPathAndFileName.append("/");
+                uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
+
+                fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
+
+                postImgVO.setPostImgName(originalFileName); // post.jpg
+                postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
+                postImgVO.setPostImgUuid(uuid); // uuid
+                postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
+
+                imgList.add(postImgVO);
+
+                uploadFileName.delete(0, uploadFileName.length());
+                uploadFullPathAndFileName.delete(0, uploadFullPathAndFileName.length());
+            }
         }
 
         Map<String, Object> map = new HashMap<>();
@@ -122,43 +144,55 @@ public class PostController {
     public ResponseEntity modify(
         @RequestPart PostDTO postDTO,
         @RequestPart("imgs") List<MultipartFile> multipartFiles) throws IOException {
-        LOGGER.info("[modify()] param postDTO : {}, multipartFiles : {}", postDTO, multipartFiles);
+        LOGGER.info("[modify()] param postDTO : {}", postDTO);
 
-        StringBuffer uploadPath = new StringBuffer();
-        StringBuffer uploadFileName = new StringBuffer();
-        StringBuffer uploadFullPathAndFileName = new StringBuffer();
+        boolean isEmpty = false;
 
-        uploadPath.append(postRootPath); // upload/post
-        uploadPath.append("/");
-        uploadPath.append(getUploadPath()); // 2023/11/10
+        for(MultipartFile multipartFile : multipartFiles) {
+            if(multipartFile.isEmpty()) { // 사용자가 이미지 수정을 하지 않은 경우
+                isEmpty = true;
+            }
+        }
+
+        LOGGER.info("[modify()] isEmpty : {}", isEmpty);
 
         List<PostImgVO> imgList = new ArrayList<>();
 
-        for (MultipartFile multipartFile : multipartFiles) {
-            PostImgVO postImgVO = new PostImgVO();
+        if(!isEmpty) {
+            StringBuffer uploadPath = new StringBuffer();
+            StringBuffer uploadFileName = new StringBuffer();
+            StringBuffer uploadFullPathAndFileName = new StringBuffer();
 
-            String uuid = UUID.randomUUID().toString();
-            String originalFileName = multipartFile.getOriginalFilename();
+            uploadPath.append(postRootPath); // upload/post
+            uploadPath.append("/");
+            uploadPath.append(getUploadPath()); // 2023/11/10
 
-            uploadFileName.append(uuid);
-            uploadFileName.append("_");
-            uploadFileName.append(originalFileName); // uuid_post.jpg
+            for (MultipartFile multipartFile : multipartFiles) {
+                PostImgVO postImgVO = new PostImgVO();
 
-            uploadFullPathAndFileName.append(uploadPath);
-            uploadFullPathAndFileName.append("/");
-            uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
+                String uuid = UUID.randomUUID().toString();
+                String originalFileName = multipartFile.getOriginalFilename();
 
-            fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
+                uploadFileName.append(uuid);
+                uploadFileName.append("_");
+                uploadFileName.append(originalFileName); // uuid_post.jpg
 
-            postImgVO.setPostImgName(originalFileName); // post.jpg
-            postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
-            postImgVO.setPostImgUuid(uuid); // uuid
-            postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
+                uploadFullPathAndFileName.append(uploadPath);
+                uploadFullPathAndFileName.append("/");
+                uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
 
-            imgList.add(postImgVO);
+                fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
 
-            uploadFileName.delete(0, uploadFileName.length());
-            uploadFullPathAndFileName.delete(0, uploadFullPathAndFileName.length());
+                postImgVO.setPostImgName(originalFileName); // post.jpg
+                postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
+                postImgVO.setPostImgUuid(uuid); // uuid
+                postImgVO.setPostImgSize(multipartFile.getSize()); // ..byte
+
+                imgList.add(postImgVO);
+
+                uploadFileName.delete(0, uploadFileName.length());
+                uploadFullPathAndFileName.delete(0, uploadFullPathAndFileName.length());
+            }
         }
 
         postService.modify(postDTO, imgList);

@@ -12,9 +12,9 @@
     </select>
 
     <select id="selectById" resultType="spaceVO">
-        SELECT space_name, space_description, space_icon_path, space_pw, space_code
+        SELECT space_id, space_name, space_description, space_pw, space_user_tally, space_register_date, space_update_date, space_icon_name, space_icon_path, space_icon_uuid, space_icon_size, space_code
         FROM spaces
-        WHERE space_id=#{spaceId}
+        WHERE space_id = #{spaceId}
     </select>
 
     <select id="selectByCodeAndPw" resultType="Long">

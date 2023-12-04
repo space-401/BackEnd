@@ -54,15 +54,17 @@ public class PostService {
     @Transactional(rollbackFor = Exception.class)
     // 게시글 작성
     public Long register(PostDTO postDTO, List<PostImgVO> imgs){
+        LOGGER.info("[register()] param postDTO : {}", postDTO);
 
         postsDAO.save(postDTO);
-        Long postId = postDTO.getPostId();
-        LOGGER.info("[register()] postId : {}", postId);
 
+        Long postId = postDTO.getPostId();
         List<Long> tags = postDTO.getTags();
         List<Long> people = postDTO.getPeople();
 
         for (PostImgVO img : imgs) {
+            LOGGER.info("[register()] img : {}", img);
+
             img.setPostId(postId);
             postImgsDAO.save(img);
         }
@@ -89,21 +91,16 @@ public class PostService {
 
     // 게시글 수정
     @Transactional(rollbackFor = Exception.class)
-    public void modify(PostDTO postDTO, List<PostImgVO> imgs){
+    public void modify(PostDTO postDTO, List<PostImgVO> imgs) {
+        LOGGER.info("[modify()] param postDTO {}", postDTO);
 
         Long postId = postDTO.getPostId();
         List<Long> tags = postDTO.getTags();
         List<Long> people = postDTO.getPeople();
 
         postsDAO.set(postDTO);
-        postImgsDAO.delete(postId);
         postTagsDAO.delete(postId);
         mentionDAO.delete(postId);
-
-        for (PostImgVO img : imgs) {
-            img.setPostId(postId);
-            postImgsDAO.save(img);
-        }
 
         for (Long tag: tags) {
             postTagsDAO.save(postId, tag);
@@ -111,6 +108,15 @@ public class PostService {
 
         for (Long person: people) {
             mentionDAO.insert(postId, person);
+        }
+
+        if(!imgs.isEmpty()) { // 사용자가 이미지를 변경한 경우
+            postImgsDAO.delete(postId);
+
+            for (PostImgVO img : imgs) {
+                img.setPostId(postId);
+                postImgsDAO.save(img);
+            }
         }
     }
 
