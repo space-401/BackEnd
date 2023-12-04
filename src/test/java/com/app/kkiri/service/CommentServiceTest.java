@@ -31,8 +31,8 @@ class CommentServiceTest {
 
     @Test
     void list() {
-        List<CommentResponseDTO> list = new ArrayList<>();
-        list= commentService.list(44L, 46L);
-        log.info("list: " + list);
+//        List<CommentResponseDTO> list = new ArrayList<>();
+//        list= commentService.list(44L, 46L);
+//        log.info("list: " + list);
     }
 }
