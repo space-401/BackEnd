@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.MyCommentListResponseDTO;
 import com.app.kkiri.domain.dto.response.MyPostListResponseDTO;
 import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
 import org.slf4j.Logger;
@@ -78,5 +79,11 @@ public class UserController {
 	public ResponseEntity<MyPostListResponseDTO> mypost(@RequestParam int page, HttpServletRequest httpServletRequest) {
 
 		return ResponseEntity.ok().body(userService.myPostList(jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest), page));
+	}
+
+	@GetMapping("/mycomment")
+	public ResponseEntity<MyCommentListResponseDTO> mycomment(@RequestParam int page, HttpServletRequest httpServletRequest) {
+
+		return ResponseEntity.ok().body(userService.myCommentList(jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest), page));
 	}
 }

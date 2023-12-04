@@ -42,4 +42,20 @@
         SELECT COUNT(comment_id) FROM comments
         WHERE post_id=#{postId}
     </select>
+
+    <!-- userId 와 startIndex 를 사용하여 사용자가 작성한 댓글을 조회 -->
+    <select id="selectByUserIdAndStartIndex" resultType="commentVO">
+        SELECT comment_id, comment_content, comment_register_date, post_id
+        FROM comments
+        WHERE user_id = #{userId}
+        ORDER BY comment_register_date DESC, comment_id DESC
+        LIMIT #{startIndex}, 10;
+    </select>
+    
+    <!-- userId 를 사용하여 사용자가 작성한 댓글의 수를 조회 -->
+    <select id="getTotalByUserId" resultType="long">
+        SELECT COUNT(comment_id)
+        FROM comments
+        WHERE user_id = #{userId}
+    </select>
 </mapper>

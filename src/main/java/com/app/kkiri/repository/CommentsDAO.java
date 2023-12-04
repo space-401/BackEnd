@@ -31,4 +31,14 @@ public class CommentsDAO {
 
     // 게시글 댓글 총 개수
     public Long getTotal(Long postId){ return commentsMapper.getTotal(postId); }
+
+    // userId 와 startIndex 를 사용하여 사용자가 작성한 댓글을 조회
+    public List<CommentVO> findByUserIdAndStartIndex(Long userId, Long startIndex) {
+        return commentsMapper.selectByUserIdAndStartIndex(userId, startIndex);
+    }
+
+    // userId 를 사용하여 사용자가 작성한 댓글의 수를 조회
+    public Long countByUserId(Long userId) {
+        return commentsMapper.getTotalByUserId(userId);
+    }
 }

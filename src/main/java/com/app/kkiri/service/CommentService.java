@@ -1,7 +1,5 @@
 package com.app.kkiri.service;
 
-import com.app.kkiri.global.exception.ExceptionCode;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +11,7 @@ import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.global.exception.BadRequestException;
+import com.app.kkiri.global.exception.ExceptionCode;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.SpaceUsersDAO;
 
@@ -86,4 +85,5 @@ public class CommentService {
 
         return commentList;
     }
+
 }

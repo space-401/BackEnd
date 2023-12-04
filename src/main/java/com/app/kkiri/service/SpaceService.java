@@ -6,10 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.app.kkiri.domain.dto.response.UserResponseDTO;
-import com.app.kkiri.domain.vo.UserVO;
 import com.app.kkiri.repository.UsersDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +57,7 @@ public class SpaceService {
 			SpaceResponseDTO spaceResponseDTO = new SpaceResponseDTO();
 			spaceResponseDTO.setSpaceId(space.getSpaceId());
 			spaceResponseDTO.setSpaceTitle(space.getSpaceName());
-			spaceResponseDTO.setImgUrl(fileService.getS3ObjectURL(space.getSpaceIconPath()));
+			spaceResponseDTO.setImgUrl(fileService.getFileUrl(space.getSpaceIconPath()));
 
 			List<SpaceUserVO> users = spaceUsersDAO.findAll(space.getSpaceId(), userId);
 			List<SpaceUserResponseDTO> userList = new ArrayList<>();
@@ -69,7 +66,7 @@ public class SpaceService {
 				SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
 				spaceUserResponseDTO.setUserId(user.getUserId());
 				spaceUserResponseDTO.setUserName(user.getUserNickname());
-				spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+				spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
 				userList.add(spaceUserResponseDTO);
 			}
@@ -90,7 +87,7 @@ public class SpaceService {
 
 		spaceDetailDTO.setSpaceTitle(spaceVO.getSpaceName());
 		spaceDetailDTO.setSpaceDescription(spaceVO.getSpaceDescription());
-		spaceDetailDTO.setImgUrl(fileService.getS3ObjectURL(spaceVO.getSpaceIconPath()));
+		spaceDetailDTO.setImgUrl(fileService.getFileUrl(spaceVO.getSpaceIconPath()));
 		spaceDetailDTO.setSpacePw(spaceVO.getSpacePw());
 		spaceDetailDTO.setSpaceCode(spaceVO.getSpaceCode());
 		spaceDetailDTO.setIsAdmin(spaceUsersDAO.findByUserAdminYn(spaceId, userId));
@@ -112,7 +109,7 @@ public class SpaceService {
 			SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
 			spaceUserResponseDTO.setUserId(user.getUserId());
 			spaceUserResponseDTO.setUserName(user.getUserNickname());
-			spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+			spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
 			spaceUserResponseDTOList.add(spaceUserResponseDTO);
 		}

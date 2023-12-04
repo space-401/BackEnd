@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,12 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.PostDateDTO;
-import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
 import com.app.kkiri.domain.dto.response.PostDetailResponseDTO;
 import com.app.kkiri.domain.dto.PostFilterDTO;
 import com.app.kkiri.domain.dto.response.PostFilterResponseDTO;
 import com.app.kkiri.domain.dto.PostPositionDTO;
-import com.app.kkiri.domain.dto.response.BookmarkedPostResponseDTO;
 import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.vo.PostImgVO;
@@ -143,7 +139,7 @@ public class PostService {
 
         List<String> fileKeys = postImgsDAO.findById(postId);
         List<String> fileURIs = new ArrayList<>();
-        fileKeys.forEach(fileKey -> fileURIs.add(fileService.getS3ObjectURL(fileKey)));
+        fileKeys.forEach(fileKey -> fileURIs.add(fileService.getFileUrl(fileKey)));
         postDetailResponseDTO.setImgsUrl(fileURIs);
 
         List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId, spaceId);
@@ -152,7 +148,7 @@ public class PostService {
             SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
             spaceUserResponseDTO.setUserId(user.getUserId());
             spaceUserResponseDTO.setUserName(user.getUserNickname());
-            spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+            spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
             selectedUserList.add(spaceUserResponseDTO);
         }
@@ -165,7 +161,7 @@ public class PostService {
             SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
             spaceUserResponseDTO.setUserId(user.getUserId());
             spaceUserResponseDTO.setUserName(user.getUserNickname());
-            spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+            spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
             userList.add(spaceUserResponseDTO);
         }
@@ -224,7 +220,7 @@ public class PostService {
 
                 List<String> fileKeys = postImgsDAO.findById(postId);
                 List<String> fileURIs = new ArrayList<>();
-                fileKeys.forEach(fileKey -> fileURIs.add(fileService.getS3ObjectURL(fileKey)));
+                fileKeys.forEach(fileKey -> fileURIs.add(fileService.getFileUrl(fileKey)));
                 postFilterDTO.setImgUrl(fileURIs);
 
                 List<TagVO> tagVOList = postTagsDAO.findById(postId);
@@ -246,7 +242,7 @@ public class PostService {
                     SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
                     spaceUserResponseDTO.setUserId(user.getUserId());
                     spaceUserResponseDTO.setUserName(user.getUserNickname());
-                    spaceUserResponseDTO.setImgUrl(fileService.getS3ObjectURL(user.getProfileImgPath()));
+                    spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
                     userList.add(spaceUserResponseDTO);
                 }

@@ -36,7 +36,4 @@ public interface SpacesMapper {
 
 	// userId 로 스페이스 삭제
 	public void deleteByUserId(Long userId);
-
-	// spaceId 를 사용하여 spaces 의 모든 컬럼을 조회
-	public SpaceVO selectBySpaceId(Long spaceId);
 }
