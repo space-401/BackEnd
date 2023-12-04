@@ -27,9 +27,9 @@ public class FileService {
 	private String bucket;
 
 	public void uploadFile(String fileName, MultipartFile multipartFile) {
-		LOGGER.info("[uploadFileToS3()] param fileName : {}", fileName);
-		LOGGER.info("[uploadFileToS3()] param multipartFile.getName() : {}", multipartFile.getName());
-		LOGGER.info("[uploadFileToS3()] param multipartFile.getSize() : {}", (double)multipartFile.getSize()/1024/1024 + "MB");
+		LOGGER.info("[uploadFile()] param fileName : {}", fileName);
+		LOGGER.info("[uploadFile()] param multipartFile.getName() : {}", multipartFile.getName());
+		LOGGER.info("[uploadFile()] param multipartFile.getSize() : {}", (double)multipartFile.getSize()/1024/1024 + "MB");
 
 		try {
 			ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -42,11 +42,11 @@ public class FileService {
 	}
 
 	public String getFileUrl(String keyName) {
-		LOGGER.info("[getS3ObjectURL()] param keyName : {}", keyName);
+		LOGGER.info("[getFileUrl()] param keyName : {}", keyName);
 
 		try {
 			String imgUrl = amazonS3Client.getUrl(bucket, keyName).toString();
-			LOGGER.info("[getS3ObjectURL()] imgUrl : {}", imgUrl);
+			LOGGER.info("[getFileUrl()] imgUrl : {}", imgUrl);
 
 			return imgUrl;
 		} catch (Exception e) {
@@ -55,7 +55,7 @@ public class FileService {
 	}
 
 	public void deleteFile(String keyName) {
-		LOGGER.info("[deleteS3Object()] param keyName : {}", keyName);
+		LOGGER.info("[deleteFile()] param keyName : {}", keyName);
 
 		try {
 			amazonS3Client.deleteObject(bucket, keyName);

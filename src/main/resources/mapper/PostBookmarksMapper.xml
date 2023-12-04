@@ -24,6 +24,6 @@
         SELECT COUNT(post_id)
         FROM post_bookmarks
         WHERE user_id = #{userId}
-          AND bookmark_yn = TRUE
+        AND bookmark_yn = TRUE
     </select>
 </mapper>
