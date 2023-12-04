@@ -11,7 +11,7 @@ public interface PostBookmarksMapper {
     public void delete(Long postId, Long userId);
 
     // 게시글 북마크 조회
-    public int select(Long postId, Long userId);
+    public Integer select(Long postId, Long userId);
 
     // 북마크 전체 조회
     public void selectAll(Long userId);

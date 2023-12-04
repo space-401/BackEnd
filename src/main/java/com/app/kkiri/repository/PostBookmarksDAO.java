@@ -17,7 +17,7 @@ public class PostBookmarksDAO {
     public void delete(Long postId, Long userId){ postBookmarksMapper.delete(postId, userId); }
 
     // 게시글 북마크 조회
-    public int select(Long postId, Long userId){ return postBookmarksMapper.select(postId, userId); }
+    public Integer select(Long postId, Long userId){ return postBookmarksMapper.select(postId, userId); }
 
     // 북마크 전체 조회
     public void selectAll(Long userId){};
