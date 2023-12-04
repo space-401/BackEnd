@@ -236,17 +236,17 @@ public class PostService {
 
                 postFilterDTO.setSelectedTags(tagList);
 
-                List<SpaceUserVO> users = spaceUsersDAO.findAll((Long)param.get("spaceId"), userId);
-                List<SpaceUserResponseDTO> userList = new ArrayList<>();
-                for (SpaceUserVO user:users) {
+                List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId,(Long)param.get("spaceId"));
+                List<SpaceUserResponseDTO> selectedUserList = new ArrayList<>();
+                for (SpaceUserVO user:selectedUsers) {
                     SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
                     spaceUserResponseDTO.setUserId(user.getUserId());
                     spaceUserResponseDTO.setUserName(user.getUserNickname());
                     spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
-                    userList.add(spaceUserResponseDTO);
+                    selectedUserList.add(spaceUserResponseDTO);
                 }
-                postFilterDTO.setUsersList(userList);
+                postFilterDTO.setUsersList(selectedUserList);
 
                 postList.add(postFilterDTO);
             }
