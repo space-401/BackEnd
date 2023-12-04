@@ -18,4 +18,12 @@
         SELECT COUNT(post_id) FROM post_bookmarks
         WHERE post_id=#{postId} AND user_id=#{userId}
     </select>
+
+    <!-- 사용자가 북마크한 게시글의 수를 조회 -->
+    <select id="getTotalBookmarkedPosts" resultType="long">
+        SELECT COUNT(post_id)
+        FROM post_bookmarks
+        WHERE user_id = #{userId}
+          AND bookmark_yn = TRUE
+    </select>
 </mapper>

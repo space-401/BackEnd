@@ -136,12 +136,19 @@
         ORDER BY p.post_register_date DESC
         LIMIT #{startIndex}, 10;
     </select>
-    
-    <!-- 사용자가 북마크한 게시글의 수를 조회 -->
-    <select id="getTotalBookmarkedPosts" resultType="long">
-        SELECT COUNT(post_id)
-        FROM post_bookmarks
+
+    <!-- userId 를 사용하여 사용자가 작성한 게시글 조회 -->
+    <select id="selectByUserId" resultType="postVO">
+        SELECT space_id, post_id, post_title, post_register_date
+        FROM posts
         WHERE user_id = #{userId}
-        AND bookmark_yn = TRUE
+        ORDER BY post_register_date DESC, post_id DESC
+        LIMIT #{startIndex}, 10;
+    </select>
+
+    <!-- userId 를 사용하여 사용자가 작성한 게시글 수를 조회-->
+    <select id="getTotalByUserId" resultType="long">
+        SELECT COUNT(post_id) FROM posts
+        WHERE user_id = #{userId}
     </select>
 </mapper>

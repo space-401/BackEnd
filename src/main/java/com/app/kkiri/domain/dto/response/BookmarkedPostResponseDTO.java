@@ -1,9 +1,5 @@
 package com.app.kkiri.domain.dto.response;
 
-import java.util.List;
-
-import com.app.kkiri.domain.vo.PostVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostBookmarkResponseDTO {
+public class BookmarkedPostResponseDTO {
 
-	List<PostResponseDTO> bookMarkList;
-	int page;
-	Long total;
-	int itemLength;
+	private Long postId;
+	private String postTitle;
+	private Long postCommentCount;
+	private String postCreatedAt;
+	private String postWriterName;
 }

@@ -21,4 +21,9 @@ public class PostBookmarksDAO {
 
     // 북마크 전체 조회
     public void selectAll(Long userId){};
+
+    // 사용자가 북마크한 게시글의 수를 조회
+    public Long countByUserId (Long userId) {
+        return postBookmarksMapper.getTotalBookmarkedPosts(userId);
+    }
 }

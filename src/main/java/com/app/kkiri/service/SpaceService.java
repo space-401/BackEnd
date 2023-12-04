@@ -250,9 +250,7 @@ public class SpaceService {
 
 	// userId 를 사용한 스페이스 회원 삭제
 	@Transactional(rollbackFor = Exception.class)
-	public void deleteSpaceUser(HttpServletRequest httpServletRequest) {
-
-		Long userId = getUserId(httpServletRequest);
+	public void deleteSpaceUser(Long userId) {
 
 		List<Long> spaceIds = spaceUsersDAO.findSpaceIdByUserIdAndUserAdminYnTrue(userId);
 
@@ -269,13 +267,9 @@ public class SpaceService {
 
 	// userId 를 사용한 스페이스 회원 삭제
 	@Transactional(rollbackFor = Exception.class)
-	public void deleteSpace(HttpServletRequest httpServletRequest) {
+	public void deleteSpace(Long userId) {
 
-		spacesDAO.deleteByUserId(getUserId(httpServletRequest));
-	}
-
-	private Long getUserId(HttpServletRequest httpServletRequest) {
-		return jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+		spacesDAO.deleteByUserId(userId);
 	}
 
 	// spaceId 를 사용하여 spaces 의 모든 컬럼을 조회

@@ -46,4 +46,7 @@ public interface SpaceUsersMapper {
 
 	// postId 를 사용하여 해당 게시글을 작성한 사용자의 userNickname 을 조회
 	public String selectUserNicknameByPostId(Long postId);
+
+	// postId 와 spaceId 를 사용하여 게시글에 맨션된 회원 정보를 조회
+	public List<SpaceUserVO> selectByPostIdAndSpaceId(Long postId, Long spaceId);
 }

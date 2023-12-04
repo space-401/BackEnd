@@ -15,4 +15,7 @@ public interface PostBookmarksMapper {
 
     // 북마크 전체 조회
     public void selectAll(Long userId);
+
+    // 사용자가 북마크한 게시글의 수를 조회
+    public Long getTotalBookmarkedPosts(Long userId);
 }
