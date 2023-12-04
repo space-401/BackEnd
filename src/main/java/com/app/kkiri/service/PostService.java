@@ -188,11 +188,7 @@ public class PostService {
     // 게시글 북마크
     public void bookmark(Long postId, Long userId){
         try {
-            if(postBookmarksDAO.select(postId, userId) == 0){
-                postBookmarksDAO.setBookmark(postId, userId);
-            } else{
-                postBookmarksDAO.delete(postId, userId);
-            }
+            postBookmarksDAO.setBookmark(postId, userId);
         } catch (Exception e){
             // throw new CustomException(StatusCode.BAD_REQUEST);
         }
