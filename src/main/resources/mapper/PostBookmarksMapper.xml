@@ -15,7 +15,7 @@
     </delete>
 
     <select id="select" resultType="int">
-        SELECT COUNT(post_id) FROM post_bookmarks
+        SELECT bookmark_yn FROM post_bookmarks
         WHERE post_id=#{postId} AND user_id=#{userId}
     </select>
 
