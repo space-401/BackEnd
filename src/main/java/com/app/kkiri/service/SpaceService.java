@@ -101,7 +101,7 @@ public class SpaceService {
 		LOGGER.info("[spaceDetail()] userResponseDTO : {}", userResponseDTO);
 
 		spaceDetailDTO.setIsFirst(spaceUserVO.getUserNickname().toString().equals(userResponseDTO.getUserEmail().toString()) ?  1 : 0);
-		
+
 		List<SpaceUserVO> userList = spaceUsersDAO.findAll(spaceId, userId);
 		List<SpaceUserResponseDTO> spaceUserResponseDTOList = new ArrayList<>();
 
@@ -115,7 +115,7 @@ public class SpaceService {
 		}
 
 		spaceDetailDTO.setUserList(spaceUserResponseDTOList);
-//		}
+		//		}
 
 		List<TagVO> tags = Optional.ofNullable(tagsDAO.findAll(spaceId)).orElse(new ArrayList<>());
 		List<TagDTO> tagList = new ArrayList<>();
@@ -200,7 +200,7 @@ public class SpaceService {
 		Long spaceId = spacesDAO.findByCodeAndPw(spaceVO).orElseThrow(()->new BadRequestException(ExceptionCode.INVALID_SPACE_CODE_OR_PASSWORD));
 
 		if(spaceUsersDAO.findById(spaceId, userId) != null){
-			 throw new BadRequestException(ExceptionCode.ALREADY_SAVED_SPACE);
+			throw new BadRequestException(ExceptionCode.ALREADY_SAVED_SPACE);
 		} else {
 			SpaceUserVO spaceUserVO = new SpaceUserVO();
 			spaceUserVO.createNormal(userId);

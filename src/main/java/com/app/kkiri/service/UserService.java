@@ -1,5 +1,7 @@
 package com.app.kkiri.service;
 
+import static com.app.kkiri.global.exception.ExceptionCode.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,7 @@ import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.domain.vo.CommentVO;
 import com.app.kkiri.domain.vo.PostVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
+import com.app.kkiri.global.exception.DeleteFailureException;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.PostBookmarksDAO;
 import com.app.kkiri.repository.PostImgsDAO;
