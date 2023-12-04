@@ -131,7 +131,7 @@ public class PostService {
         postDetailResponseDTO.setPostCreatedAt(postVO.getPostRegisterDate());
         postDetailResponseDTO.setPostUpdatedAt(postVO.getPostUpdateDate());
         postDetailResponseDTO.setIsMine(postVO.getUserId() == userId);
-        postDetailResponseDTO.setIsBookmark(postBookmarksDAO.select(postId, userId) != 0);
+        postDetailResponseDTO.setIsBookmark(postBookmarksDAO.select(postId, userId) == 1);
 
         PostDateDTO postDateDTO = new PostDateDTO();
         postDateDTO.create(postVO.getPostBeginDate(), postVO.getPostEndDate());
