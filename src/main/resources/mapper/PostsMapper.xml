@@ -125,7 +125,7 @@
         WHERE user_Id = #{userId}
     </delete>
 
-    <!-- 사용자가 북마크한 게시글 정보를 조회 -->
+    <!-- userId 를 사용해서 사용자가 북마크한 게시글 정보를 조회 -->
     <select id="selectBookmarkedPosts" resultType="postVO">
         SELECT p.post_id, p.post_title, p.post_register_date
         FROM post_bookmarks pb
@@ -133,7 +133,7 @@
         ON pb.post_id = p.post_id
         WHERE pb.user_id = #{userId}
         AND pb.bookmark_yn = TRUE
-        ORDER BY p.post_register_date DESC
+        ORDER BY p.post_register_date DESC, p.post_id DESC
         LIMIT #{startIndex}, 10;
     </select>
 
