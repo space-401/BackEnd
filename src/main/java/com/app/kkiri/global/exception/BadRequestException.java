@@ -15,4 +15,5 @@ public class BadRequestException extends RuntimeException {
 		this.code = exceptionCode.getCode();
 		this.message = exceptionCode.getMessage();
 	}
+
 }

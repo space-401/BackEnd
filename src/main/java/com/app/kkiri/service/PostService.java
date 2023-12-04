@@ -175,17 +175,17 @@ public class PostService {
         }
         postDetailResponseDTO.setUserList(userList);
 
-//        List<TagVO> tagVOList = postTagsDAO.findById(postId);
-//        List<TagDTO> tagList = new ArrayList<>();
-//
-//        for (TagVO tag:tagVOList) {
-//            TagDTO tagDTO = new TagDTO();
-//            tagDTO.setTagId(tag.getTagId());
-//            tagDTO.setTagTitle(tag.getTagName());
-//
-//            tagList.add(tagDTO);
-//        }
-//        postDetailResponseDTO.setSelectedTags(tagList);
+        //        List<TagVO> tagVOList = postTagsDAO.findById(postId);
+        //        List<TagDTO> tagList = new ArrayList<>();
+        //
+        //        for (TagVO tag:tagVOList) {
+        //            TagDTO tagDTO = new TagDTO();
+        //            tagDTO.setTagId(tag.getTagId());
+        //            tagDTO.setTagTitle(tag.getTagName());
+        //
+        //            tagList.add(tagDTO);
+        //        }
+        //        postDetailResponseDTO.setSelectedTags(tagList);
         postDetailResponseDTO.setSelectedTags(postTagsDAO.findById(postId));
         postDetailResponseDTO.setCommentCount(commentsDAO.getTotal(postId));
         LOGGER.info("[postDetail()] postDetailResponseDTO : {}", postDetailResponseDTO);
