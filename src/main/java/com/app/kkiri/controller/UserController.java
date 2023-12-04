@@ -65,6 +65,7 @@ public class UserController {
 		spaceService.deleteSpace(userId);
 		spaceService.deleteSpaceUser(userId);
 		userService.deleteUser(userId);
+		LOGGER.info("[deleteUser()] {} has been deleted", userId);
 
 		return ResponseEntity.noContent().build();
 	}
