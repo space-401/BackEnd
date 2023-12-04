@@ -3,6 +3,7 @@ package com.app.kkiri.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.app.kkiri.security.jwt.JwtTokenProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,8 @@ import com.app.kkiri.repository.SpaceUsersDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CommentService {
     private final CommentsDAO commentsDAO;
     private final SpaceUsersDAO spaceUsersDAO;
+    private final FileService fileService;
 
     @Transactional(rollbackFor = Exception.class)
     // 댓글 추가
@@ -50,7 +54,7 @@ public class CommentService {
     }
 
     // 댓글 조회
-    public List<CommentResponseDTO> list(Long postId, Long spaceId){
+    public List<CommentResponseDTO> list(Long postId, Long spaceId, Long userId){
         List<CommentVO> commentVOList = commentsDAO.findById(postId);
         List<CommentResponseDTO> commentList = new ArrayList<>();
 
@@ -72,12 +76,13 @@ public class CommentService {
             userVO = spaceUsersDAO.findById(spaceId, commentsDAO.selectByGroup(comment.getCommentGroup()));
             user.setUserId(userVO.getUserId());
             user.setUserName(userVO.getUserNickname());
-            user.setImgUrl(userVO.getProfileImgPath());
+            user.setImgUrl(fileService.getFileUrl(userVO.getProfileImgPath()));
             commentResponseDTO.setReplyMember(user);
 
             commentResponseDTO.setContent(comment.getCommentContent());
             commentResponseDTO.setCreateDate(comment.getCommentRegisterDate());
             commentResponseDTO.setIsRef(comment.getCommentRefYn());
+            commentResponseDTO.setIsMine(comment.getUserId() == userId);
 
             commentList.add(commentResponseDTO);
 
