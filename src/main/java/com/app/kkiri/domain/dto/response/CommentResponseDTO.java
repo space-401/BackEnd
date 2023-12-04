@@ -16,6 +16,7 @@ public class CommentResponseDTO {
     private String content;
     private String createDate;
     private Boolean isRef;
+    private Boolean isMine;
 
     public void create(Long id, Long refId, SpaceUserResponseDTO writer, SpaceUserResponseDTO replyMember, String content, String createDate, Boolean isRef) {
         this.id = id;
