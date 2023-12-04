@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.app.kkiri.domain.dto.PostFilterValueDTO;
 import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.service.UserService;
-import com.google.gson.JsonObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -135,7 +135,7 @@ public class SpaceController {
 			uploadFullPathAndFileName.append("/");
 			uploadFullPathAndFileName.append(uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
 
-			fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
+			fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
 
 			spaceVO.setSpaceIconName(originalFileName); // space.jpg
 			spaceVO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
@@ -225,7 +225,7 @@ public class SpaceController {
 			uploadFullPathAndFileName.append("/");
 			uploadFullPathAndFileName.append(uploadFileName); // upload/space/2023/11/10/uuid_space.jpg
 
-			fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
+			fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
 
 			spaceDTO.setSpaceIconName(originalFileName); // space.jpg
 			spaceDTO.setSpaceIconPath(uploadFullPathAndFileName.toString()); // upload/space/2023/11/10/uuid_space.jpg
@@ -349,7 +349,7 @@ public class SpaceController {
 			uploadFullPathAndFileName.append("/");
 			uploadFullPathAndFileName.append(uploadFileName); // upload/profile/2023/11/10/uuid_profile.jpg
 
-			fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
+			fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
 
 			spaceUserVO.setProfileImgName(originalFileName); // profile.jpg
 			spaceUserVO.setProfileImgPath(uploadFullPathAndFileName.toString()); // upload/profile/2023/11/10/uuid_profile.jpg

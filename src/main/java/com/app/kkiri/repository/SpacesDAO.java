@@ -48,6 +48,6 @@ public class SpacesDAO {
 
 	// spaceId 를 사용하여 spaces 의 모든 컬럼을 조회
 	public SpaceVO findBySpaceId(Long spaceId) {
-		return spacesMapper.selectBySpaceId(spaceId);
+		return spacesMapper.selectById(spaceId);
 	}
 }

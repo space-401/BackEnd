@@ -88,7 +88,7 @@ public class PostController {
             uploadFullPathAndFileName.append("/");
             uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
 
-            fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
+            fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
 
             postImgVO.setPostImgName(originalFileName); // post.jpg
             postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg
@@ -148,7 +148,7 @@ public class PostController {
             uploadFullPathAndFileName.append("/");
             uploadFullPathAndFileName.append(uploadFileName); // upload/post/2023/11/10/uuid_post.jpg
 
-            fileService.uploadFileToS3(uploadFullPathAndFileName.toString(), multipartFile);
+            fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
 
             postImgVO.setPostImgName(originalFileName); // post.jpg
             postImgVO.setPostImgPath(uploadFullPathAndFileName.toString()); // upload/post/2023/11/10/uuid_post.jpg

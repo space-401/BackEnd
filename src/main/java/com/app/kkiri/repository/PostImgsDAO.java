@@ -22,4 +22,9 @@ public class PostImgsDAO {
 
     // 이미지 삭제
     public void delete(Long postId){ postImgsMapper.delete(postId); }
+
+    // postId 를 사용하여 대표 이미지 한장을 조회
+    public String findByPostId(Long postId) {
+        return postImgsMapper.selectOne(postId);
+    }
 }

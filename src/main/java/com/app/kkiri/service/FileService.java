@@ -26,7 +26,7 @@ public class FileService {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
-	public void uploadFileToS3(String fileName, MultipartFile multipartFile) {
+	public void uploadFile(String fileName, MultipartFile multipartFile) {
 		LOGGER.info("[uploadFileToS3()] param fileName : {}", fileName);
 		LOGGER.info("[uploadFileToS3()] param multipartFile.getName() : {}", multipartFile.getName());
 		LOGGER.info("[uploadFileToS3()] param multipartFile.getSize() : {}", (double)multipartFile.getSize()/1024/1024 + "MB");
@@ -41,7 +41,7 @@ public class FileService {
 		}
 	}
 
-	public String getS3ObjectURL(String keyName) {
+	public String getFileUrl(String keyName) {
 		LOGGER.info("[getS3ObjectURL()] param keyName : {}", keyName);
 
 		try {
@@ -54,7 +54,7 @@ public class FileService {
 		}
 	}
 
-	public void deleteS3Object(String keyName) {
+	public void deleteFile(String keyName) {
 		LOGGER.info("[deleteS3Object()] param keyName : {}", keyName);
 
 		try {

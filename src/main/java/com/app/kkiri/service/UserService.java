@@ -3,17 +3,6 @@ package com.app.kkiri.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
-import com.app.kkiri.domain.dto.response.BookmarkedPostResponseDTO;
-import com.app.kkiri.domain.dto.response.MyPostListResponseDTO;
-import com.app.kkiri.domain.dto.response.MyPostResponseDTO;
-import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
-import com.app.kkiri.domain.dto.response.UserProfileResponseDTO;
-import com.app.kkiri.domain.vo.PostVO;
-import com.app.kkiri.domain.vo.SpaceUserVO;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -24,11 +13,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.UserDTO;
+import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.BookmarkedPostResponseDTO;
+import com.app.kkiri.domain.dto.response.MyCommentListResponseDTO;
+import com.app.kkiri.domain.dto.response.MyCommentResponseDTO;
+import com.app.kkiri.domain.dto.response.MyPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.MyPostResponseDTO;
+import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
+import com.app.kkiri.domain.dto.response.UserProfileResponseDTO;
 import com.app.kkiri.domain.dto.response.UserResponseDTO;
+import com.app.kkiri.domain.vo.CommentVO;
+import com.app.kkiri.domain.vo.PostVO;
+import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.PostBookmarksDAO;
+import com.app.kkiri.repository.PostImgsDAO;
 import com.app.kkiri.repository.PostsDAO;
 import com.app.kkiri.repository.SpaceUsersDAO;
+import com.app.kkiri.repository.SpacesDAO;
 import com.app.kkiri.repository.UsersDAO;
 import com.app.kkiri.security.enums.UserStatus;
 import com.app.kkiri.security.jwt.JwtTokenProvider;
@@ -41,13 +43,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 	private final UsersDAO usersDAO;
 	private final PostsDAO postsDAO;
 	private final CommentsDAO commentsDAO;
 	private final SpaceUsersDAO spaceUsersDAO;
 	private final PostBookmarksDAO postBookmarksDAO;
+	private final SpacesDAO spacesDAO;
+	private final PostImgsDAO postImgsDAO;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final FileService fileService;
+	private final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
 	// userId 를 사용하여 회원 조회
 	@Transactional(rollbackFor = Exception.class)
@@ -72,8 +77,8 @@ public class UserService {
 	// 회원 가입 및 로그인
 	@Transactional(rollbackFor = Exception.class)
 	public AuthenticatedOAuth2User register(CustomOAuth2User customOAuth2User) throws OAuth2AuthenticationException {
-		LOGGER.info("register() [param] customOAuth2User.getName() : {}", customOAuth2User.getName());
-		LOGGER.info("register() [param] customOAuth2User.getEmail() : {}", customOAuth2User.getEmail());
+		LOGGER.info("[register()] param customOAuth2User.getName() : {}", customOAuth2User.getName());
+		LOGGER.info("[register()] param customOAuth2User.getEmail() : {}", customOAuth2User.getEmail());
 
 		// 토큰에 이메일 데이터가 없는 경우
 		String userEmail = customOAuth2User.getEmail();
@@ -141,7 +146,7 @@ public class UserService {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void updateAccessToken(String reissuedAccessToken) throws AuthenticationException {
-		LOGGER.info("updateAccessToken() [param] reissuedAccessToken : {}", reissuedAccessToken);
+		LOGGER.info("[updateAccessToken()] param reissuedAccessToken : {}", reissuedAccessToken);
 
 		Long userId = jwtTokenProvider.getUserIdByToken(reissuedAccessToken);
 
@@ -158,6 +163,7 @@ public class UserService {
 	// 사용자가 북마크한 게시글 정보를 조회
 	@Transactional
 	public BookmarkedPostListResponseDTO bookmarkList(Long userId, int page) {
+		LOGGER.info("[bookmarkList()] param page : {}", page);
 
 		int itemLength = 10;
 		Long startIndex = Long.valueOf((page - 1) * itemLength);
@@ -189,8 +195,10 @@ public class UserService {
 		return bookmarkedPostListResponseDTO;
 	}
 
+	// 사용자가 등록한 게시글을 페이징하여 조회한다.
 	@Transactional(rollbackFor = Exception.class)
 	public MyPostListResponseDTO myPostList(Long userId, int page) {
+		LOGGER.info("[myPostList()] param page : {}", page);
 
 		int itemLength = 10;
 		Long startIndex = Long.valueOf ((page - 1) * itemLength);
@@ -209,7 +217,7 @@ public class UserService {
 				UserProfileResponseDTO userProfileResponseDTO = UserProfileResponseDTO.builder()
 					.userId(spaceUserVO.getUserId())
 					.userName(spaceUserVO.getUserNickname())
-					.imgUrl(spaceUserVO.getProfileImgPath())
+					.imgUrl(fileService.getFileUrl(spaceUserVO.getProfileImgPath()))
 					.build();
 
 				selectedUserProfileList.add(userProfileResponseDTO);
@@ -236,5 +244,49 @@ public class UserService {
 		LOGGER.info("[myPostList()] myPostListResponseDTO : {}", myPostListResponseDTO);
 
 		return myPostListResponseDTO;
+	}
+
+
+	// 사용자가 작성한 댓글을 페이징하여 조회한다.
+	@Transactional
+	public MyCommentListResponseDTO myCommentList(Long userId, int page) {
+		LOGGER.info("[myCommentList()] param page : {}", page);
+
+		int itemLength = 4;
+		Long total = commentsDAO.countByUserId(userId);
+		Long startIndex = Long.valueOf ((page - 1) * itemLength);
+
+		List<MyCommentResponseDTO> myCommentList = new ArrayList<>();
+
+		List<CommentVO> selectedComments = commentsDAO.findByUserIdAndStartIndex(userId, startIndex);
+		for(CommentVO commentVO : selectedComments) {
+			Long postId = commentVO.getPostId();
+			PostVO postVO = postsDAO.findById(postId);
+			Long spaceId = postVO.getSpaceId();
+
+			MyCommentResponseDTO myCommentResponseDTO = MyCommentResponseDTO.builder()
+				.postId(postId)
+				.postTitle(postVO.getPostTitle())
+				.postContent(postVO.getPostContent())
+				.postCreateDate(postVO.getPostRegisterDate())
+				.spaceTitle(spacesDAO.findBySpaceId(spaceId).getSpaceName())
+				.mainImgUrl(fileService.getFileUrl(postImgsDAO.findByPostId(postId)))
+				.commentId(commentVO.getCommentId())
+				.commentContent(commentVO.getCommentContent())
+				.commentCreateDate(commentVO.getCommentRegisterDate())
+				.build();
+
+			myCommentList.add(myCommentResponseDTO);
+		}
+
+		MyCommentListResponseDTO myCommentListResponseDTO = MyCommentListResponseDTO.builder()
+			.myCommentList(myCommentList)
+			.page(page)
+			.total(total)
+			.itemLength(itemLength)
+			.build();
+		LOGGER.info("[myCommentList()] myCommentListResponseDTO : {}", myCommentListResponseDTO);
+
+		return myCommentListResponseDTO;
 	}
 }
