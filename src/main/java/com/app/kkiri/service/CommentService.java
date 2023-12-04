@@ -82,7 +82,7 @@ public class CommentService {
             commentResponseDTO.setContent(comment.getCommentContent());
             commentResponseDTO.setCreateDate(comment.getCommentRegisterDate());
             commentResponseDTO.setIsRef(comment.getCommentRefYn());
-            commentResponseDTO.setIsMine(comment.getUserId() == userId);
+            commentResponseDTO.setIsMyComment(comment.getUserId() == userId);
 
             commentList.add(commentResponseDTO);
 
