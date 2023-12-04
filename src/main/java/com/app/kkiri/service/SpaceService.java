@@ -271,6 +271,10 @@ public class SpaceService {
 
 	// spaceId 를 사용하여 spaces 의 모든 컬럼을 조회
 	public SpaceVO findBySpaceId(Long spaceId) {
-		return spacesDAO.findBySpaceId(spaceId);
+
+		SpaceVO spaceVO = spacesDAO.findBySpaceId(spaceId);
+		LOGGER.info("[findBySpaceId()] spaceVO : {}", spaceVO);
+
+		return spaceVO;
 	}
 }
