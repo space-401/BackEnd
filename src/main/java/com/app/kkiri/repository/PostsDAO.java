@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.vo.PostVO;
-import com.app.kkiri.domain.vo.SpaceVO;
 import com.app.kkiri.mapper.PostsMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class PostsDAO {
     public PostVO findById(Long postId){ return postsMapper.selectById(postId); }
 
     // 게시글 필터 조회
-    public List<PostVO> findByfilter(Map<String, Object> param){ return postsMapper.selectByfilter(param); }
+    public List<PostVO> findByFilter(Map<String, Object> param){ return postsMapper.selectByFilter(param); }
 
     // 필터된 게시글 총 개수
     public int getTotal(Map<String, Object> param){ return postsMapper.getTotal(param); }

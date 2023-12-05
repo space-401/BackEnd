@@ -61,7 +61,7 @@ class PostsMapperTest {
 //        param.put("tags", tagId);
         param.put("amount", 10);
         param.put("page", 1);
-        postsMapper.selectByfilter(param);
+        postsMapper.selectByFilter(param);
     }
 
     @Test

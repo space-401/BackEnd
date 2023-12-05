@@ -376,12 +376,11 @@ public class SpaceController {
 			@RequestBody(required = false) PostFilterValueDTO data,
 			HttpServletRequest request){
 		Long id = jwtTokenProvider.getUserIdByHttpRequest(request);
-
 		LOGGER.info("[filter()] searchValue : {}", data);
 
 		Map<String, Object> param = new HashMap<>();
 		List<LocalDate> dateList = new ArrayList<>();
-		int amount = 10;
+		int amount = 12;
 
 		param.put("spaceId", data.getSpaceId());
 		param.put("page", data.getPage().intValue());
@@ -408,6 +407,7 @@ public class SpaceController {
 		LOGGER.info("[filter()] DateList : {}", dateList);
 
 		param.put("dateList", dateList);
+		param.put("startIndex", (data.getPage() - 1) * amount); // 1page 인 경우 startIndex = 0
 		param.put("amount", amount);
 
 		return ResponseEntity.ok().body(postService.filter(param, id));
