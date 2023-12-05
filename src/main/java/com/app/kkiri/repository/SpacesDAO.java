@@ -41,7 +41,7 @@ public class SpacesDAO {
 	// 스페이스 인원 업데이트
 	public void setTally(Long spaceId, int spaceUserTally){ spacesMapper.updateTally(spaceId, spaceUserTally); }
 
-	// userId 로 스페이스 삭제
+	// user_id 를 사용하여 space 를 삭제
 	public void deleteByUserId(Long userId) {
 		spacesMapper.deleteByUserId(userId);
 	}
@@ -49,5 +49,10 @@ public class SpacesDAO {
 	// spaceId 를 사용하여 spaces 의 모든 컬럼을 조회
 	public SpaceVO findBySpaceId(Long spaceId) {
 		return spacesMapper.selectById(spaceId);
+	}
+
+	// user_id 를 사용하여 방장이면서 스페이스 총 인원수가 한명이 아닌 스페이스의 space_name 을 조회
+	public List<String> findByUserId(Long userId) {
+		return spacesMapper.selectByUserId(userId);
 	}
 }

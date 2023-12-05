@@ -61,11 +61,7 @@ public class UserController {
 
 		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
 
-		postService.deleteByUserId(userId);
-		spaceService.deleteSpace(userId);
-		spaceService.deleteSpaceUser(userId);
 		userService.deleteUser(userId);
-		LOGGER.info("[deleteUser()] {} has been deleted", userId);
 
 		return ResponseEntity.noContent().build();
 	}

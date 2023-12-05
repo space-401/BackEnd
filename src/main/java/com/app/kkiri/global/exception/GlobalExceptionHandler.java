@@ -3,6 +3,8 @@ package com.app.kkiri.global.exception;
 import static org.springframework.http.HttpStatus.*;
 import static com.app.kkiri.global.exception.ExceptionCode.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -48,6 +50,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.warn(ex.getMessage(), ex);
 
         return ResponseEntity.status(UNAUTHORIZED).body(new ExceptionResponse(ex.getCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(DeleteFailureException.class)
+    public ResponseEntity<?> delteFailureException(final DeleteFailureException ex) {
+        LOGGER.warn(ex.getMessage(), ex);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", 1005);
+        map.put("message", ex.getMessage());
+
+        return ResponseEntity.badRequest().body(map);
     }
 
     @ExceptionHandler(Exception.class)

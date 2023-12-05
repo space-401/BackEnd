@@ -159,9 +159,30 @@ public class UserService {
 	@Transactional(rollbackFor = Exception.class)
 	public void deleteUser(Long userId) {
 
-		usersDAO.deleteUser(userId);
-	}
+		List<String> selectedSpaceNames = spacesDAO.findByUserId(userId);
+		if(!selectedSpaceNames.isEmpty()) {
+			StringBuffer message = new StringBuffer();
+			for(String spaceName : selectedSpaceNames) {
+				message.append("\'" + spaceName + "\' 스페이스 ");
+			}
+			message.append(" 의 방장이므로 회원 탈퇴가 불가능합니다.");
+			throw new DeleteFailureException(message.toString());
+		}
 
+		// post 삭제
+		postsDAO.deleteByUserId(userId);
+
+		// space 삭제
+		spacesDAO.deleteByUserId(userId);
+
+		// space_users 삭제
+		spaceUsersDAO.deleteByUserId(userId);
+
+		// users 삭제
+		usersDAO.deleteUser(userId);
+
+		LOGGER.info("[deleteUser()] userId 가 {}인 사용자 탈퇴 성공", userId);
+	}
 
 	// 사용자가 북마크한 게시글 정보를 조회
 	@Transactional
