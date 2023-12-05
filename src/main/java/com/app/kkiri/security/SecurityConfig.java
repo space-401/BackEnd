@@ -63,6 +63,7 @@ public class SecurityConfig {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.addAllowedOrigin("https://kkiri.net");
 		corsConfiguration.addAllowedOrigin("http://localhost:3000");
+		corsConfiguration.addAllowedOrigin("https://d3u31m5mtxomjp.cloudfront.net");
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.addAllowedHeader("*");
 
