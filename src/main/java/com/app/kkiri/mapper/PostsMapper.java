@@ -24,7 +24,7 @@ public interface PostsMapper {
     public PostVO selectById(Long postId);
 
     // 게시글 필터 조회
-    public List<PostVO> selectByfilter(Map<String, Object> param);
+    public List<PostVO> selectByFilter(Map<String, Object> param);
 
     // 필터된 게시글 총 개수
     public int getTotal(Map<String, Object> param);

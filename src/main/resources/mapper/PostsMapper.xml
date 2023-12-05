@@ -30,62 +30,12 @@
         WHERE post_id=#{postId}
     </select>
 
-    <select id="selectByfilter" parameterType="hashmap" resultType="postVO">
-        SELECT post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng
-        FROM
-            (
-            SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng, space_id
-            FROM
-                (SELECT DISTINCT(p.post_id) post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng, space_id
-                FROM posts p LEFT JOIN post_tags t
-                ON p.post_id=t.post_id
-                WHERE p.space_id=#{spaceId}
-                <if test="keyword != null">
-                    AND post_title LIKE CONCAT('%',#{keyword},'%')
-                </if>
-                <if test="dateList != null and dateList.size != 0">
-                    <foreach collection="dateList" item="date" index="index">
-                        <choose>
-                            <when test="index == 0">
-                                AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
-                            </when>
-                            <when test="index != 0">
-                                OR #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
-                            </when>
-                        </choose>
-                    </foreach>
-                </if>
-                <if test="tags != null and tags.size != 0">
-                    AND t.tag_id IN
-                    <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
-                        #{tag}
-                    </foreach>
-                </if>
-                <if test="writers != null and writers.size != 0">
-                    AND user_id IN
-                    <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
-                        #{writer}
-                    </foreach>
-                </if>
-                ORDER BY
-                post_register_date DESC
-                ) D2
-            <![CDATA[
-            WHERE @ROWNUM:=0 <= #{page} * #{amount} AND space_id=#{spaceId}
-        ) D3 WHERE ROWNUM > (#{page} - 1) * #{amount}
-        ]]>
-    </select>
-
-    <select id="getTotal" resultType="_int">
-        SELECT COUNT(post_id)
-        FROM
-        (
-        SELECT @ROWNUM := @ROWNUM + 1 AS ROWNUM, post_id, space_id
-        FROM
-        (SELECT DISTINCT(p.post_id) post_id, space_id
-        FROM posts p LEFT JOIN post_tags t
+    <select id="selectByFilter" parameterType="hashmap" resultType="postVO">
+        SELECT DISTINCT(p.post_id) post_id, post_title, post_location_keyword, post_register_date, post_update_date, post_location_lat, post_location_lng, space_id
+        FROM posts p
+        LEFT JOIN post_tags t
         ON p.post_id=t.post_id
-        WHERE p.space_id=#{spaceId}
+        WHERE p.space_id = 2
         <if test="keyword != null">
             AND post_title LIKE CONCAT('%',#{keyword},'%')
         </if>
@@ -93,10 +43,10 @@
             <foreach collection="dateList" item="date" index="index">
                 <choose>
                     <when test="index == 0">
-                        AND #{date} BETWEEN post_begin_date AND post_end_date
+                        AND #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
                     </when>
                     <when test="index != 0">
-                        OR #{date} BETWEEN post_begin_date AND post_end_date
+                        OR #{date} BETWEEN POST_BEGIN_DATE AND POST_END_DATE
                     </when>
                 </choose>
             </foreach>
@@ -112,11 +62,47 @@
             <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
                 #{writer}
             </foreach>
-        </if>) D2
-        <![CDATA[
-            WHERE @ROWNUM:=0 <= #{page} * #{amount} AND space_id=#{spaceId}
-        )D3 WHERE ROWNUM > (#{page} - 1) * #{amount}
-        ]]>
+        </if>
+        ORDER BY
+        post_register_date DESC
+        LIMIT #{startIndex}, #{amount}
+    </select>
+
+    <select id="getTotal" resultType="_int">
+        SELECT COUNT(x.post_id)
+        FROM (
+            SELECT DISTINCT(p.post_id) post_id, space_id
+            FROM posts p LEFT JOIN post_tags t
+            ON p.post_id=t.post_id
+            WHERE p.space_id=#{spaceId}
+            <if test="keyword != null">
+                AND post_title LIKE CONCAT('%',#{keyword},'%')
+            </if>
+            <if test="dateList != null and dateList.size != 0">
+                <foreach collection="dateList" item="date" index="index">
+                    <choose>
+                        <when test="index == 0">
+                            AND #{date} BETWEEN post_begin_date AND post_end_date
+                        </when>
+                        <when test="index != 0">
+                            OR #{date} BETWEEN post_begin_date AND post_end_date
+                        </when>
+                    </choose>
+                </foreach>
+            </if>
+            <if test="tags != null and tags.size != 0">
+                AND t.tag_id IN
+                <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
+                    #{tag}
+                </foreach>
+            </if>
+            <if test="writers != null and writers.size != 0">
+                AND user_id IN
+                <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
+                    #{writer}
+                </foreach>
+            </if>
+        ) x
     </select>
 
     <!-- userId 를 사용하여 post 를 삭제 -->

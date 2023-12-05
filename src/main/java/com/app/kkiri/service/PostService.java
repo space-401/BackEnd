@@ -204,12 +204,14 @@ public class PostService {
 
     // 게시글 필터 조회
     public PostFilterResponseDTO filter(Map<String, Object> param, Long userId){
+        LOGGER.info("[filter()] param param : {}", param);
+
         try{
             PostFilterResponseDTO postFilterResponseDTO = new PostFilterResponseDTO();
-            List<PostVO> postVOListst = postsDAO.findByfilter(param);
+            List<PostVO> postVOList = postsDAO.findByFilter(param);
             List<PostFilterDTO> postList = new ArrayList<>();
 
-            for (PostVO post: postVOListst) {
+            for (PostVO post: postVOList) {
                 Long postId = post.getPostId();
                 PostFilterDTO postFilterDTO = new PostFilterDTO();
                 postFilterDTO.setPostId(post.getPostId());
@@ -256,10 +258,8 @@ public class PostService {
             }
 
             postFilterResponseDTO.setPostList(postList);
-            LOGGER.info("[filter()] Amount : {}", param.get("amount"));
             postFilterResponseDTO.setItemLength((Integer)param.get("amount"));
             postFilterResponseDTO.setTotal(postsDAO.getTotal(param));
-            LOGGER.info("[filter()] Page : {}", param.get("page"));
             postFilterResponseDTO.setPage((Integer)param.get("page"));
             LOGGER.info("[filter()] postFilterResponseDTO : {}", postFilterResponseDTO);
 
