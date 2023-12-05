@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.app.kkiri.domain.dto.PostFilterValueDTO;
 import com.app.kkiri.domain.dto.response.UserResponseDTO;
+import com.app.kkiri.repository.SpaceUsersDAO;
 import com.app.kkiri.service.UserService;
 
 import org.slf4j.Logger;
@@ -321,15 +322,15 @@ public class SpaceController {
 		Long newAdminUserId = spaceUserDTO.getUserId();
 		Long spaceId = spaceUserDTO.getSpaceId();
 
-		SpaceUserVO spaceUserVO = new SpaceUserVO();
-		spaceUserVO.setUserId(originalAdminUserId);
-
 		if(spaceUserDTO.getIsAdmin()) { // 방장 변경
 			spaceService.modifyStatus(originalAdminUserId, newAdminUserId, spaceId);
 			return ResponseEntity.noContent().build();
 		}
 
-		if(!multipartFile.isEmpty()) { // 사용자가 이미지를 지정한 경우
+		SpaceUserVO selectedSpaceUser = spaceService.showSpaceUsers(spaceId, originalAdminUserId);
+		selectedSpaceUser.setUserNickname(spaceUserDTO.getUserNickname());
+
+		if(!multipartFile.isEmpty()) { // 사용자가 이미지를 지정하는 경우 해당 이미지로 프로필을 변경한다.
 			StringBuffer uploadPath = new StringBuffer();
 			StringBuffer uploadFileName = new StringBuffer();
 			StringBuffer uploadFullPathAndFileName = new StringBuffer();
@@ -351,21 +352,13 @@ public class SpaceController {
 
 			fileService.uploadFile(uploadFullPathAndFileName.toString(), multipartFile);
 
-			spaceUserVO.setProfileImgName(originalFileName); // profile.jpg
-			spaceUserVO.setProfileImgPath(uploadFullPathAndFileName.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
-			spaceUserVO.setProfileImgUuid(uuid); // uuid
-			spaceUserVO.setProfileImgSize(multipartFile.getSize()); // ...bytes
-		} else { // 사용자가 어떠한 이미지도 선택하지 않은 경우 기본 이미지를 저장한다.
-			spaceUserVO.setProfileImgName("defaultProfile.png"); // defaultProfile.png
-			spaceUserVO.setProfileImgPath(defaultRootPath + "/defaultProfile.png"); // upload/default/defaultProfile.png
-			spaceUserVO.setProfileImgUuid("default"); // default
-			spaceUserVO.setProfileImgSize(0L); // 0L
+			selectedSpaceUser.setProfileImgName(originalFileName); // profile.jpg
+			selectedSpaceUser.setProfileImgPath(uploadFullPathAndFileName.toString()); // upload/profile/2023/11/10/uuid_profile.jpg
+			selectedSpaceUser.setProfileImgUuid(uuid); // uuid
+			selectedSpaceUser.setProfileImgSize(multipartFile.getSize()); // ...bytes
 		}
 
-		spaceUserVO.setSpaceId(spaceId);
-		spaceUserVO.setUserNickname(spaceUserDTO.getUserNickname());
-
-		spaceService.modifyInfo(spaceUserVO);
+		spaceService.modifyInfo(selectedSpaceUser);
 
 		return ResponseEntity.noContent().build();
 	}
