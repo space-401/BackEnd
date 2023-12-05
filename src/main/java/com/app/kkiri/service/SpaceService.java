@@ -248,7 +248,7 @@ public class SpaceService {
 		try{
 			spaceUsersDAO.set(spaceUserVO);
 		} catch (Exception e){
-			// throw new CustomException(StatusCode.BAD_REQUEST);
+			throw new BadRequestException(INVALID_REQUEST);
 		}
 	}
 
@@ -267,4 +267,10 @@ public class SpaceService {
 
 		return spaceVO;
 	}
+
+	// space_id 와 user_id 를 사용하여 space_users 의 모든 데이터를 조회
+	public SpaceUserVO showSpaceUsers(Long spaceId, Long userId) {
+		return spaceUsersDAO.findById(spaceId, userId);
+	}
+
 }
