@@ -63,8 +63,7 @@
                 #{writer}
             </foreach>
         </if>
-        ORDER BY
-        post_register_date DESC
+        ORDER BY post_register_date DESC
         LIMIT #{startIndex}, #{amount}
     </select>
 

@@ -30,8 +30,6 @@ public class SecurityConfig {
 	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-	// private final JwtTokenProvider jwtTokenProvider;
-	// private final UsersDAO usersDAO;
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,13 +38,8 @@ public class SecurityConfig {
 		http.csrf().disable();
 
 		http.authorizeRequests(requests -> requests
-			// .antMatchers("/").permitAll()
-			// .antMatchers("/user/auth/*").permitAll()
-			// .antMatchers("/user/refreshToken").permitAll()
 			.antMatchers("/**").permitAll()
 		);
-
-		// http.addFilterAfter(jwtFilter(), LogoutFilter.class);
 
 		http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
@@ -90,12 +83,4 @@ public class SecurityConfig {
 	public CustomOAuth2LoginConfigurer customOAuth2LoginConfigurer() {
 		return new CustomOAuth2LoginConfigurer();
 	}
-
-	// @Bean
-	// public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UsersDAO usersDAO) {
-	// 	JwtAuthenticationProvider jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtTokenProvider, usersDAO);
-	// 	AuthenticationManager authenticationManager = new ProviderManager(jwtAuthenticationProvider);
-	//
-	// 	return new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
-	// }
 }
