@@ -202,10 +202,17 @@ public class SpaceService {
 		if(spaceUsersDAO.findById(spaceId, userId) != null){
 			throw new BadRequestException(ExceptionCode.ALREADY_SAVED_SPACE);
 		} else {
-			SpaceUserVO spaceUserVO = new SpaceUserVO();
-			spaceUserVO.createNormal(userId);
-			spaceUserVO.setSpaceId(spaceId);
-			spaceUserVO.setUserNickname(usersDAO.findById(userId).getUserEmail());
+			SpaceUserVO spaceUserVO = SpaceUserVO.builder()
+				.spaceId(spaceId)
+				.userId(userId)
+				.userAdminYn(false)
+				.userNickname(usersDAO.findById(userId).getUserEmail())
+				.profileImgName("defaultProfile.png")
+				.profileImgPath("upload/default/defaultProfile.png")
+				.profileImgUuid("default")
+				.profileImgSize(0L)
+				.build();
+
 			spaceUsersDAO.save(spaceUserVO);
 			spacesDAO.setTally(spaceId,spacesDAO.getTally(spaceId) + 1);
 		}
