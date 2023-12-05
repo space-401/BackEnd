@@ -35,7 +35,7 @@
         FROM posts p
         LEFT JOIN post_tags t
         ON p.post_id=t.post_id
-        WHERE p.space_id = #{spaceId}
+        WHERE p.space_id = IFNULL(#{spaceId}, 0)
         <if test="keyword != null">
             AND post_title LIKE CONCAT('%',#{keyword},'%')
         </if>
@@ -70,37 +70,37 @@
     <select id="getTotal" resultType="_int">
         SELECT COUNT(x.post_id)
         FROM (
-            SELECT DISTINCT(p.post_id) post_id, space_id
-            FROM posts p LEFT JOIN post_tags t
-            ON p.post_id=t.post_id
-            WHERE p.space_id = #{spaceId}
-            <if test="keyword != null">
-                AND post_title LIKE CONCAT('%',#{keyword},'%')
-            </if>
-            <if test="dateList != null and dateList.size != 0">
-                <foreach collection="dateList" item="date" index="index">
-                    <choose>
-                        <when test="index == 0">
-                            AND #{date} BETWEEN post_begin_date AND post_end_date
-                        </when>
-                        <when test="index != 0">
-                            OR #{date} BETWEEN post_begin_date AND post_end_date
-                        </when>
-                    </choose>
-                </foreach>
-            </if>
-            <if test="tags != null and tags.size != 0">
-                AND t.tag_id IN
-                <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
-                    #{tag}
-                </foreach>
-            </if>
-            <if test="writers != null and writers.size != 0">
-                AND user_id IN
-                <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
-                    #{writer}
-                </foreach>
-            </if>
+        SELECT DISTINCT(p.post_id) post_id, space_id
+        FROM posts p LEFT JOIN post_tags t
+        ON p.post_id=t.post_id
+        WHERE p.space_id = IFNULL(#{spaceId}, 0)
+        <if test="keyword != null">
+            AND post_title LIKE CONCAT('%',#{keyword},'%')
+        </if>
+        <if test="dateList != null and dateList.size != 0">
+            <foreach collection="dateList" item="date" index="index">
+                <choose>
+                    <when test="index == 0">
+                        AND #{date} BETWEEN post_begin_date AND post_end_date
+                    </when>
+                    <when test="index != 0">
+                        OR #{date} BETWEEN post_begin_date AND post_end_date
+                    </when>
+                </choose>
+            </foreach>
+        </if>
+        <if test="tags != null and tags.size != 0">
+            AND t.tag_id IN
+            <foreach collection="tags" item="tag" separator="," index="index" open="(" close=")">
+                #{tag}
+            </foreach>
+        </if>
+        <if test="writers != null and writers.size != 0">
+            AND user_id IN
+            <foreach collection="writers" item="writer" separator="," index="index" open="(" close=")">
+                #{writer}
+            </foreach>
+        </if>
         ) x
     </select>
 
@@ -114,12 +114,12 @@
     <select id="selectBookmarkedPosts" resultType="postVO">
         SELECT p.post_id, p.post_title, p.post_register_date
         FROM post_bookmarks pb
-        INNER JOIN posts p
-        ON pb.post_id = p.post_id
+                 INNER JOIN posts p
+                            ON pb.post_id = p.post_id
         WHERE pb.user_id = #{userId}
-        AND pb.bookmark_yn = TRUE
+          AND pb.bookmark_yn = TRUE
         ORDER BY p.post_register_date DESC, p.post_id DESC
-        LIMIT #{startIndex}, 10;
+            LIMIT #{startIndex}, 10;
     </select>
 
     <!-- userId 를 사용하여 사용자가 작성한 게시글 조회 -->
@@ -128,7 +128,7 @@
         FROM posts
         WHERE user_id = #{userId}
         ORDER BY post_register_date DESC, post_id DESC
-        LIMIT #{startIndex}, 10;
+            LIMIT #{startIndex}, 10;
     </select>
 
     <!-- userId 를 사용하여 사용자가 작성한 게시글 수를 조회 -->

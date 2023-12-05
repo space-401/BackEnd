@@ -32,8 +32,6 @@ public class UserController {
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserService userService;
-	private final SpaceService spaceService;
-	private final PostService postService;
 	private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
 	@GetMapping("/refreshToken")
