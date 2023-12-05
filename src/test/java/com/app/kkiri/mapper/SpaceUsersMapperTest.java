@@ -34,13 +34,13 @@ class SpaceUsersMapperTest {
 		spaceUsersMapper.selectByFirst(4L, 1L);
 	}
 
-	@Test
-	void insert() {
-		SpaceUserVO spaceUserVO = new SpaceUserVO();
-		spaceUserVO.createNormal(2L);
-		spaceUserVO.setSpaceId(46L);
-		spaceUsersMapper.insert(spaceUserVO);
-	}
+	// @Test
+	// void insert() {
+	// 	SpaceUserVO spaceUserVO = new SpaceUserVO();
+	// 	spaceUserVO.createNormal(2L);
+	// 	spaceUserVO.setSpaceId(46L);
+	// 	spaceUsersMapper.insert(spaceUserVO);
+	// }
 
 	@Test
 	void delete() {

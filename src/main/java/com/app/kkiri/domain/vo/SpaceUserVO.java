@@ -2,12 +2,15 @@ package com.app.kkiri.domain.vo;
 
 import org.springframework.stereotype.Component;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Component
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class SpaceUserVO {
 	private Long spaceId;
 	private Long userId;
@@ -34,16 +37,6 @@ public class SpaceUserVO {
 	public void createAdmin(Long userId) {
 		this.userId = userId;
 		this.userAdminYn = true;
-		this.userNickname = "default";
-		this.profileImgName = "default";
-		this.profileImgPath = "default";
-		this.profileImgUuid = "default";
-		this.profileImgSize = 0L;
-	}
-
-	public void createNormal(Long userId) {
-		this.userId = userId;
-		this.userAdminYn = false;
 		this.userNickname = "default";
 		this.profileImgName = "default";
 		this.profileImgPath = "default";
