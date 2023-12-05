@@ -35,7 +35,7 @@
         FROM posts p
         LEFT JOIN post_tags t
         ON p.post_id=t.post_id
-        WHERE p.space_id = 2
+        WHERE p.space_id = #{spaceId}
         <if test="keyword != null">
             AND post_title LIKE CONCAT('%',#{keyword},'%')
         </if>
@@ -74,7 +74,7 @@
             SELECT DISTINCT(p.post_id) post_id, space_id
             FROM posts p LEFT JOIN post_tags t
             ON p.post_id=t.post_id
-            WHERE p.space_id=#{spaceId}
+            WHERE p.space_id = #{spaceId}
             <if test="keyword != null">
                 AND post_title LIKE CONCAT('%',#{keyword},'%')
             </if>
