@@ -12,7 +12,7 @@ public enum ExceptionCode {
 	DUPLICATED_MEMEBER_NICKNAME(1002, "중복된 닉네임입니다."),
 	ALREADY_SAVED_SPACE(1003, "이미 가입된 스페이스입니다."),
 	INVALID_SPACE_CODE_OR_PASSWORD(1004, "유효하지 않은 스페이스 코드나 비밀번호입니다."),
-	FAIL_TO_DELETE_USER(1005, "스페이스의 방장은 회원 탈퇴를 할 수 없습니다."),
+	// FAIL_TO_DELETE_USER(1005, "스페이스의 방장은 회원 탈퇴를 할 수 없습니다."),
 
 	OVERSIZED_IMAGE(5001, "업로드 가능한 이미지 용량을 초과했습니다."),
 	MISSING_IMAGE(5002, "기본 이미지가 없습니다."),

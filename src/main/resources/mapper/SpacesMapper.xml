@@ -60,13 +60,23 @@
         WHERE space_id=#{spaceId}
     </update>
 
+    <!-- user_id 를 사용하여 space 를 삭제 -->
     <delete id="deleteByUserId">
         DELETE s
         FROM spaces s
         INNER JOIN space_users su
         ON s.space_id = su.space_id
-        WHERE s.space_user_tally = 1
-        AND su.user_id = #{userId}
-        AND su.user_admin_yn = TRUE;
+        WHERE su.user_id = #{userId}
     </delete>
+
+    <!-- user_id 를 사용하여 방장이면서 스페이스 총 인원수가 한명이 아닌 스페이스의 space_name 을 조회 -->
+    <select id="selectByUserId" resultType="string">
+        SELECT s.space_name
+        FROM spaces s
+        INNER JOIN space_users su
+        ON s.space_id = su.space_id
+        WHERE su.user_id = #{user_id}
+        AND su.user_admin_yn = TRUE
+        AND s.space_user_tally != 1
+    </select>
 </mapper>
