@@ -2,13 +2,17 @@ package com.app.kkiri.domain.dto;
 
 import org.springframework.stereotype.Component;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Component
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SpaceDTO {
+
     private String spaceName;
     private String spaceDescription;
     private String spacePw;
@@ -22,4 +26,5 @@ public class SpaceDTO {
     private String spaceIconUuid;
     private Long spaceIconSize;
     private Long defaultImg;
-}
+    private String[] tags;
+ }

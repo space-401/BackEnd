@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.vo.PostVO;
+import com.app.kkiri.domain.vo.SpaceVO;
 
 @Mapper
 public interface PostsMapper {
@@ -23,8 +24,20 @@ public interface PostsMapper {
     public PostVO selectById(Long postId);
 
     // 게시글 필터 조회
-    public List<PostVO> selectByfilter(Map<String, Object> param);
+    public List<PostVO> selectByFilter(Map<String, Object> param);
 
     // 필터된 게시글 총 개수
     public int getTotal(Map<String, Object> param);
+
+    // userId 를 사용하여 post 를 삭제
+    public void deleteByUserId(Long userId);
+
+    // 사용자가 북마크한 게시글 정보를 조회
+    public List<PostVO> selectBookmarkedPosts(Long userId, Long startIndex);
+
+    // userId 를 사용하여 사용자가 작성한 게시글 조회
+    public List<PostVO> selectByUserId(Long userId, Long startIndex);
+
+    // userId 를 사용하여 사용자가 작성한 게시글 수를 조회
+    public Long getTotalByUserId(Long userId);
 }

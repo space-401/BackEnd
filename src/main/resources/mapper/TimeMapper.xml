@@ -3,6 +3,6 @@
 
 <mapper namespace="com.app.kkiri.mapper.TimeMapper">
     <select id="getTime" resultType="string">
-        SELECT SYSDATE FROM DUAL
+        SELECT SYSDATE();
     </select>
 </mapper>

@@ -1,7 +1,8 @@
 package com.app.kkiri.service;
 
+import static com.app.kkiri.global.exception.ExceptionCode.*;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -12,18 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.app.kkiri.domain.dto.PostDTO;
 import com.app.kkiri.domain.dto.PostDateDTO;
-import com.app.kkiri.domain.dto.PostDetailResponseDTO;
+import com.app.kkiri.domain.dto.response.PostDetailResponseDTO;
 import com.app.kkiri.domain.dto.PostFilterDTO;
-import com.app.kkiri.domain.dto.PostFilterResponseDTO;
+import com.app.kkiri.domain.dto.response.PostFilterResponseDTO;
 import com.app.kkiri.domain.dto.PostPositionDTO;
-import com.app.kkiri.domain.dto.SpaceUserRespnseDTO;
+import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
 import com.app.kkiri.domain.dto.TagDTO;
 import com.app.kkiri.domain.vo.PostImgVO;
 import com.app.kkiri.domain.vo.PostVO;
 import com.app.kkiri.domain.vo.SpaceUserVO;
 import com.app.kkiri.domain.vo.TagVO;
-import com.app.kkiri.exceptions.CustomException;
-import com.app.kkiri.exceptions.StatusCode;
+import com.app.kkiri.global.exception.BadRequestException;
 import com.app.kkiri.repository.CommentsDAO;
 import com.app.kkiri.repository.MentionDAO;
 import com.app.kkiri.repository.PostBookmarksDAO;
@@ -31,6 +31,7 @@ import com.app.kkiri.repository.PostImgsDAO;
 import com.app.kkiri.repository.PostTagsDAO;
 import com.app.kkiri.repository.PostsDAO;
 import com.app.kkiri.repository.SpaceUsersDAO;
+import com.app.kkiri.security.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,21 +45,26 @@ public class PostService {
     private final PostTagsDAO postTagsDAO;
     private final PostBookmarksDAO postBookmarksDAO;
     private final MentionDAO mentionDAO;
-    private final SpaceUsersDAO  spaceUsersDAO;
+    private final SpaceUsersDAO spaceUsersDAO;
     private final CommentsDAO commentsDAO;
     private final FileService fileService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final Logger LOGGER = LoggerFactory.getLogger(PostService.class);
 
     @Transactional(rollbackFor = Exception.class)
     // 게시글 작성
     public Long register(PostDTO postDTO, List<PostImgVO> imgs){
+        LOGGER.info("[register()] param postDTO : {}", postDTO);
+
         postsDAO.save(postDTO);
+
         Long postId = postDTO.getPostId();
         List<Long> tags = postDTO.getTags();
         List<Long> people = postDTO.getPeople();
 
-        log.info("postId: " + postId);
-
         for (PostImgVO img : imgs) {
+            LOGGER.info("[register()] img : {}", img);
+
             img.setPostId(postId);
             postImgsDAO.save(img);
         }
@@ -79,26 +85,22 @@ public class PostService {
         try {
             postsDAO.delete(postId);
         } catch (Exception e){
-            throw new CustomException(StatusCode.BAD_REQUEST);
+            // throw new CustomException(StatusCode.BAD_REQUEST);
         }
     }
 
     // 게시글 수정
     @Transactional(rollbackFor = Exception.class)
-    public void modify(PostDTO postDTO, List<PostImgVO> imgs){
+    public void modify(PostDTO postDTO, List<PostImgVO> imgs) {
+        LOGGER.info("[modify()] param postDTO {}", postDTO);
+
         Long postId = postDTO.getPostId();
         List<Long> tags = postDTO.getTags();
         List<Long> people = postDTO.getPeople();
 
         postsDAO.set(postDTO);
-        postImgsDAO.delete(postId);
         postTagsDAO.delete(postId);
         mentionDAO.delete(postId);
-
-        for (PostImgVO img : imgs) {
-            img.setPostId(postId);
-            postImgsDAO.save(img);
-        }
 
         for (Long tag: tags) {
             postTagsDAO.save(postId, tag);
@@ -108,6 +110,14 @@ public class PostService {
             mentionDAO.insert(postId, person);
         }
 
+        if(!imgs.isEmpty()) { // 사용자가 이미지를 변경한 경우
+            postImgsDAO.delete(postId);
+
+            for (PostImgVO img : imgs) {
+                img.setPostId(postId);
+                postImgsDAO.save(img);
+            }
+        }
     }
 
     // 게시글 상세조회
@@ -127,7 +137,9 @@ public class PostService {
         postDetailResponseDTO.setPostCreatedAt(postVO.getPostRegisterDate());
         postDetailResponseDTO.setPostUpdatedAt(postVO.getPostUpdateDate());
         postDetailResponseDTO.setIsMine(postVO.getUserId() == userId);
-        postDetailResponseDTO.setIsBookmark(postBookmarksDAO.select(postId, userId) != 0);
+
+        Integer bookmark = postBookmarksDAO.select(postId, userId);
+        postDetailResponseDTO.setIsBookmark(bookmark == null? false : bookmark == 1);
 
         PostDateDTO postDateDTO = new PostDateDTO();
         postDateDTO.create(postVO.getPostBeginDate(), postVO.getPostEndDate());
@@ -135,49 +147,48 @@ public class PostService {
 
         List<String> fileKeys = postImgsDAO.findById(postId);
         List<String> fileURIs = new ArrayList<>();
-        fileKeys.forEach(fileKey -> fileURIs.add(fileService.displayFile(fileKey)));
+        fileKeys.forEach(fileKey -> fileURIs.add(fileService.getFileUrl(fileKey)));
         postDetailResponseDTO.setImgsUrl(fileURIs);
 
         List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId, spaceId);
-        List<SpaceUserRespnseDTO> selectedUserList = new ArrayList<>();
+        List<SpaceUserResponseDTO> selectedUserList = new ArrayList<>();
         for (SpaceUserVO user:selectedUsers) {
-            SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-            spaceUserRespnseDTO.setUserId(user.getUserId());
-            spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+            SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+            spaceUserResponseDTO.setUserId(user.getUserId());
+            spaceUserResponseDTO.setUserName(user.getUserNickname());
+            spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
-            selectedUserList.add(spaceUserRespnseDTO);
+            selectedUserList.add(spaceUserResponseDTO);
         }
 
         postDetailResponseDTO.setSelectedUsers(selectedUserList);
 
         List<SpaceUserVO> users = spaceUsersDAO.findAll(spaceId, userId);
-        List<SpaceUserRespnseDTO> userList = new ArrayList<>();
+        List<SpaceUserResponseDTO> userList = new ArrayList<>();
         for (SpaceUserVO user:users) {
-            SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-            spaceUserRespnseDTO.setUserId(user.getUserId());
-            spaceUserRespnseDTO.setUserName(user.getUserNickname());
-            spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+            SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+            spaceUserResponseDTO.setUserId(user.getUserId());
+            spaceUserResponseDTO.setUserName(user.getUserNickname());
+            spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
-            userList.add(spaceUserRespnseDTO);
+            userList.add(spaceUserResponseDTO);
         }
         postDetailResponseDTO.setUserList(userList);
 
-//        List<TagVO> tagVOList = postTagsDAO.findById(postId);
-//        List<TagDTO> tagList = new ArrayList<>();
-//
-//        for (TagVO tag:tagVOList) {
-//            TagDTO tagDTO = new TagDTO();
-//            tagDTO.setTagId(tag.getTagId());
-//            tagDTO.setTagTitle(tag.getTagName());
-//
-//            tagList.add(tagDTO);
-//        }
-//        postDetailResponseDTO.setSelectedTags(tagList);
+        //        List<TagVO> tagVOList = postTagsDAO.findById(postId);
+        //        List<TagDTO> tagList = new ArrayList<>();
+        //
+        //        for (TagVO tag:tagVOList) {
+        //            TagDTO tagDTO = new TagDTO();
+        //            tagDTO.setTagId(tag.getTagId());
+        //            tagDTO.setTagTitle(tag.getTagName());
+        //
+        //            tagList.add(tagDTO);
+        //        }
+        //        postDetailResponseDTO.setSelectedTags(tagList);
         postDetailResponseDTO.setSelectedTags(postTagsDAO.findById(postId));
-        postDetailResponseDTO.setCommentConut(commentsDAO.getTotal(postId));
-
-        log.info("postDetailResponseDTO: " + postDetailResponseDTO);
+        postDetailResponseDTO.setCommentCount(commentsDAO.getTotal(postId));
+        LOGGER.info("[postDetail()] postDetailResponseDTO : {}", postDetailResponseDTO);
 
         return postDetailResponseDTO;
     }
@@ -185,24 +196,22 @@ public class PostService {
     // 게시글 북마크
     public void bookmark(Long postId, Long userId){
         try {
-            if(postBookmarksDAO.select(postId, userId) == 0){
-                postBookmarksDAO.setBookmark(postId, userId);
-            } else{
-                postBookmarksDAO.delete(postId, userId);
-            }
+            postBookmarksDAO.setBookmark(postId, userId);
         } catch (Exception e){
-            throw new CustomException(StatusCode.BAD_REQUEST);
+            // throw new CustomException(StatusCode.BAD_REQUEST);
         }
     }
 
     // 게시글 필터 조회
     public PostFilterResponseDTO filter(Map<String, Object> param, Long userId){
+        LOGGER.info("[filter()] param param : {}", param);
+
         try{
             PostFilterResponseDTO postFilterResponseDTO = new PostFilterResponseDTO();
-            List<PostVO> postVOListst = postsDAO.findByfilter(param);
+            List<PostVO> postVOList = postsDAO.findByFilter(param);
             List<PostFilterDTO> postList = new ArrayList<>();
 
-            for (PostVO post: postVOListst) {
+            for (PostVO post: postVOList) {
                 Long postId = post.getPostId();
                 PostFilterDTO postFilterDTO = new PostFilterDTO();
                 postFilterDTO.setPostId(post.getPostId());
@@ -217,7 +226,7 @@ public class PostService {
 
                 List<String> fileKeys = postImgsDAO.findById(postId);
                 List<String> fileURIs = new ArrayList<>();
-                fileKeys.forEach(fileKey -> fileURIs.add(fileService.displayFile(fileKey)));
+                fileKeys.forEach(fileKey -> fileURIs.add(fileService.getFileUrl(fileKey)));
                 postFilterDTO.setImgUrl(fileURIs);
 
                 List<TagVO> tagVOList = postTagsDAO.findById(postId);
@@ -226,24 +235,24 @@ public class PostService {
                 for (TagVO tag:tagVOList) {
                     TagDTO tagDTO = new TagDTO();
                     tagDTO.setTagId(tag.getTagId());
-                    tagDTO.setTagTitle(tag.getTagName());
+                    tagDTO.setTagName(tag.getTagName());
 
                     tagList.add(tagDTO);
                 }
 
                 postFilterDTO.setSelectedTags(tagList);
 
-                List<SpaceUserVO> users = spaceUsersDAO.findAll((Long)param.get("spaceId"), userId);
-                List<SpaceUserRespnseDTO> userList = new ArrayList<>();
-                for (SpaceUserVO user:users) {
-                    SpaceUserRespnseDTO spaceUserRespnseDTO = new SpaceUserRespnseDTO();
-                    spaceUserRespnseDTO.setUserId(user.getUserId());
-                    spaceUserRespnseDTO.setUserName(user.getUserNickname());
-                    spaceUserRespnseDTO.setImgUrl(fileService.displayFile(user.getProfileImgPath()));
+                List<SpaceUserVO> selectedUsers = mentionDAO.selectById(postId,(Long)param.get("spaceId"));
+                List<SpaceUserResponseDTO> selectedUserList = new ArrayList<>();
+                for (SpaceUserVO user:selectedUsers) {
+                    SpaceUserResponseDTO spaceUserResponseDTO = new SpaceUserResponseDTO();
+                    spaceUserResponseDTO.setUserId(user.getUserId());
+                    spaceUserResponseDTO.setUserName(user.getUserNickname());
+                    spaceUserResponseDTO.setImgUrl(fileService.getFileUrl(user.getProfileImgPath()));
 
-                    userList.add(spaceUserRespnseDTO);
+                    selectedUserList.add(spaceUserResponseDTO);
                 }
-                postFilterDTO.setUsersList(userList);
+                postFilterDTO.setUsersList(selectedUserList);
 
                 postList.add(postFilterDTO);
             }
@@ -251,10 +260,18 @@ public class PostService {
             postFilterResponseDTO.setPostList(postList);
             postFilterResponseDTO.setItemLength((Integer)param.get("amount"));
             postFilterResponseDTO.setTotal(postsDAO.getTotal(param));
+            postFilterResponseDTO.setPage((Integer)param.get("page"));
+            LOGGER.info("[filter()] postFilterResponseDTO : {}", postFilterResponseDTO);
 
             return postFilterResponseDTO;
         } catch (Exception e) {
-            throw new CustomException(StatusCode.BAD_REQUEST);
+            throw new BadRequestException(INVALID_REQUEST);
         }
+    }
+
+    // userId 를 사용하여 post 를 삭제
+    public void deleteByUserId(Long userId) {
+
+        postsDAO.deleteByUserId(userId);
     }
 }

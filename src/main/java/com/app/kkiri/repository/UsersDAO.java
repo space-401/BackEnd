@@ -3,7 +3,7 @@ package com.app.kkiri.repository;
 import org.springframework.stereotype.Repository;
 
 import com.app.kkiri.domain.dto.UserDTO;
-import com.app.kkiri.domain.dto.UserResponseDTO;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.domain.vo.UserVO;
 import com.app.kkiri.mapper.UsersMapper;
 
@@ -94,5 +94,10 @@ public class UsersDAO {
 	// 엑세스 토큰과 리프레쉬 토큰 재발급 후 수정
 	public void setTokens(Long userId, String accessToken, String refreshToken) {
 		usersMapper.updateAccessTokenAndRefreshToken(userId, accessToken, refreshToken);
+	}
+
+	// 회원 탈퇴
+	public void deleteUser(Long userId) {
+		usersMapper.updateUserStatus(userId);
 	}
 }

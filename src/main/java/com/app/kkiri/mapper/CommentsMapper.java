@@ -25,4 +25,10 @@ public interface CommentsMapper {
 
     // 게시글 댓글 총 개수
     public Long getTotal(Long postId);
+
+    // userId 와 startIndex 를 사용하여 사용자가 작성한 댓글을 조회
+    public List<CommentVO> selectByUserIdAndStartIndex(Long userId, Long startIndex);
+
+    // userId 를 사용하여 사용자가 작성한 댓글의 수를 조회
+    public Long getTotalByUserId(Long userId);
 }

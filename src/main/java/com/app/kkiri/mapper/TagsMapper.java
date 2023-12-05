@@ -19,4 +19,7 @@ public interface TagsMapper {
 
 	// 스페이스 태그 삭제
 	public void delete(Long tagId);
+
+	// 가장 최근에 생성된 태그 조회
+	public TagVO selectRecentTag();
 }

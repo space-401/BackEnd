@@ -58,10 +58,10 @@ class SpaceUsersMapperTest {
 		spaceUsersMapper.update(spaceUserVO);
 	}
 
-	@Test
-	void updateByAdminYn() {
-		spaceUsersMapper.updateByAdminYn(4L);
-	}
+	// @Test
+	// void updateByAdminYn() {
+	// 	spaceUsersMapper.updateByAdminYn(4L);
+	// }
 
 	@Test
 	void updateByUserId() {

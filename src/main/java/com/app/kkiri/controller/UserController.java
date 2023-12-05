@@ -1,58 +1,86 @@
 package com.app.kkiri.controller;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.app.kkiri.domain.dto.response.BookmarkedPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.MyCommentListResponseDTO;
+import com.app.kkiri.domain.dto.response.MyPostListResponseDTO;
+import com.app.kkiri.domain.dto.response.UserMypageResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.kkiri.security.jwt.JwtTokenProvider;
+import com.app.kkiri.service.PostService;
+import com.app.kkiri.service.SpaceService;
 import com.app.kkiri.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/user/*")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserService userService;
+	private final SpaceService spaceService;
+	private final PostService postService;
+	private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
 	@GetMapping("/refreshToken")
-	public ResponseEntity<Map<String, Object>> refreshToken(HttpServletRequest httpServletRequest) throws AuthenticationException, IOException {
+	public ResponseEntity<Map<String, Object>> refreshToken(HttpServletRequest httpServletRequest) {
 
-		String refreshToken = jwtTokenProvider.resolveToken(httpServletRequest);
-		if(refreshToken == null) {
-			OAuth2Error oAuth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
-			throw new OAuth2AuthenticationException(oAuth2Error, "헤더 정보가 잘못되었습니다");
-		}
-		LOGGER.info("refreshToken() value refreshToken : {}", refreshToken);
-
-		if(!jwtTokenProvider.validateToken(refreshToken)) {
-			OAuth2Error oAuth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN);
-			throw new OAuth2AuthenticationException(oAuth2Error, "유효하지 않은 토큰입니다");
-		}
-
-		String newAccessToken = userService.reissueAccessToken(refreshToken);
-		LOGGER.info("refreshToken() value newAccessToken : {}", newAccessToken);
+		String reissuedAccessToken = jwtTokenProvider.reissueAccessToken(httpServletRequest);
+		userService.updateAccessToken(reissuedAccessToken);
 
 		Map<String, Object> map = new HashMap<>();
-		map.put("newAccessToken", newAccessToken);
+		map.put("newAccessToken", reissuedAccessToken);
 
-		return ResponseEntity.status(HttpStatus.OK).body(map);
+		return ResponseEntity.ok().body(map);
+	}
+
+	@GetMapping("/mypage")
+	public ResponseEntity<?> mypage(HttpServletRequest request) {
+
+		UserMypageResponseDTO userMypageResponseDTO = userService.searchMypage(jwtTokenProvider.getUserIdByHttpRequest(request));
+
+		return ResponseEntity.ok().body(userMypageResponseDTO);
+	}
+
+	@DeleteMapping("")
+	public ResponseEntity<?> deleteUser(HttpServletRequest httpServletRequest) {
+
+		Long userId = jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest);
+
+		userService.deleteUser(userId);
+
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/bookmark")
+	public ResponseEntity<BookmarkedPostListResponseDTO> bookmark(@RequestParam int page, HttpServletRequest httpServletRequest) {
+
+		return ResponseEntity.ok().body(userService.bookmarkList(jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest), page));
+	}
+
+	@GetMapping("/mypost")
+	public ResponseEntity<MyPostListResponseDTO> mypost(@RequestParam int page, HttpServletRequest httpServletRequest) {
+
+		return ResponseEntity.ok().body(userService.myPostList(jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest), page));
+	}
+
+	@GetMapping("/mycomment")
+	public ResponseEntity<MyCommentListResponseDTO> mycomment(@RequestParam int page, HttpServletRequest httpServletRequest) {
+
+		return ResponseEntity.ok().body(userService.myCommentList(jwtTokenProvider.getUserIdByHttpRequest(httpServletRequest), page));
 	}
 }

@@ -3,60 +3,80 @@
 
 <mapper namespace="com.app.kkiri.mapper.SpacesMapper">
     <select id="selectAll" resultType="spaceVO">
-            SELECT s.SPACE_ID, SPACE_NAME, SPACE_ICON_PATH
-            FROM SPACES s
-            INNER JOIN SPACE_USERS su
-            ON s.SPACE_ID = su.SPACE_ID
-            WHERE su.USER_ID = #{userId}
-            ORDER BY SPACE_SIGNUP_DATE DESC
+        SELECT s.space_id, space_name, space_icon_path
+        FROM spaces s
+        INNER JOIN space_users su
+        ON s.space_id = su.space_id
+        WHERE su.user_id = #{userId}
+        ORDER BY space_signup_date DESC
     </select>
 
     <select id="selectById" resultType="spaceVO">
-        SELECT SPACE_NAME, SPACE_DESCRIPTION, SPACE_ICON_PATH, SPACE_PW
-        FROM SPACES
-        WHERE SPACE_ID=#{spaceId}
+        SELECT space_id, space_name, space_description, space_pw, space_user_tally, space_register_date, space_update_date, space_icon_name, space_icon_path, space_icon_uuid, space_icon_size, space_code
+        FROM spaces
+        WHERE space_id = #{spaceId}
     </select>
 
     <select id="selectByCodeAndPw" resultType="Long">
-        SELECT SPACE_ID
-        FROM SPACES
-        WHERE SPACE_CODE=#{spaceCode} AND SPACE_PW=#{spacePw}
+        SELECT space_id
+        FROM spaces
+        WHERE space_code=#{spaceCode} AND space_pw=#{spacePw}
     </select>
 
     <insert id="insert">
-        <selectKey keyProperty="spaceId" order="BEFORE" resultType="long">
-            SELECT SEQ_SPACES.NEXTVAL FROM DUAL
+        INSERT INTO spaces (space_name, space_description, space_pw, space_code, space_user_tally, space_icon_name, space_icon_path, space_icon_uuid, space_icon_size)
+        VALUES(#{spaceName}, #{spaceDescription}, #{spacePw}, #{spaceCode}, #{spaceUserTally}, #{spaceIconName}, #{spaceIconPath}, #{spaceIconUuid}, #{spaceIconSize})
+        <selectKey keyProperty="spaceId" order="AFTER" resultType="long">
+            SELECT MAX(space_id) FROM spaces
         </selectKey>
-        INSERT INTO SPACES (SPACE_ID, SPACE_NAME, SPACE_DESCRIPTION, SPACE_PW, SPACE_CODE, SPACE_USER_TALLY, SPACE_ICON_NAME, SPACE_ICON_PATH, SPACE_ICON_UUID, SPACE_ICON_SIZE)
-        VALUES(#{spaceId}, #{spaceName}, #{spaceDescription}, #{spacePw}, #{spaceCode}, #{spaceUserTally}, #{spaceIconName}, #{spaceIconPath}, #{spaceIconUuid}, #{spaceIconSize})
     </insert>
 
     <delete id="delete">
-        DELETE FROM SPACES
-        WHERE SPACE_ID=#{spaceId}
+        DELETE FROM spaces
+        WHERE space_id=#{spaceId}
     </delete>
 
     <update id="update">
-        UPDATE SPACES
-        SET SPACE_NAME=#{spaceName},
-            SPACE_DESCRIPTION=#{spaceDescription},
-            SPACE_PW=#{spacePw},
-            SPACE_ICON_NAME=#{spaceIconName},
-            SPACE_ICON_PATH=#{spaceIconPath},
-            SPACE_ICON_UUID=#{spaceIconUuid},
-            SPACE_ICON_SIZE=#{spaceIconSize},
-            SPACE_UPDATE_DATE = SYSDATE
-        WHERE SPACE_ID=#{spaceId}
+        UPDATE spaces
+        SET space_name=#{spaceName},
+            space_description=#{spaceDescription},
+            space_pw=#{spacePw},
+            space_icon_name=#{spaceIconName},
+            space_icon_path=#{spaceIconPath},
+            space_icon_uuid=#{spaceIconUuid},
+            space_icon_size=#{spaceIconSize},
+            space_update_date = SYSDATE()
+        WHERE space_id=#{spaceId}
     </update>
 
     <select id="getTally" resultType="int">
-        SELECT SPACE_USER_TALLY FROM SPACES
-        WHERE SPACE_ID=#{spaceId}
+        SELECT space_user_tally FROM spaces
+        WHERE space_id=#{spaceId}
     </select>
 
     <update id="updateTally">
-        UPDATE SPACES
-        SET SPACE_USER_TALLY=#{spaceUserTally}
-        WHERE SPACE_ID=#{spaceId}
+        UPDATE spaces
+        SET space_user_tally=#{spaceUserTally}
+        WHERE space_id=#{spaceId}
     </update>
+
+    <!-- user_id 를 사용하여 space 를 삭제 -->
+    <delete id="deleteByUserId">
+        DELETE s
+        FROM spaces s
+        INNER JOIN space_users su
+        ON s.space_id = su.space_id
+        WHERE su.user_id = #{userId}
+    </delete>
+
+    <!-- user_id 를 사용하여 방장이면서 스페이스 총 인원수가 한명이 아닌 스페이스의 space_name 을 조회 -->
+    <select id="selectByUserId" resultType="string">
+        SELECT s.space_name
+        FROM spaces s
+        INNER JOIN space_users su
+        ON s.space_id = su.space_id
+        WHERE su.user_id = #{user_id}
+        AND su.user_admin_yn = TRUE
+        AND s.space_user_tally != 1
+    </select>
 </mapper>

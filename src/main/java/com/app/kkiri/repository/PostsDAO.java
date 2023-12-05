@@ -28,8 +28,28 @@ public class PostsDAO {
     public PostVO findById(Long postId){ return postsMapper.selectById(postId); }
 
     // 게시글 필터 조회
-    public List<PostVO> findByfilter(Map<String, Object> param){ return postsMapper.selectByfilter(param); }
+    public List<PostVO> findByFilter(Map<String, Object> param){ return postsMapper.selectByFilter(param); }
 
     // 필터된 게시글 총 개수
     public int getTotal(Map<String, Object> param){ return postsMapper.getTotal(param); }
+
+    // userId 를 사용하여 post 를 삭제
+    public void deleteByUserId(Long userId) {
+        postsMapper.deleteByUserId(userId);
+    }
+
+    // 사용자가 북마크한 게시글 정보를 조회
+    public List<PostVO> findBookmarkedPostsByUserIdAndPage(Long userId, Long startIndex) {
+        return postsMapper.selectBookmarkedPosts(userId, startIndex);
+    }
+
+    // userId 를 사용하여 사용자가 작성한 게시글 조회
+    public List<PostVO> findByUserId(Long userId, Long startIndex) {
+        return postsMapper.selectByUserId(userId, startIndex);
+    }
+
+    // userId 를 사용하여 사용자가 작성한 게시글 수를 조회
+    public Long countByUserId(Long userId) {
+        return postsMapper.getTotalByUserId(userId);
+    }
 }

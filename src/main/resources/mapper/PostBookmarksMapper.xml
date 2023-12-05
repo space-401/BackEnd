@@ -3,21 +3,27 @@
 
 <mapper namespace="com.app.kkiri.mapper.PostBookmarksMapper">
     <update id="updateBookmark">
-        MERGE INTO POST_BOOKMARKS
-        USING DUAL
-        ON (POST_ID=#{postId} AND USER_ID=#{userId})
-        WHEN NOT MATCHED THEN
-        INSERT(POST_ID, USER_ID)
-        VALUES(#{postId},#{userId})
+        INSERT INTO post_bookmarks (post_id, user_id, bookmark_yn)
+        values (#{postId}, #{userId}, 1)
+        ON DUPLICATE KEY
+        UPDATE bookmark_yn=IF(bookmark_yn, 0, 1)
     </update>
 
     <delete id="delete">
-        DELETE POST_BOOKMARKS
-        WHERE USER_ID=#{userId} AND POST_ID=#{postId}
+        DELETE post_bookmarks
+        WHERE user_id=#{userId} AND post_id=#{postId}
     </delete>
 
     <select id="select" resultType="int">
-        SELECT COUNT(POST_ID) FROM POST_BOOKMARKS
-        WHERE POST_ID=#{postId} AND USER_ID=#{userId}
+        SELECT bookmark_yn FROM post_bookmarks
+        WHERE post_id=#{postId} AND user_id=#{userId}
+    </select>
+
+    <!-- 사용자가 북마크한 게시글의 수를 조회 -->
+    <select id="getTotalBookmarkedPosts" resultType="long">
+        SELECT COUNT(post_id)
+        FROM post_bookmarks
+        WHERE user_id = #{userId}
+        AND bookmark_yn = TRUE
     </select>
 </mapper>

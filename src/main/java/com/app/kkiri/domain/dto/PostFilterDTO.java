@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.app.kkiri.domain.dto.response.SpaceUserResponseDTO;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +19,7 @@ public class PostFilterDTO {
     private List<TagDTO> selectedTags;
     private String postCreatedAt;
     private String postUpdatedAt;
-    private List<SpaceUserRespnseDTO> usersList;
+    private List<SpaceUserResponseDTO> usersList;
     private List<String> imgUrl;
     private PostPositionDTO position;
 }

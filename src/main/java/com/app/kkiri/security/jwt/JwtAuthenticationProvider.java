@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.stereotype.Component;
 
-import com.app.kkiri.domain.dto.UserResponseDTO;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.repository.UsersDAO;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 			throw new OAuth2AuthenticationException(oauth2Error, "만료된 토큰입니다");
 		}
 
-		Long userId = jwtTokenProvider.getUserId(accessToken);
+		Long userId = jwtTokenProvider.getUserIdByToken(accessToken);
 		UserResponseDTO userResponseDTO = usersDAO.findById(userId);
 		if(userResponseDTO == null) {
 			OAuth2Error oauth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT);

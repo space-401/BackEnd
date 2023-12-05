@@ -2,9 +2,11 @@ package com.app.kkiri.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,8 +30,6 @@ public class SecurityConfig {
 	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-	// private final JwtTokenProvider jwtTokenProvider;
-	// private final UsersDAO usersDAO;
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,13 +38,8 @@ public class SecurityConfig {
 		http.csrf().disable();
 
 		http.authorizeRequests(requests -> requests
-			// .antMatchers("/").permitAll()
-			// .antMatchers("/user/auth/*").permitAll()
-			// .antMatchers("/user/refreshToken").permitAll()
 			.antMatchers("/**").permitAll()
 		);
-
-		// http.addFilterAfter(jwtFilter(), LogoutFilter.class);
 
 		http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
@@ -55,6 +50,9 @@ public class SecurityConfig {
 			.successHandler(oAuth2AuthenticationSuccessHandler)
 		);
 
+		http.logout(logout -> logout
+			.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
+
 		return http.build();
 	}
 
@@ -63,13 +61,13 @@ public class SecurityConfig {
 
 		// 주어진 요청의 실제 출처, HTTP 메소드 및 헤더를 확인하는 메소드와 함께 CORS 구성을 위한 컨테이너입니다.
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.addAllowedOrigin("https://www.kkiri.net");
 		corsConfiguration.addAllowedOrigin("http://localhost:3000");
-		corsConfiguration.addAllowedOrigin("http://localhost:8085");
+		corsConfiguration.addAllowedOrigin("https://d3u31m5mtxomjp.cloudfront.net");
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.addAllowedHeader("*");
 
-		// setAllowCredentials(true) 로 작성할 경우
-		// addAllowOrigin() 에 "*" 를 작성할 수 없다.
+		// setAllowCredentials(true) 로 작성할 경우 addAllowOrigin() 에 "*" 를 작성할 수 없다.
 		corsConfiguration.setAllowCredentials(true);
 
 		// URL 경로 패턴을 사용하여 요청에 대한 CorsConfiguration 을 선택하는 CorsConfigurationSource 입니다.
@@ -85,12 +83,4 @@ public class SecurityConfig {
 	public CustomOAuth2LoginConfigurer customOAuth2LoginConfigurer() {
 		return new CustomOAuth2LoginConfigurer();
 	}
-
-	// @Bean
-	// public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UsersDAO usersDAO) {
-	// 	JwtAuthenticationProvider jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtTokenProvider, usersDAO);
-	// 	AuthenticationManager authenticationManager = new ProviderManager(jwtAuthenticationProvider);
-	//
-	// 	return new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
-	// }
 }

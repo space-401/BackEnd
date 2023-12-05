@@ -4,27 +4,27 @@
 <mapper namespace="com.app.kkiri.mapper.SpaceUsersMapper">
     <select id="selectAll" resultType="spaceUserVO">
         SELECT user_id, user_nickname, profile_img_path
-        FROM SPACE_USERS
-        WHERE SPACE_ID=#{spaceId}
-        ORDER BY (CASE WHEN USER_ID = #{userId} THEN 1
-                        WHEN USER_ADMIN_YN='1' THEN 2 ELSE 3 END)
+        FROM space_users
+        WHERE space_id=#{spaceId}
+        ORDER BY (CASE WHEN user_id = #{userId} THEN 1
+                        WHEN user_admin_yn='1' THEN 2 ELSE 3 END)
     </select>
 
     <select id="selectById" resultType="spaceUserVO">
         SELECT user_admin_yn, user_nickname, profile_img_name, profile_img_path, profile_img_uuid, profile_img_size, space_signup_date, space_id, user_id
-        FROM SPACE_USERS
-        WHERE SPACE_ID=#{spaceId} AND USER_ID=#{userId}
+        FROM space_users
+        WHERE space_id=#{spaceId} AND user_id=#{userId}
     </select>
 
 <!-- int 로 가져와지는지 체크 -->
     <select id="selectByUserAdminYn" resultType="int">
-        SELECT USER_ADMIN_YN FROM SPACE_USERS
-        WHERE SPACE_ID=#{spaceId} AND USER_ID=#{userId}
+        SELECT user_admin_yn FROM space_users
+        WHERE space_id=#{spaceId} AND user_id=#{userId}
     </select>
 
     <select id="selectByFirst" resultType="int">
-        SELECT COUNT(USER_ID) FROM SPACE_USERS
-        WHERE SPACE_ID=#{spaceId} AND USER_ID=#{userId} AND USER_NICKNAME= 'default'
+        SELECT COUNT(user_id) FROM space_users
+        WHERE space_id=#{spaceId} AND user_id=#{userId} AND user_nickname= 'default'
     </select>
 
 <!--    <select id="getTotal" resultType="int">-->
@@ -33,38 +33,62 @@
 <!--    </select>-->
 
     <insert id="insert">
-        INSERT INTO SPACE_USERS(SPACE_ID, USER_ID, USER_NICKNAME, USER_ADMIN_YN, PROFILE_IMG_NAME, PROFILE_IMG_PATH, PROFILE_IMG_SIZE, PROFILE_IMG_UUID)
+        INSERT INTO space_users(space_id, user_id, user_nickname, user_admin_yn, profile_img_name, profile_img_path, profile_img_size, profile_img_uuid)
         VALUES(#{spaceId}, #{userId}, #{userNickname}, #{userAdminYn}, #{profileImgName}, #{profileImgPath}, #{profileImgSize}, #{profileImgUuid})
     </insert>
 
     <delete id="delete">
-        DELETE FROM SPACE_USERS
-        WHERE USER_ID=#{userId} AND SPACE_ID=#{spaceId}
+        DELETE FROM space_users
+        WHERE user_id=#{userId} AND space_id=#{spaceId}
     </delete>
 
     <update id="update">
-        UPDATE SPACE_USERS
-        SET USER_NICKNAME=#{userNickname}, PROFILE_IMG_NAME=#{profileImgName},
-            PROFILE_IMG_PATH=#{profileImgPath}, PROFILE_IMG_UUID=#{profileImgUuid},
-            PROFILE_IMG_SIZE=#{profileImgSize}
-        WHERE USER_ID=#{userId} AND SPACE_ID=#{spaceId}
+        UPDATE space_users
+        SET user_nickname=#{userNickname}, profile_img_name=#{profileImgName},
+            profile_img_path=#{profileImgPath}, profile_img_uuid=#{profileImgUuid},
+            profile_img_size=#{profileImgSize}
+        WHERE user_id=#{userId} AND space_id=#{spaceId}
     </update>
 
     <update id="updateByAdminYn">
-        UPDATE SPACE_USERS
-        SET USER_ADMIN_YN = '0'
-        WHERE USER_ADMIN_YN = '1' AND SPACE_ID=#{spaceId}
+        UPDATE space_users
+        SET user_admin_yn = FALSE
+        WHERE user_id = #{userId} AND space_id = #{spaceId}
     </update>
 
     <update id="updateByUserId">
-        UPDATE SPACE_USERS
-        SET USER_ADMIN_YN = '1'
-        WHERE USER_ID=#{userId} AND SPACE_ID=#{spaceId}
+        UPDATE space_users
+        SET user_admin_yn = TRUE
+        WHERE user_id=#{userId} AND space_id=#{spaceId}
     </update>
 
     <select id="selectByNickname" resultType="int">
-        SELECT COUNT(USER_ID) FROM SPACE_USERS
-        WHERE SPACE_ID=#{spaceId} AND USER_NICKNAME=#{userNickname}
+        SELECT COUNT(user_id) FROM space_users
+        WHERE space_id=#{spaceId} AND user_nickname=#{userNickname}
     </select>
 
+    <delete id="deleteByUserId">
+        DELETE FROM space_users
+        WHERE user_id = #{userId}
+    </delete>
+
+    <!-- postId 를 사용하여 해당 게시글을 작성한 사용자의 userNickname 을 조회 -->
+    <select id="selectUserNicknameByPostId" resultType="string">
+        SELECT su.user_nickname
+        FROM space_users su
+        INNER JOIN posts p
+        ON su.user_id = p.user_id
+        AND su.space_id = p.space_id
+        WHERE p.post_id = #{postId}
+    </select>
+
+    <!-- postId 와 spaceId 를 사용하여 게시글에 맨션된 회원 정보를 조회 -->
+    <select id="selectByPostIdAndSpaceId" resultType="spaceUserVO">
+        SELECT su.user_id, su.user_nickname, su.profile_img_path
+        FROM space_users su
+        INNER JOIN mention m
+        ON su.user_id = m.user_id
+        WHERE m.post_id = #{postId}
+        AND su.space_id = #{spaceId}
+    </select>
 </mapper>

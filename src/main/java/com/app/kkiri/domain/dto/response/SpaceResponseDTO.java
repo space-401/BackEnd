@@ -1,4 +1,4 @@
-package com.app.kkiri.domain.dto;
+package com.app.kkiri.domain.dto.response;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ public class SpaceResponseDTO {
     private Long spaceId;
     private String spaceTitle;
     private String imgUrl;
-    private List<SpaceUserRespnseDTO> userList;
+    private List<SpaceUserResponseDTO> userList;
 
-    public void create(Long spaceId, String spaceTitle, String imgUrl, List<SpaceUserRespnseDTO> userList) {
+    public void create(Long spaceId, String spaceTitle, String imgUrl, List<SpaceUserResponseDTO> userList) {
         this.spaceId = spaceId;
         this.spaceTitle = spaceTitle;
         this.imgUrl = imgUrl;

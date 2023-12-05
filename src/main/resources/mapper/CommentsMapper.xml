@@ -3,39 +3,59 @@
 
 <mapper namespace="com.app.kkiri.mapper.CommentsMapper">
     <insert id="insert">
+        INSERT INTO comments (comment_content, comment_ref_yn, comment_group, post_id, user_id)
+        VALUES (#{commentContent}, #{commentRefYn}, #{commentId}, #{postId}, #{userId})
         <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
-            SELECT SEQ_COMMENTS.nextval FROM DUAL
+            SELECT `auto_increment`
+            FROM information_schema.tables
+            WHERE table_schema = 'kkiri' AND table_name = 'comments'
         </selectKey>
-        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
-        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentId}, #{postId}, #{userId})
     </insert>
 
     <insert id="insertReply">
+        INSERT INTO comments (comment_content, comment_ref_yn, comment_group, post_id, user_id)
+        VALUES (#{commentContent}, #{commentRefYn}, #{commentGroup}, #{postId}, #{userId})
         <selectKey keyProperty="commentId" order="BEFORE" resultType="long">
-            SELECT SEQ_COMMENTS.nextval FROM DUAL
+            SELECT `auto_increment`
+            FROM information_schema.tables
+            WHERE table_schema = 'kkiri' AND table_name = 'comments'
         </selectKey>
-        INSERT INTO COMMENTS (COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, POST_ID, USER_ID)
-        VALUES (#{commentId}, #{commentContent}, #{commentRefYn}, #{commentGroup}, #{postId}, #{userId})
     </insert>
 
     <delete id="delete">
-        DELETE FROM COMMENTS
-        WHERE COMMENT_ID=#{commentId}
+        DELETE FROM comments
+        WHERE comment_id=#{commentId}
     </delete>
 
     <select id="selectById" resultType="commentVO">
-        SELECT COMMENT_ID, COMMENT_CONTENT, COMMENT_REF_YN, COMMENT_GROUP, COMMENT_REGISTER_DATE, USER_ID FROM COMMENTS
-        WHERE POST_ID=#{postId}
-        ORDER BY COMMENT_GROUP, COMMENT_ID
+        SELECT comment_id, comment_content, comment_ref_yn, comment_group, comment_register_date, user_id FROM comments
+        WHERE post_id=#{postId}
+        ORDER BY comment_group, comment_id
     </select>
 
     <select id="selectByGroup" resultType="long">
-        SELECT USER_ID FROM COMMENTS
-        WHERE COMMENT_ID=#{commentGroup}
+        SELECT user_id FROM comments
+        WHERE comment_id=#{commentGroup}
     </select>
 
     <select id="getTotal" resultType="long">
-        SELECT COUNT(COMMENT_ID) FROM COMMENTS
-        WHERE POST_ID=#{postId}
+        SELECT COUNT(comment_id) FROM comments
+        WHERE post_id=#{postId}
+    </select>
+
+    <!-- userId 와 startIndex 를 사용하여 사용자가 작성한 댓글을 조회 -->
+    <select id="selectByUserIdAndStartIndex" resultType="commentVO">
+        SELECT comment_id, comment_content, comment_register_date, post_id
+        FROM comments
+        WHERE user_id = #{userId}
+        ORDER BY comment_register_date DESC, comment_id DESC
+        LIMIT #{startIndex}, 4;
+    </select>
+    
+    <!-- userId 를 사용하여 사용자가 작성한 댓글의 수를 조회 -->
+    <select id="getTotalByUserId" resultType="long">
+        SELECT COUNT(comment_id)
+        FROM comments
+        WHERE user_id = #{userId}
     </select>
 </mapper>

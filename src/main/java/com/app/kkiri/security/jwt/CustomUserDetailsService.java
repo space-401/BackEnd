@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.app.kkiri.domain.dto.UserResponseDTO;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.repository.UsersDAO;
 import com.app.kkiri.security.oAuth2Login.AuthenticatedUser;
 

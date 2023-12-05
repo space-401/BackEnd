@@ -3,19 +3,19 @@
 
 <mapper namespace="com.app.kkiri.mapper.PostTagsMapper">
     <insert id="insert">
-        INSERT INTO POST_TAGS (POST_ID, TAG_ID)
+        INSERT INTO post_tags (post_id, tag_id)
         VALUES (#{postId}, #{tagId})
     </insert>
 
     <delete id="delete">
-        DELETE FROM POST_TAGS
-        WHERE POST_ID=#{postId}
+        DELETE FROM post_tags
+        WHERE post_id=#{postId}
     </delete>
 
     <select id="selectById" resultType="tagVO">
-        SELECT pt.TAG_ID, t.TAG_NAME
-        FROM POST_TAGS pt INNER JOIN TAGS t
-        ON pt.TAG_ID=t.TAG_ID
-        WHERE POST_ID=#{postId}
+        SELECT pt.tag_id, t.tag_name
+        FROM post_tags pt INNER JOIN tags t
+        ON pt.tag_id=t.tag_id
+        WHERE post_id=#{postId}
     </select>
 </mapper>

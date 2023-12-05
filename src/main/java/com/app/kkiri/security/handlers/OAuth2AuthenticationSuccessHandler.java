@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.app.kkiri.domain.dto.UserResponseDTO;
+import com.app.kkiri.domain.dto.response.UserResponseDTO;
 import com.app.kkiri.security.oAuth2Login.AuthenticatedOAuth2User;
 import com.google.gson.Gson;
 

@@ -3,19 +3,19 @@
 
 <mapper namespace="com.app.kkiri.mapper.MentionMapper">
     <insert id="insert">
-        INSERT INTO MENTION(POST_ID, USER_ID)
+        INSERT INTO mention (post_id, user_id)
         VALUES (#{postId}, #{userId})
     </insert>
 
     <select id="selectById" resultType="spaceUserVO">
-        SELECT u.USER_ID, u.USER_NICKNAME, u.PROFILE_IMG_PATH
-        FROM MENTION m INNER JOIN SPACE_USERS u
-        ON m.USER_ID = u.USER_ID
-        WHERE POST_ID=#{postId} AND SPACE_ID=#{spaceId}
+        SELECT u.user_id, u.user_nickname, u.profile_img_path
+        FROM mention m INNER JOIN space_users u
+        ON m.user_id = u.user_id
+        WHERE post_id=#{postId} AND space_id=#{spaceId}
     </select>
 
     <delete id="delete">
-        DELETE FROM MENTION
-        WHERE POST_ID=#{postId}
+        DELETE FROM mention
+        WHERE post_id=#{postId}
     </delete>
 </mapper>
