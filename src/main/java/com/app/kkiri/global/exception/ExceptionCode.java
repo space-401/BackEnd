@@ -12,7 +12,6 @@ public enum ExceptionCode {
 	DUPLICATED_MEMEBER_NICKNAME(1002, "중복된 닉네임입니다."),
 	ALREADY_SAVED_SPACE(1003, "이미 가입된 스페이스입니다."),
 	INVALID_SPACE_CODE_OR_PASSWORD(1004, "유효하지 않은 스페이스 코드나 비밀번호입니다."),
-	// FAIL_TO_DELETE_USER(1005, "스페이스의 방장은 회원 탈퇴를 할 수 없습니다."),
 
 	OVERSIZED_IMAGE(5001, "업로드 가능한 이미지 용량을 초과했습니다."),
 	MISSING_IMAGE(5002, "기본 이미지가 없습니다."),
@@ -25,6 +24,8 @@ public enum ExceptionCode {
 	FAIL_TO_VALIDATE_TOKEN(9103, "토큰 유효성 검사 중 오류가 발생했습니다."),
 	TOKEN_NOT_FOUND(9104, "헤더에 토큰 정보가 포함되어 있지 않습니다."),
 	UNAUTHORIZED_REQUEST(9105, "해당 요청에 대한 접근 권한이 없습니다."),
+	EMAIL_NOT_FOUND(9106, "토큰에 이메일 주소가 포함되어 있지 않습니다."),
+	EMAIL_ALREADY_EXIST(9107, "이미 가입된 이메일 주소입니다."),
 
 	INTERNAL_SEVER_ERROR(9999, "서버 에러가 발생하였습니다. 관리자에게 문의해 주세요.");
 

@@ -115,13 +115,11 @@ public class JwtTokenProvider {
 
 		try {
 			Date expirationDate = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
-			Date now = new Date();
-
-			boolean result = expirationDate.after(now);
+			boolean result = expirationDate.after(new Date());
 			LOGGER.info("[validateToken()] result : {}", result);
 
 			return result;
-		} catch (ExpiredJwtException ex) {
+		} catch (ExpiredJwtException ex) { // 토큰이 만료된 경우
 			throw new AuthException(EXPIRED_TOKEN);
 		} catch (JwtException ex){
 			throw new AuthException(INVALID_TOKEN);

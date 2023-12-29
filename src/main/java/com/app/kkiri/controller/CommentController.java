@@ -57,10 +57,11 @@ public class CommentController {
     @GetMapping("")
     // 댓글 조회
     public ResponseEntity<?> list(@RequestParam Long postId, @RequestParam Long spaceId, HttpServletRequest request){
+
         Long userId = jwtTokenProvider.getUserIdByHttpRequest(request);
+
         List<CommentResponseDTO> commentList = commentService.list(postId, spaceId, userId);
 
         return ResponseEntity.ok().body(commentList);
-
     }
 }

@@ -5,6 +5,7 @@ import static com.app.kkiri.global.exception.ExceptionCode.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.app.kkiri.global.exception.AuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -86,7 +87,7 @@ public class UserService {
 		// 토큰에 이메일 데이터가 없는 경우
 		String userEmail = customOAuth2User.getEmail();
 		if(userEmail == null) {
-			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), "토큰에 이메일 주소가 포함되어 있지 않습니다");
+			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), "토큰에 이메일 주소가 포함되어 있지 않습니다.");
 		}
 
 		UserResponseDTO selectedUser = usersDAO.findByUserEmail(userEmail);
@@ -94,7 +95,7 @@ public class UserService {
 
 		// 동일한 이메일 주소로 다른 소셜 로그인을 시도하는 경우
 		if(selectedUser != null && userEmail.equals(selectedUser.getUserEmail()) && !socialType.equals(selectedUser.getSocialType())) {
-			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT), "이미 가입된 이메일 주소입니다");
+			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT), "이미 가입된 이메일 주소입니다.");
 		}
 
 		UserResponseDTO userResponseDTO = null;

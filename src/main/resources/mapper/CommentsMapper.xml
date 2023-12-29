@@ -29,7 +29,7 @@
 
     <select id="selectById" resultType="commentVO">
         SELECT comment_id, comment_content, comment_ref_yn, comment_group, comment_register_date, user_id FROM comments
-        WHERE post_id=#{postId}
+        WHERE post_id = #{postId}
         ORDER BY comment_group, comment_id
     </select>
 
