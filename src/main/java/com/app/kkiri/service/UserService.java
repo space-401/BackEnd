@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.app.kkiri.global.exception.AuthException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -117,13 +118,12 @@ public class UserService {
 			usersDAO.save(userDTO);
 
 			userResponseDTO = usersDAO.findRecentUser();
-			LOGGER.info("register() [if 신규 회원인 경우 result] userResponseDTO : {}", userResponseDTO);
+			LOGGER.info("[register() 신규 회원인 경우] userResponseDTO : {}", userResponseDTO);
 		} else { // 기존 회원인 경우
 			userResponseDTO = usersDAO.findByUserEmail(userEmail);
-			LOGGER.info("register() [if 기존 회원인 경우 start] userResponseDTO : {}", userResponseDTO);
+			LOGGER.info("[register() 기존 회원인 경우] userResponseDTO : {}", userResponseDTO);
 
-			// 리프레쉬 토큰이 만료되어 다시 소셜 로그인을 하는 경우
-			if(!jwtTokenProvider.validateToken(userResponseDTO.getRefreshToken())) {
+			if(!jwtTokenProvider.validateToken(userResponseDTO.getRefreshToken())) { // 리프레시 토큰이 만료된 경우 리프레시 토큰과 액세스 토큰을 재발급한다.
 				Long selectedUserId = userResponseDTO.getUserId();
 
 				String newAccessToken = jwtTokenProvider.createAccessToken(selectedUserId);
@@ -131,7 +131,7 @@ public class UserService {
 				usersDAO.setTokens(selectedUserId, newAccessToken, newRefreshToken);
 
 				userResponseDTO = usersDAO.findById(selectedUserId);
-				LOGGER.info("register() [if 기존 회원인 경우 end] userResponseDTO : {}", userResponseDTO);
+				LOGGER.info("[register() 기존 회원인 경우] userResponseDTO : {}", userResponseDTO);
 			}
 		}
 
@@ -143,7 +143,7 @@ public class UserService {
 			.refreshToken(userResponseDTO.getRefreshToken())
 			.userEmail(userResponseDTO.getUserEmail())
 			.build();
-		LOGGER.info("register() returned value authenticatedOAuth2User : {}", authenticatedOAuth2User);
+		LOGGER.info("[register()] authenticatedOAuth2User : {}", authenticatedOAuth2User);
 
 		return authenticatedOAuth2User;
 	}

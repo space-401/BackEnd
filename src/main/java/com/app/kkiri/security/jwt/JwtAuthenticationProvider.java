@@ -33,6 +33,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 		LOGGER.info("[authenticate()] param jwtAuthenticationToken : {}", jwtAuthenticationToken);
 
 		String accessToken = jwtAuthenticationToken.getJwt();
+
 		if(!jwtTokenProvider.validateToken(accessToken)) {
 			OAuth2Error oauth2Error = new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN);
 			throw new OAuth2AuthenticationException(oauth2Error, "만료된 토큰입니다");
