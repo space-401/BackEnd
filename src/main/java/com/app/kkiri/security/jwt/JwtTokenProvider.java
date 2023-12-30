@@ -111,19 +111,22 @@ public class JwtTokenProvider {
 	}
 
 	// 토큰의 유효성과 만료일 체크
-	public boolean validateToken(String token) {
+	public boolean validateToken(String token) throws ExpiredJwtException {
+
+		boolean result;
 
 		try {
 			Date expirationDate = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
-			boolean result = expirationDate.after(new Date());
-			LOGGER.info("[validateToken()] result : {}", result);
-
-			return result;
-		} catch (ExpiredJwtException ex) { // 토큰이 만료된 경우
-			throw new AuthException(EXPIRED_TOKEN);
-		} catch (JwtException ex){
+			result = expirationDate.after(new Date());
+		} catch (ExpiredJwtException e) { // UserService 에서 result 의 값을 사용하여 토큰을 재발급할 수 있도록 한다.
+			result = false;
+		} catch (JwtException e) {
 			throw new AuthException(INVALID_TOKEN);
 		}
+
+		LOGGER.info("[validateToken()] result : {}", result);
+
+		return result;
 	}
 
 	// 헤더에서 토큰 추출
